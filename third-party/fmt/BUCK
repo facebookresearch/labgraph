@@ -1,0 +1,15 @@
+cxx_library(
+  name = "fmt",
+  preferred_linkage="static",
+  header_namespace = "third-party/fmt/include",
+  srcs = [
+    "src/format.cc",
+  ],
+  exported_headers = glob(["include/fmt/*.h"]),
+  public_include_directories=["include"],
+  visibility = [
+    "PUBLIC",
+  ],
+  exported_preprocessor_flags = ["-DFMT_EXCEPTIONS=0"],
+  link_whole = True,
+)

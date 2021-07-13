@@ -1,0 +1,9 @@
+cxx_library(
+    name="logging",
+    preferred_linkage="static",
+    raw_headers=glob(["include/logging/*.h"]),
+    header_namespace="logging",
+    public_include_directories=["include"],
+    deps=["//third-party/fmt:fmt"],
+    visibility=["PUBLIC"],
+)

@@ -1,0 +1,49 @@
+with allow_unsafe_import():
+    import os, platform, shutil
+
+PYTHON_VERSION = "3.6"
+
+
+def _config_var(executable, key):
+    cmd = " ".join(
+        [
+            executable,
+            "-c",
+            "\"import sysconfig; print(sysconfig.get_config_var('" + key + "'))\"",
+        ]
+    )
+    output_pipe = os.popen(cmd)
+    output_str = output_pipe.read()
+    return output_str.strip()
+
+
+def config_var(key):
+    for executable in ("python", "python3", "python" + PYTHON_VERSION):
+        if not shutil.which(executable):
+            continue
+        if _config_var(executable, "py_version_short") != "3.6":
+            continue
+        return _config_var(executable, key)
+    raise Exception("Could not find Python " + PYTHON_VERSION + " on PATH")
+
+
+PYTHON_SHARED_LIB_DIR = (
+    config_var("BINDIR") if platform.system() == "Windows" else config_var("LIBDIR")
+)
+PYTHON_SHARED_LIB_FILENAME = (
+    "python" + PYTHON_VERSION.replace(".", "") + ".dll"
+    if platform.system() == "Windows"
+    else config_var("LDLIBRARY")
+)
+PYTHON_SHARED_LIB_PATH = PYTHON_SHARED_LIB_DIR + os.sep + PYTHON_SHARED_LIB_FILENAME
+
+PYTHON_STATIC_LIB_DIR = {
+    "Windows": lambda: config_var("BINDIR") + os.sep + "libs",
+    "Darwin": lambda: config_var("LIBPL"),
+    "Linux": lambda: config_var("LIBDIR"),
+}[platform.system()]()
+
+PYTHON_STATIC_LIB_FILENAME = "python" + PYTHON_VERSION.replace(".", "") + ".lib" if platform.system() == "Windows" else config_var("LIBRARY")
+PYTHON_STATIC_LIB_PATH = PYTHON_STATIC_LIB_DIR + os.sep + PYTHON_STATIC_LIB_FILENAME
+
+PYTHON_INCLUDE_DIR = config_var("INCLUDEPY")

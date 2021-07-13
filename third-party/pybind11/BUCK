@@ -1,0 +1,9 @@
+cxx_library(
+    name = "pybind11",
+    header_namespace = "third-party/pybind11/include",
+    public_include_directories = ["include"],
+    preferred_linkage = "static",
+    exported_headers = glob(["include/pybind11/**/*.h"]),
+    deps = ["//third-party/python:python3.6"],
+    visibility = ["PUBLIC"],
+)

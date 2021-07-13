@@ -1,0 +1,18 @@
+// Copyright 2004-present Facebook. All Rights Reserved.
+
+#pragma once
+
+namespace cthulhu {
+
+class ForceCleanable {
+ public:
+  virtual ~ForceCleanable() = default;
+  virtual inline void forceClean() {
+    force_clean_ = true;
+  }
+
+ protected:
+  bool force_clean_ = false;
+};
+
+} // namespace cthulhu

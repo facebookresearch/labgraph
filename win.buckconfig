@@ -1,0 +1,10 @@
+[cxx]
+  ar = win/ar.bat
+  archiver_platform = windows
+  cxxpp = win/cxxpp.bat
+  cxxpp_type = windows
+  cxx = win/cxx.bat
+  cxxflags = /std:c++17 /EHsc
+  cxx_type = windows
+  ld = win/ld.bat
+  linker_platform = windows

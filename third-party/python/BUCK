@@ -1,0 +1,41 @@
+load("//:DEFS", "PLATFORM")
+load("//third-party/python:DEFS", "PYTHON_SHARED_LIB_DIR", "PYTHON_SHARED_LIB_PATH", "PYTHON_STATIC_LIB_PATH", "PYTHON_INCLUDE_DIR", "PYTHON_VERSION", "PYTHON_STATIC_LIB_FILENAME", "PYTHON_SHARED_LIB_FILENAME")
+
+genrule(
+    name = "python" + PYTHON_VERSION + "_include",
+    cmd_exe = "xcopy /s /h /e /k /f /i \"" + PYTHON_INCLUDE_DIR + "\" \"$OUT\"",
+    bash = "cp -r \"" + PYTHON_INCLUDE_DIR + "\" \"$OUT\"",
+    out = "include",
+)
+
+
+if PLATFORM == "win":
+    # Static linking on Windows
+    genrule(
+        name = "python" + PYTHON_VERSION + "_lib",
+        cmd_exe = "copy /b \"" + PYTHON_STATIC_LIB_PATH + "\" \"$OUT\"",
+        out = PYTHON_STATIC_LIB_FILENAME,
+    )
+
+    prebuilt_cxx_library(
+        name = "python" + PYTHON_VERSION,
+        header_dirs = [":python" + PYTHON_VERSION + "_include"],
+        static_lib = ":python" + PYTHON_VERSION + "_lib",
+        preferred_linkage = "static",
+        visibility = ["PUBLIC"],
+    )
+else:
+    # Dynamic linking on UNIX
+    genrule(
+        name = "python" + PYTHON_VERSION + "_lib",
+        bash = "cp \"" + PYTHON_SHARED_LIB_PATH + "\" \"$OUT\"",
+        out = PYTHON_SHARED_LIB_FILENAME,
+    )
+
+    prebuilt_cxx_library(
+        name = "python" + PYTHON_VERSION,
+        header_dirs = [":python" + PYTHON_VERSION + "_include"],
+        shared_lib = ":python" + PYTHON_VERSION + "_lib",
+        preferred_linkage = "shared",
+        visibility = ["PUBLIC"],
+    )

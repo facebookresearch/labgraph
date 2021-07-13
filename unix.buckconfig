@@ -1,0 +1,5 @@
+[cxx]
+  cxxppflags = -Wall -std=c++17
+  cxxpp = /usr/bin/g++
+  cxx = /usr/bin/g++
+  ld = /usr/bin/g++

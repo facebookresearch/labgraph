@@ -1,0 +1,10 @@
+HOST_INFO = host_info()
+
+if HOST_INFO.os.is_macos:
+    PLATFORM = "mac"
+elif HOST_INFO.os.is_windows:
+    PLATFORM = "win"
+elif HOST_INFO.os.is_linux:
+    PLATFORM = "linux"
+else:
+    raise Exception("Unsupported platform")

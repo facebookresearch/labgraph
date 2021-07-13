@@ -1,0 +1,173 @@
+load("//:DEFS", "PLATFORM")
+
+BOOST_DATE_TIME_RAW_HEADERS = ["boost/date_time.h*", "boost/date_time/**/*.h*", "boost/date_time/**/*.ipp"]
+BOOST_THREAD_RAW_HEADERS = [
+    "boost/thread.h*",
+    "boost/thread/**/*.h*",
+    "libs/thread/**/*.h*",
+    "libs/thread/src/pthread/once_atomic.cpp",
+]
+BOOST_CHRONO_RAW_HEADERS = [
+    "boost/chrono.h*",
+    "boost/chrono/**/*.h*",
+    "libs/chrono/**/*.h*",
+]
+BOOST_SYSTEM_RAW_HEADERS = [
+    "boost/system/**/*.h*",
+    "libs/system/**/*.h*",
+]
+
+CXXFLAGS = [
+    "-fexceptions",
+    "-Wall",
+    "-Wno-narrowing",
+    "-Wno-overloaded-virtual",
+    "-Wno-shadow",
+    "-Wno-unused-function",
+    "-Wno-unused-variable",
+    "-Wno-unused-parameter",
+    "-Wno-unused-local-typedefs",
+    "-frtti",
+]
+
+WINCXXFLAGS = [
+    "-DBOOST_THREAD_BUILD_LIB",
+]
+
+PUBLIC_PREPROCESSOR_FLAGS = [
+    "-DBOOST_ALL_NO_LIB",
+    "-DBOOST_PP_VARIADICS=1",
+]
+
+PREPROCESSOR_WINDOWS_FLAGS = [
+    "-DWIN32_LEAN_AND_MEAN",
+]
+
+cxx_library(
+    name = "boost",
+    header_namespace = "third-party/boost",
+    preferred_linkage = "static",
+    public_include_directories = ["."],
+    preprocessor_flags = PUBLIC_PREPROCESSOR_FLAGS,
+    raw_headers = glob(
+        ["boost/*.h*", "boost/**/*.h*", "boost/**/*.ipp", "libs/**/*.h*"],
+        exclude = glob(BOOST_DATE_TIME_RAW_HEADERS) + glob(BOOST_THREAD_RAW_HEADERS) + glob(BOOST_CHRONO_RAW_HEADERS) + glob(BOOST_SYSTEM_RAW_HEADERS) + [
+            "boost/asio.h*",
+            "boost/asio/**/*.h*",
+            "boost/asio/**/*.ipp",
+            "boost/context/**/*.h*",
+            "libs/context/**/*.h*",
+            "boost/coroutine/**/*.h*",
+            "libs/coroutine/**/*.h*",
+            "boost/dll.h*",
+            "boost/dll/**/*.h*",
+            "boost/filesystem.h*",
+            "boost/filesystem/**/*.h*",
+            "libs/filesystem/**/*.h*",
+            "boost/interprocess/**/*.hpp",
+            "boost/iostreams/**/*.h*",
+            "libs/iostreams/**.h*",
+            "boost/log/**/*.h*",
+            "libs/log/**/*.h*",
+            "boost/program_options.h*",
+            "boost/program_options/**/*.h*",
+            "libs/program_options/**/*.h*",
+            "boost/python.h*",
+            "boost/python/**/*.h*",
+            "libs/python/**/*.h*",
+            "boost/*regex*.h*",
+            "boost/regex/**/*.h*",
+            "boost/algorithm/**/*regex*.h*",
+            "libs/regex/**/*.h*",
+            "libs/serialization/**/*.h*",
+            "libs/serialization/**/*.ipp",
+            "boost/timer.h*",
+            "boost/timer/**/*.h*",
+            "libs/timer/**/*.h*",
+        ],
+    ),
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "boost_date_time",
+    header_namespace = "third-party/boost",
+    preferred_linkage = "static",
+    include_directories = ["."],
+    compiler_flags = {
+        "win": WINCXXFLAGS,
+    }.get(PLATFORM, CXXFLAGS),
+    preprocessor_flags = {
+        "win": PREPROCESSOR_WINDOWS_FLAGS,
+    }.get(PLATFORM, []) + PUBLIC_PREPROCESSOR_FLAGS,
+    srcs = glob(["libs/date_time/src/gregorian/*.cpp"]),
+    raw_headers = glob(BOOST_DATE_TIME_RAW_HEADERS),
+    exported_deps = [":boost"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "boost_thread",
+    header_namespace = "third-party/boost",
+    preferred_linkage = "static",
+    srcs = {
+        "win": [
+            "libs/thread/src/future.cpp",
+            "libs/thread/src/tss_null.cpp",
+            "libs/thread/src/win32/thread.cpp",
+            "libs/thread/src/win32/tss_dll.cpp",
+            "libs/thread/src/win32/tss_pe.cpp",
+        ],
+    }.get(PLATFORM, [
+        "libs/thread/src/future.cpp",
+        "libs/thread/src/pthread/once.cpp",
+        "libs/thread/src/pthread/thread.cpp",
+        "libs/thread/src/pthread/once_atomic.cpp",
+    ]),
+    compiler_flags = {
+        "win": WINCXXFLAGS,
+    }.get(PLATFORM, CXXFLAGS + ["-Wno-non-virtual-dtor"]),
+    include_directories = ["."],
+    preprocessor_flags = {
+        "win": PREPROCESSOR_WINDOWS_FLAGS,
+    }.get(PLATFORM, []) + PUBLIC_PREPROCESSOR_FLAGS,
+    exported_deps = [":boost", ":boost_chrono", ":boost_date_time", ":boost_system"],
+    raw_headers = glob(BOOST_THREAD_RAW_HEADERS),
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "boost_chrono",
+    preferred_linkage = "static",
+    srcs = [
+        "libs/chrono/src/chrono.cpp",
+        "libs/chrono/src/process_cpu_clocks.cpp",
+        "libs/chrono/src/thread_clock.cpp",
+    ],
+    compiler_flags = {
+        "win": WINCXXFLAGS,
+    }.get(PLATFORM, CXXFLAGS),
+    include_directories = ["."],
+    preprocessor_flags = {
+        "win": PREPROCESSOR_WINDOWS_FLAGS,
+    }.get(PLATFORM, []) + PUBLIC_PREPROCESSOR_FLAGS,
+    exported_deps = [":boost", ":boost_system"],
+    raw_headers = glob(BOOST_CHRONO_RAW_HEADERS),
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "boost_system",
+    preferred_linkage = "static",
+    srcs = glob(["libs/system/src/**/*.cpp"]),
+    compiler_flags = {
+        "win": WINCXXFLAGS,
+    }.get(PLATFORM, CXXFLAGS),
+    include_directories = ["."],
+    preprocessor_flags = {
+        "win": PREPROCESSOR_WINDOWS_FLAGS,
+    }.get(PLATFORM, []) + PUBLIC_PREPROCESSOR_FLAGS,
+    exported_deps = [":boost"],
+    raw_headers = glob(BOOST_SYSTEM_RAW_HEADERS),
+    visibility = ["PUBLIC"],
+)
