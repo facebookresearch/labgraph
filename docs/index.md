@@ -1,6 +1,6 @@
 # Introduction
 
-LabGraph is a Python framework for building real-time research systems. The Facebook Reality Lab Research (FRLR) team at Facebook uses it to rapidly prototype and test new wearable hardware systems, experimental stimulus protocols, digital signal processing steps, and live visualizations. LabGraph has allowed FRLR to greatly accelerate its pace of experimentation. We hope for other groups to benefit from this tooling as well.
+LabGraph is a Python framework for building real-time research systems. The Facebook Reality Labs Research (FRLR) team at Facebook uses it to rapidly prototype and test new wearable hardware systems, experimental stimulus protocols, digital signal processing steps, and live visualizations. LabGraph has allowed FRLR to greatly accelerate its pace of experimentation. We hope for other groups to benefit from this tooling as well.
 
 More specifically, LabGraph provides a way to define a computational graph in a standardized way. This results in a less tedious development process for real-time algorithms and systems. In other words, the framework decides how data types, computations, and connections between the inputs and outputs of related computations should be stated, and then it sets up the boilerplate needed to run these streaming computations efficiently in parallel. In turn, the researcher is able to focus on developing individual real-time algorithms while assuming the rest of the system runs correctly.
 
