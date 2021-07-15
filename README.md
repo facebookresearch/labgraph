@@ -31,7 +31,7 @@ You can also run the test suite as follows:
 python -m pytest --pyargs labgraph
 ```
 
-Now go to the [documentation](docs/) to learn more!
+Now go to the [index](docs/index.md) and [documentation](docs/) to learn more!
 
 
 **License**:
