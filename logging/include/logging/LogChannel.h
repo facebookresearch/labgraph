@@ -21,7 +21,7 @@ void log(const char* channel, const char* levelName, ::arvr::logging::Level leve
 
   char* const out = ::fmt::format_to_n(buffer, kLogCapacity, std::forward<Args>(args)...).out;
   int lineLength = out - buffer;
-  std::string line(out, out + lineLength);
+  std::string line(buffer, out + lineLength);
 
   stubLog("[{}][{}] {}", channel, levelName, line);
 }
