@@ -104,7 +104,7 @@ class RollingAverager(lg.Node):
         mean_data = np.mean(all_data, axis=0)
         yield self.OUTPUT, RandomMessage(timestamp=current_time, data=mean_data)
 ```
-First, we define some state & configuration - see [Lifecycles and Configuration](lifecycles-and-configuration) for details. Then we define the `RollingAverager` node:
+First, we define some state & configuration - see [Lifecycles and Configuration](lifecycles-and-configuration.md) for details. Then we define the `RollingAverager` node:
 
 * We define two topics, `INPUT` and `OUTPUT` which are references to streams of type `RandomMessage`. These topics are local to the `RolingAverager` node; it is the only node that can interact with them. When we construct a graph, we can point these topics at whatever streams we want.
 * We define a method `average` to describe the averaging algorithm.
