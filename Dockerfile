@@ -10,9 +10,9 @@ RUN yum install -y python2 python36 python36-devel wget java-1.8.0-openjdk \
 
 # Install Ant
 WORKDIR "/tmp"
-RUN wget https://downloads.apache.org/ant/binaries/apache-ant-1.10.9-bin.zip
-RUN unzip apache-ant-1.10.9-bin.zip \
-    && mv apache-ant-1.10.9/ /opt/ant \
+RUN wget https://downloads.apache.org/ant/binaries/apache-ant-1.10.11-bin.zip
+RUN unzip apache-ant-1.10.11-bin.zip \
+    && mv apache-ant-1.10.11/ /opt/ant \
     && ln -s /opt/ant/bin/ant /usr/bin/ant
 
 # Download Buck
