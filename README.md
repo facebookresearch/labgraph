@@ -23,6 +23,11 @@ pip install labgraph
 - [Python 3.6](https://www.python.org/downloads/release/python-368/) (note: currently incompatible with Anaconda)
 - **Windows only:** [Build Tools for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019)
 
+```
+cd labgraph
+python setup.py install
+```
+
 ### Method 3 - using Docker
 
 **Prerequisites**:
