@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserved.
+
+# docker build -t ubuntu20py36
+FROM ubuntu:20.04
+RUN apt-get update && \
+  apt-get install -y software-properties-common && \
+  add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update
+
+RUN apt-get install -y build-essential python3.6 python3.6-dev python3-pip 
+
+RUN export LC_ALL=C.UTF-8
+RUN export LANG=en_US.utf-8
+
+RUN python3.6 -m pip install labgraph
