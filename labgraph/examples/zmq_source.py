@@ -21,7 +21,7 @@ def stream_samples(socket):
         n += 1
         print(f"\r{c[n % 4]}", end="")
 
-
+# Create a sample zmq PUB which publishes to TOPIC at address ENDPOINT
 if __name__ == '__main__':
     context = zmq.Context()
     socket = context.socket(zmq.PUB)

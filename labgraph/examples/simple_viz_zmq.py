@@ -22,7 +22,6 @@ import numpy as np
 
 
 # Constants used by nodes
-SAMPLE_RATE = 10.0
 NUM_FEATURES = 100
 WINDOW = 2.0
 REFRESH_RATE = 2.0
@@ -93,7 +92,6 @@ class RollingAverager(lg.Node):
 
 # Configuration for AveragedNoise
 class AveragedNoiseConfig(lg.Config):
-    sample_rate: float  # Rate at which to generate noise
     num_features: int  # Number of features to generate
     window: float  # Window, in seconds, to average over
     read_addr: str
@@ -198,7 +196,7 @@ class Demo(lg.Graph):
         # have a configuration object provided to this graph as well).
         self.AVERAGED_NOISE.configure(
             AveragedNoiseConfig(
-                sample_rate=SAMPLE_RATE, num_features=NUM_FEATURES, window=WINDOW,
+                num_features=NUM_FEATURES, window=WINDOW,
                 read_addr=ENDPOINT, zmq_topic=TOPIC, poll_time=1.0
             )
         )
@@ -216,6 +214,8 @@ class Demo(lg.Graph):
 
 
 # Entry point: run the Demo graph
+# This demo does the same thing as simple_viz.py, but uses a zmq source (zmq_source.py) rather
+# than a hardcoded source.
 if __name__ == "__main__":
     print("Initializing ZMQ demo - please run zmq_source.py in another terminal.")
     lg.run(Demo)
