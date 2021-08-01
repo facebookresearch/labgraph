@@ -1,5 +1,6 @@
-RUN export LC_ALL=C.UTF-8
-RUN export LANG=en_US.utf-8
+# Copyright 2004-present Facebook. All Rights Reserved.
+# RUN export LC_ALL=C.UTF-8
+# RUN export LANG=en_US.utf-8
 
 python3.6 -m pytest --pyargs -v labgraph._cthulhu
 python3.6 -m pytest --pyargs -v labgraph.events
