@@ -37,4 +37,6 @@ TL;DR: Based on a performance test in this doc, LabGraph and Cthulhu support 100
 
 ## Overall Takeaways
 * This study provides a high level picture of how LabGraph and Cthulhu perform on different platforms. What we can see for sure is that the order of magnitude we are dealing with is several kHz of samples and 100s of MB/s of data transfer that Dragonfly can support. The uncertainty comes from the tests that were written, in particular when we try to compare across languages. Still, from speaking with our colleagues in Pittsburgh who work on Cthulhu, it sounds like this is a reasonable starting point for understanding our performance that we can build upon. For example, we can take these metrics, start logging them, and monitor for regressions; even if the metrics aren’t perfect, sudden movements in them could alert us to potentially faulty changes. This also gives us a reasonable ballpark for whether or not we would be able to support the data rate of a proposed hardware system.
-* Please share your thoughts and suggestions! Measuring and tuning the performance of our frameworks is a work in progress. Additional ideas for testing methods and analyses are recommended.
+* Please share your thoughts and suggestions! Measuring and tuning the performance of our frameworks is a work in progress. Additional ideas for testing methods and analyses are welcomed.
+
+More details on the analysis can be found [here](https://github.com/facebookresearch/labgraph/tree/master/docs/performance).
