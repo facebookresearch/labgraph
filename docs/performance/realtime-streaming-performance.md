@@ -40,3 +40,4 @@ TL;DR: Based on a performance test in this doc, LabGraph and Cthulhu support 100
 * Please share your thoughts and suggestions! Measuring and tuning the performance of our frameworks is a work in progress. Additional ideas for testing methods and analyses are welcomed.
 
 More details on the analysis can be found [here](https://github.com/facebookresearch/labgraph/tree/master/docs/performance).
+Sample test run: python load_test.py --duration 30 --output load_test.h5
