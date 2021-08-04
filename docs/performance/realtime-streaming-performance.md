@@ -4,14 +4,13 @@ TL;DR: Based on a performance test in this doc, LabGraph and Cthulhu support 100
 
 ## Plots
 
-.. figure:: https://github.com/facebookresearch/labgraph/tree/master/docs/performance/images/sample_rate_data_transfer_cross_platform_language.png
-   :alt: Sample Rate and Data Transfer cross Platfrom and Language
+![Sample Rate and Data Transfer cross Platfrom and Language](https://raw.githubusercontent.com/facebookresearch/labgraph/master/docs/performance/images/sample_rate_data_transfer_cross_platform_language.png)
 
-.. figure:: https://github.com/facebookresearch/labgraph/tree/master/docs/performance/images/sample_rate_data_transfer_rate_by_block_size.png
-   :alt: Sample Rate and Data Transfer by Block Size
+![Sample Rate and Data Transfer by Block Size](https://raw.githubusercontent.com/facebookresearch/labgraph/master/docs/performance/images/sample_rate_data_transfer_rate_by_block_size.png)
 
-.. figure:: https://github.com/facebookresearch/labgraph/tree/master/docs/performance/images/sample_latency.png
-   :alt: Sample Latency
+<p align="center">
+   <img width="460*2" height="300*2" src="https://raw.githubusercontent.com/facebookresearch/labgraph/master/docs/performance/images/sample_latency.png">
+</p>
 
 ## Discussion
 
