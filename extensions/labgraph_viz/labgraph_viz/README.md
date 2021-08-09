@@ -29,4 +29,4 @@ python -m labgraph.extensions.labgraph_viz.labgraph_viz.spatial_plot_example
 ```
 
 ### Contributers:
-Ryan Catoen, Pradeep Damodara, John Princeton, Dev Chakraborty
+Ryan Catoen, Pradeep Damodara, John Princen, Dev Chakraborty
