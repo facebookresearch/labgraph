@@ -27,3 +27,6 @@ python -m labgraph.extensions.labgraph_viz.labgraph_viz.line_plot_example
 python -m labgraph.extensions.labgraph_viz.labgraph_viz.scatter_plot_example
 python -m labgraph.extensions.labgraph_viz.labgraph_viz.spatial_plot_example
 ```
+
+### Contributers:
+Ryan Catoen, Pradeep Damodara, John Princeton, Dev Chakraborty
