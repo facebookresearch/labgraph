@@ -11,11 +11,8 @@ setup(
     packages=find_packages(),
     python_requires=">=3.6, <3.7",
     install_requires=[
-        "dataclasses",
-        "labgraph",
-        "matplotlib",
-        "numpy",
-        "PyQt5-sip",
-        "pyqtgraph",
+        "labgraph>=1.0.2",
+        "PyQt5-sip==12.8.1",
+        "pyqtgraph==0.11.1",
     ],
 )
