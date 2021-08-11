@@ -35,8 +35,7 @@ PYTHON_SHARED_LIB_FILENAME = (
     if platform.system() == "Windows"
     else config_var("LDLIBRARY")
 )
-#PYTHON_SHARED_LIB_PATH = PYTHON_SHARED_LIB_DIR + os.sep + PYTHON_SHARED_LIB_FILENAME
-PYTHON_SHARED_LIB_PATH = os.path.dirname(PYTHON_SHARED_LIB_DIR) + os.sep + "Python"
+PYTHON_SHARED_LIB_PATH = PYTHON_SHARED_LIB_DIR + os.sep + PYTHON_SHARED_LIB_FILENAME
 
 PYTHON_STATIC_LIB_DIR = {
     "Windows": lambda: config_var("BINDIR") + os.sep + "libs",
