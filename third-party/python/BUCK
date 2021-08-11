@@ -29,7 +29,8 @@ else:
     genrule(
         name = "python" + PYTHON_VERSION + "_lib",
         bash = "cp \"" + PYTHON_SHARED_LIB_PATH + "\" \"$OUT\"",
-        out = PYTHON_SHARED_LIB_FILENAME,
+        #out = PYTHON_SHARED_LIB_FILENAME,
+        out = "Python",
     )
 
     prebuilt_cxx_library(
