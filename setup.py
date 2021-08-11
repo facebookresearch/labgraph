@@ -22,7 +22,7 @@ LIBRARY_EXTENSIONS = [
 
 setup(
     name="labgraph",
-    version="1.0.0",
+    version="1.0.1",
     description="Python streaming framework",
     packages=find_packages(),
     package_data={"labgraph": ["tests/mypy.ini"]},

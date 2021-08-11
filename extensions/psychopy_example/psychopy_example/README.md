@@ -11,9 +11,16 @@ Provides example usage of psychopy with labgraph.
 Make sure to install labgraph before proceeding
 
 ```
-cd labgraph/extensions/psychopy_example
+cd extensions/psychopy_example
 python setup.py install
 ```
+
+#### Install-time issues
+1. msgpack install fails, but `numpy requires msgpack`
+   - Re-run the install command, installation will continue
+
+2. Missing swig.exe, `No such file or directory`
+   - https://stackoverflow.com/questions/44504899/installing-pocketsphinx-python-module-command-swig-exe-failed
 
 ### Testing:
 

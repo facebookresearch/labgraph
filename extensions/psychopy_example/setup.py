@@ -24,7 +24,7 @@ setup(
         "pyglet==1.5.16",
         # Actual dependencies for this package
         "importlib-resources~=5.2",
-        "labgraph~=1.0",
+        "labgraph~=1.0.1",
         "psychopy~=3.2.4",
     ],
 )
