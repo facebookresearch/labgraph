@@ -14,6 +14,16 @@ setup(
     },
     python_requires=">=3.6, <3.7",
     install_requires=[
+        # psychopy does not enforce versions, causing conflicts with labgraph deps.
+        # Forcing specific versions at install time should help mitigate this issue.
+        "cython",
+        "scipy==1.5.4",
+        "pandas==0.25.1",
+        "xarray==0.16.2",
+        "moviepy==1.0.1",
+        "pyglet==1.5.16",
+        # Actual dependencies for this package
+        "importlib-resources~=5.2",
         "labgraph~=1.0",
         "psychopy~=3.2.4",
     ],

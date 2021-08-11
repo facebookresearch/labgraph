@@ -4,6 +4,7 @@
 import asyncio
 from typing import Dict, List
 
+import importlib_resources
 import labgraph as lg
 from psychopy import monitors, visual
 
@@ -50,9 +51,10 @@ class Display(lg.Node):
         self._shutdown = True
 
     def _setup_stims(self, window: visual.Window) -> Dict[str, visual.BaseVisualStim]:
-        image_stim = visual.ImageStim(
-            window, image="psychopy_example/images/null.png", pos=(0, 0)
-        )
+        files = importlib_resources.files("psychopy_example")
+        null = files / "images" / "null.png"
+        with importlib_resources.as_file(null) as null_path:
+            image_stim = visual.ImageStim(window, image=str(null_path), pos=(0, 0))
         text_stim = visual.TextStim(window, text="Example Text", pos=(0, 0))
         self._stims = {
             "image": image_stim,

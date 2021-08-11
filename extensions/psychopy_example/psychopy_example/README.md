@@ -17,10 +17,9 @@ python setup.py install
 
 ### Testing:
 
-To make sure things are working you can run any of the following examples
-
+To make sure things are working you can run the following example from the labgraph dir:
 ```
-python -m labgraph.extensions.psychopy_example.psychopy_example
+python -m extensions.psychopy_example.psychopy_example
 ```
 
 ### Contributers:
