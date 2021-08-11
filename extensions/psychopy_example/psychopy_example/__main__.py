@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
+from typing import Dict, Sequence
+
 import labgraph as lg
 
 from .components import Controller, Display
@@ -19,10 +21,7 @@ class PsychopyExample(lg.Graph):
         )
 
     def logging(self) -> Dict[str, lg.Topic]:
-        return {
-            "keys": self.DISPLAY.KEYS_TOPIC,
-            "changes": self.CONTROLLER.DISPLAY_TOPIC,
-        }
+        return {"changes": self.CONTROLLER.DISPLAY_TOPIC}
 
 
 if __name__ == "__main__":

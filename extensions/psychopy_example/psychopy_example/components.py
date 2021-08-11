@@ -2,7 +2,7 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 import asyncio
-from typing import List
+from typing import Dict, List
 
 import labgraph as lg
 from psychopy import monitors, visual
@@ -28,13 +28,13 @@ class Controller(lg.Node):
         self._keys = message.keys
 
     @lg.publisher(DISPLAY_TOPIC)
-    def control(self) -> lg.AsyncPublisher:
+    async def control(self) -> lg.AsyncPublisher:
         while self._keys is None:
-            asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)
         for i in range(10):
             key = self._keys[i % len(self._keys)]
-            yield (DISPLAY_TOPIC, DisplayMessage(key))
-            asyncio.sleep(5.0)
+            yield (self.DISPLAY_TOPIC, DisplayMessage(key))
+            await asyncio.sleep(1.0)
         raise lg.NormalTermination()
 
 
@@ -50,7 +50,9 @@ class Display(lg.Node):
         self._shutdown = True
 
     def _setup_stims(self, window: visual.Window) -> Dict[str, visual.BaseVisualStim]:
-        image_stim = visual.ImageStim(window, image="images/null.png", pos=(0, 0))
+        image_stim = visual.ImageStim(
+            window, image="psychopy_example/images/null.png", pos=(0, 0)
+        )
         text_stim = visual.TextStim(window, text="Example Text", pos=(0, 0))
         self._stims = {
             "image": image_stim,
@@ -58,8 +60,9 @@ class Display(lg.Node):
         }
 
     @lg.publisher(KEYS_TOPIC)
+    async def send_keys(self) -> lg.AsyncPublisher:
         while self._stims is None:
-            asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)
         yield(self.KEYS_TOPIC, KeysMessage(list(self._stims.keys())))
 
     @lg.subscriber(DISPLAY_TOPIC)
