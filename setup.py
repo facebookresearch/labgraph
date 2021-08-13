@@ -22,7 +22,7 @@ LIBRARY_EXTENSIONS = [
 
 setup(
     name="labgraph",
-    version="1.0.1",
+    version="1.0.3",
     description="Python streaming framework",
     packages=find_packages(),
     package_data={"labgraph": ["tests/mypy.ini"]},
@@ -42,7 +42,7 @@ setup(
         "pytest_mock==2.0.0",
         "pyzmq==18.1.0",
         "typeguard==2.5.1",
-        "typing_extensions~=3.7.4",
+        "typing_extensions>=3.7.4.3",
         "yappi==1.2.5",
     ],
 )
