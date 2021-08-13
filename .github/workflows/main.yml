@@ -7,7 +7,7 @@ jobs:
     steps:
       - name: Hello world action step
         id: hello
-        uses: facebookresearch/labgraph@1.0.0
+        uses: facebookresearch/labgraph@1.0.3
         with:
           who-to-greet: 'Mona the Octocat'
       # Use the output from the `hello` step
