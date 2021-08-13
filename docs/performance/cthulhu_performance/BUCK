@@ -2,7 +2,7 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 
-oxx_static_library(
+cxx_library(
     name = "load_test_hdrs",
     raw_headers = ["load_test.h"],
     deps = [
@@ -17,7 +17,7 @@ oxx_static_library(
     ],
 )
 
-oxx_binary(
+cxx_binary(
     name = "load_test_subscriber",
     srcs = ["load_test_subscriber.cpp"],
     deps = [
@@ -28,7 +28,7 @@ oxx_binary(
     ],
 )
 
-oxx_binary(
+cxx_binary(
     name = "load_test_publisher",
     srcs = ["load_test_publisher.cpp"],
     deps = [
@@ -38,7 +38,7 @@ oxx_binary(
     ],
 )
 
-oxx_binary(
+cxx_binary(
     name = "load_test_bin",
     srcs = [
         "load_test.cpp",
@@ -51,7 +51,7 @@ oxx_binary(
     ],
 )
 
-oxx_command_alias(
+cxx_command_alias(
     name = "load_test_cpp",
     args = [
         "--subscriber-command",
