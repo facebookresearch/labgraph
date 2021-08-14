@@ -42,10 +42,6 @@ RUN chmod 2777 /usr/local/var/run/watchman
 WORKDIR "/opt/labgraph"
 COPY . .
 
-# Install LabGraph
-RUN ls /usr/bin/g++
-RUN ls /opt/rh/devtoolset-9/root/usr/bin/g++
-
 # Build LabGraph Wheel
 RUN python3.6 setup.py sdist bdist_wheel
 RUN python3.6 -m pip install auditwheel
