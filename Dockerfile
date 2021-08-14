@@ -43,6 +43,8 @@ WORKDIR "/opt/labgraph"
 COPY . .
 
 # Build LabGraph Wheel
+RUN which g++
+RUN echo $PATH
 RUN python3.6 setup.py sdist bdist_wheel
 RUN python3.6 -m pip install auditwheel
 RUN auditwheel repair dist/*whl -w dist/
