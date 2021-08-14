@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
-FROM centos:8
+FROM quay.io/pypa/manylinux2014_x86_64
 
 # Install Python, Java, wget, vim
 RUN yum group install -y "Development Tools"
@@ -41,6 +41,10 @@ RUN chmod 2777 /usr/local/var/run/watchman
 # Copy LabGraph files
 WORKDIR "/opt/labgraph"
 COPY . .
+
+# Install LabGraph
+RUN ls /usr/bin/g++
+RUN ls /opt/rh/devtoolset-9/root/usr/bin/g++
 RUN python3.6 setup.py install --user
 
 # Build LabGraph Wheel
@@ -60,3 +64,4 @@ RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_cpp
 RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_exception
 RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_launch
 RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+RUN python3.6 -m pytest --pyargs -v labgraph.zmq_node
