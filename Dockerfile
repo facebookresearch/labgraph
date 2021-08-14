@@ -5,6 +5,7 @@ FROM quay.io/pypa/manylinux2014_x86_64
 
 # Install Python, Java, wget, vim
 RUN yum group install -y "Development Tools"
+RUN yum install devtoolset-9
 RUN yum install -y python2 python36 python36-devel wget java-1.8.0-openjdk \
     java-1.8.0-openjdk-devel vim
 
@@ -45,6 +46,7 @@ COPY . .
 # Build LabGraph Wheel
 RUN which g++
 RUN echo $PATH
+RUN python3.6 setup.py install --user
 RUN python3.6 setup.py sdist bdist_wheel
 RUN python3.6 -m pip install auditwheel
 RUN auditwheel repair dist/*whl -w dist/
