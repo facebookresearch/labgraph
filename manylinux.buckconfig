@@ -1,5 +1,5 @@
 [cxx]
   cxxppflags = -Wall -std=c++17
-  cxxpp = /usr/bin/g++
-  cxx = /usr/bin/g++
-  ld = /usr/bin/g++
+  cxxpp = /opt/rh/devtoolset-10/root/usr/bin/g++
+  cxx = /opt/rh/devtoolset-10/root/usr/bin/g++
+  ld = /opt/rh/devtoolset-10/root/usr/bin/g++
