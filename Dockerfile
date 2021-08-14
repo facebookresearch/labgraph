@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
-FROM centos:8
+FROM quay.io/pypa/manylinux2014_x86_64
 
 # Install Python, Java, wget, vim
 RUN yum group install -y "Development Tools"
@@ -41,4 +41,25 @@ RUN chmod 2777 /usr/local/var/run/watchman
 # Copy LabGraph files
 WORKDIR "/opt/labgraph"
 COPY . .
+
+# Install LabGraph
 RUN python3.6 setup.py install --user
+
+# Build LabGraph Wheel
+RUN python3.6 setup.py sdist bdist_wheel
+RUN python3.6 -m pip install auditwheel
+RUN auditwheel repair dist/*whl -w dist/
+
+# Test LabGraph
+RUN python3.6 -m pytest --pyargs -v labgraph._cthulhu
+RUN python3.6 -m pytest --pyargs -v labgraph.events
+RUN python3.6 -m pytest --pyargs -v labgraph.graphs
+RUN python3.6 -m pytest --pyargs -v labgraph.loggers
+RUN python3.6 -m pytest --pyargs -v labgraph.messages
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_aligner
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_cpp
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_exception
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_launch
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+RUN python3.6 -m pytest --pyargs -v labgraph.zmq_node
