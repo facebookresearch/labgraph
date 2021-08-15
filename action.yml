@@ -1,13 +1,6 @@
 # action.yml
 name: 'LabGraph Docker (Linux)'
 description: 'LabGraph CI tests using Docker (Linux)'
-inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - ${{ inputs.who-to-greet }}
