@@ -1,6 +1,9 @@
-# LabGraph
+# LabGraph Studies
+
+This branch is used for publishing and sharing research and experiment developed using LabGraph. Please place your LabGraph studies in studies folder.
 
 LabGraph is a streaming framework built by the Facebook Reality Labs Research team at Facebook. LabGraph is also mentioned in this [story](https://tech.fb.com/bci-milestone-new-research-from-ucsf-with-support-from-facebook-shows-the-potential-of-brain-computer-interfaces-for-restoring-speech-communication/). More information can be found [here](docs/index.md). 
+
 
 ## Quick Start
 
