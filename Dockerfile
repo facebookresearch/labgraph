@@ -10,8 +10,6 @@ RUN yum install -y devtoolset-9
 RUN echo "source /opt/rh/devtoolset-9/enable" >> /etc/bashrc
 SHELL ["/bin/bash", "--login", "-c"]
 RUN g++ --version
-RUN /usr/bin/g++ --version
-RUN which g++
 
 # Install Python, Java, wget, vim
 RUN yum install -y python2 python36 python36-devel wget java-1.8.0-openjdk \
