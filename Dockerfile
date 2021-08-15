@@ -4,8 +4,15 @@
 FROM quay.io/pypa/manylinux2014_x86_64
 
 # Install Python, Java, wget, vim
-RUN yum group install -y "Development Tools"
-RUN yum install devtoolset-9
+RUN yum update -y
+RUN yum install -y centos-release-scl
+RUN yum install -y devtoolset-9
+
+RUN echo "source /opt/rh/devtoolset-9/enable" >> /etc/bashrc
+SHELL ["/bin/bash", "--login", "-c"]
+RUN gcc --version
+
+# RUN yum group install -y "Development Tools"
 RUN yum install -y python2 python36 python36-devel wget java-1.8.0-openjdk \
     java-1.8.0-openjdk-devel vim
 
