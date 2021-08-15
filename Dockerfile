@@ -56,4 +56,14 @@ RUN python3.6 -m pip install auditwheel
 RUN auditwheel repair dist/*whl -w dist/
 
 # Test LabGraph
-RUN python3.6 -m pytest --pyargs labgraph
+RUN python3.6 -m pytest --pyargs -v labgraph._cthulhu
+RUN python3.6 -m pytest --pyargs -v labgraph.events
+RUN python3.6 -m pytest --pyargs -v labgraph.graphs
+RUN python3.6 -m pytest --pyargs -v labgraph.loggers
+RUN python3.6 -m pytest --pyargs -v labgraph.messages
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_aligner
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_cpp
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_exception
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_launch
+RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_runner
