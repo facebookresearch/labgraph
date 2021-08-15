@@ -3,16 +3,17 @@
 
 FROM quay.io/pypa/manylinux2014_x86_64
 
-# Install Python, Java, wget, vim
+# Install devtoolset-9
 RUN yum update -y
 RUN yum install -y centos-release-scl
 RUN yum install -y devtoolset-9
-
 RUN echo "source /opt/rh/devtoolset-9/enable" >> /etc/bashrc
 SHELL ["/bin/bash", "--login", "-c"]
-RUN gcc --version
+RUN g++ --version
+RUN /usr/bin/g++ --version
+RUN which g++
 
-# RUN yum group install -y "Development Tools"
+# Install Python, Java, wget, vim
 RUN yum install -y python2 python36 python36-devel wget java-1.8.0-openjdk \
     java-1.8.0-openjdk-devel vim
 
@@ -51,22 +52,10 @@ WORKDIR "/opt/labgraph"
 COPY . .
 
 # Build LabGraph Wheel
-RUN which g++
-RUN echo $PATH
 RUN python3.6 setup.py install --user
 RUN python3.6 setup.py sdist bdist_wheel
 RUN python3.6 -m pip install auditwheel
 RUN auditwheel repair dist/*whl -w dist/
 
 # Test LabGraph
-RUN python3.6 -m pytest --pyargs -v labgraph._cthulhu
-RUN python3.6 -m pytest --pyargs -v labgraph.events
-RUN python3.6 -m pytest --pyargs -v labgraph.graphs
-RUN python3.6 -m pytest --pyargs -v labgraph.loggers
-RUN python3.6 -m pytest --pyargs -v labgraph.messages
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_aligner
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_cpp
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_exception
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_launch
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+RUN python3.6 -m pytest --pyargs labgraph
