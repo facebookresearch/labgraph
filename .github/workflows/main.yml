@@ -1,0 +1,13 @@
+on: [push]
+
+jobs:
+  labgraph_build_job:
+    runs-on: ubuntu-latest
+    name: LabGraph Build Job
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: LabGrah Build step
+        uses: ./ # Uses an action in the root directory

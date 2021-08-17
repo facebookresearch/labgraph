@@ -1,0 +1,6 @@
+# action.yml
+name: 'LabGraph Docker (Linux)'
+description: 'LabGraph CI tests using Docker (Linux)'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

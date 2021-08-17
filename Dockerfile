@@ -3,8 +3,15 @@
 
 FROM quay.io/pypa/manylinux2014_x86_64
 
+# Install devtoolset-9
+RUN yum update -y
+RUN yum install -y centos-release-scl
+RUN yum install -y devtoolset-9
+RUN echo "source /opt/rh/devtoolset-9/enable" >> /etc/bashrc
+SHELL ["/bin/bash", "--login", "-c"]
+RUN g++ --version
+
 # Install Python, Java, wget, vim
-RUN yum group install -y "Development Tools"
 RUN yum install -y python2 python36 python36-devel wget java-1.8.0-openjdk \
     java-1.8.0-openjdk-devel vim
 
@@ -42,10 +49,8 @@ RUN chmod 2777 /usr/local/var/run/watchman
 WORKDIR "/opt/labgraph"
 COPY . .
 
-# Install LabGraph
-RUN python3.6 setup.py install --user
-
 # Build LabGraph Wheel
+RUN python3.6 setup.py install --user
 RUN python3.6 setup.py sdist bdist_wheel
 RUN python3.6 -m pip install auditwheel
 RUN auditwheel repair dist/*whl -w dist/
@@ -62,4 +67,3 @@ RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_cpp
 RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_exception
 RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_launch
 RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_runner
-RUN python3.6 -m pytest --pyargs -v labgraph.zmq_node
