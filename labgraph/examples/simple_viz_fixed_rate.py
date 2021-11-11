@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Import lg.Message Class
-from random_message import RandomMessage as RandomMessage 
+from random_message import RandomMessage
 
 # Import Rate
 from rate import Rate
