@@ -16,11 +16,8 @@ import matplotlib.axes
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Import lg.Message Class
-from random_message import RandomMessage
-
-# Import Rate
-from rate import Rate
+from .random_message import RandomMessage
+from .rate import Rate
 
 # Constants used by nodes
 SAMPLE_RATE = 10.0
