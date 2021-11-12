@@ -1,9 +1,25 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
+# -*- coding: utf-8 -*-
+
+""" This example shows how to have a node that has a fixed publish rate
+For example, let’s say we have a node that publishes data and we want to have a fixed
+publish rate(Hz), exactly. We need to implement a node that processes and publishes the
+data in a loop and sleeps the correct amount of time until the next iteration.
+
+If processing data(execution time) has a varying duration, having a fixed sleep duration
+might break the “synchronization” between nodes. The sleep duration needs to be
+dynamically calculated for the given frequency in each loop.
+
+|[Code -------  execution][-------------------sleep-----------------------------------]|
+|[Code ------------------ execution][---------sleep-----------------------------------]|
+|[Code ------------- execution][--------------sleep-----------------------------------]|
+|[----------------------------------1.0 / Hz------------------------------------------]|
+"""
 
 # Built-in imports
-import asyncio
 import time
+import asyncio
 from dataclasses import field
 from typing import Any, List, Optional, Tuple, Dict
 
@@ -43,16 +59,13 @@ class NoiseGenerator(lg.Node):
     # A publisher method that produces data on a single topic
     @lg.publisher(OUTPUT)
     async def generate_noise(self) -> lg.AsyncPublisher:
-
-        rate = Rate(self.config.sample_rate) 
-        
+        rate = Rate(self.config.sample_rate)
         while True:
-            
             yield self.OUTPUT, RandomMessage(
-                timestamp= rate.last_time, data=np.random.rand(self.config.num_features)
+                timestamp=rate.last_time, data=np.random.rand(self.config.num_features)
             )
             await rate.sleep()
-            
+
 
 # ================================= ROLLING AVERAGER ===================================
 
@@ -214,6 +227,7 @@ class Demo(lg.Graph):
 
     def logging(self) -> Dict[str, lg.Topic]:
         return {"AVERAGED_NOISE.GENERATOR.OUTPUT": self.AVERAGED_NOISE.GENERATOR.OUTPUT}
+
 
 # Entry point: run the Demo graph
 if __name__ == "__main__":

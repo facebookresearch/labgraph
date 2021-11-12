@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
+# -*- coding: utf-8 -*-
 
 # Inspired by ROS Rate feature and this is a modified version of script below.
 # https://github.com/ros/ros_comm/blob/noetic-devel/clients/rospy/src/rospy/timer.py
@@ -14,19 +15,16 @@ class Rate(object):
     """
     Convenience class for sleeping in a loop at a specified rate
     """
-    
-    def __init__(self, hz):
+    def __init__(self, hz: float):
         """
         Constructor.
         @param hz: hz rate to determine sleeping
         @type  hz: float
         """
-        # #1403
         self.last_time = time.time()
-        self.elapsed = 0.0
-        self.sleep_dur = 1.0/hz
+        self.sleep_dur = 1.0 / hz
 
-    def _remaining(self, curr_time):
+    def _remaining(self, curr_time: float):
         """
         Calculate the time remaining for rate to sleep.
         @param curr_time: current time
@@ -39,8 +37,8 @@ class Rate(object):
             self.last_time = curr_time
 
         # calculate remaining time
-        self.elapsed = curr_time - self.last_time
-        return self.sleep_dur - self.elapsed
+        elapsed = curr_time - self.last_time
+        return self.sleep_dur - elapsed
 
     def remaining(self):
         """
@@ -65,5 +63,4 @@ class Rate(object):
 
         if curr_time - self.last_time > self.sleep_dur * 2:
             print("Time jumping forward detected")
-            self.last_time = curr_time  
-
+            self.last_time = curr_time
