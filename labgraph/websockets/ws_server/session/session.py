@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
+import asyncio
 import json
 from abc import abstractmethod
 from collections import defaultdict
@@ -25,9 +26,11 @@ class Session:
         self._stream_id_to_batch_num = defaultdict(int)
         self._stream_id_to_stream_desc = {}
 
-    async def send_samples(self, samples: List, stream_name: str) -> None:
+    async def send_samples(self, samples: List, stream_name: str) -> bool:
+        send_samples_success = False
         if self._active:
             stream_descs = self.get_streams(stream_name)
+            send_samples_success = True
 
             for stream_desc in stream_descs:
                 if samples is not None:
@@ -43,10 +46,15 @@ class Session:
                         }
                     }
                     message = json.dumps(message)
-                    await self.write(data=message)
+                    write_success = await self.write(data=message)
+                    if not write_success:
+                        self.remove_stream(stream_desc)
+                        # await asyncio.sleep(sleep_time)
+                        send_samples_success = False
+        return send_samples_success
 
     @abstractmethod
-    async def write(self, data: str) -> None:
+    async def write(self, data: str) -> bool:
         raise NotImplementedError()
 
     def get_streams(self, stream_name: str) -> List[ApiStreamDesc]:

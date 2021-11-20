@@ -5,6 +5,8 @@ import asyncio
 import time
 from typing import List
 
+import websockets
+
 from ...graphs import Config, Topic, subscriber
 from ...graphs.method import main, background
 from ...runners import NormalTermination
@@ -118,8 +120,19 @@ class WSAPIServerNode(WSServerNode):
                 sample_data=message.samples,
                 batch_size=self.batch_size,
             )
-            await self.session.send_samples(
-                samples=samples,
-                stream_name=stream_name,
-            )
+
+            try:
+                send_samples_success = await self.session.send_samples(
+                    samples=samples,
+                    stream_name=stream_name,
+                )
+            except websockets.exceptions.ConnectionClosedError:
+                send_samples_success = False
+
+            if not send_samples_success:
+                logger.info("Removing Session Stream...")
+                self.session.remove_stream(stream_desc)
+                logger.info("Removing Stream from WS Server...")
+                self.wsServer.remove_stream(stream_name)
+
         await asyncio.sleep(1 / self.config.sample_rate)

@@ -120,3 +120,17 @@ Input/Output stream messages should be sent in the following format, where indiv
   }
 }
 ```
+
+## Example Usage
+Step 1: Run WebSocket Server
+```
+python -m labgraph.websockets.ws_server.tests.test_server_local
+```
+Step 2: Run WebSocket Client
+```
+python -m labgraph.websockets.ws_server.tests.test_server_local
+```
+Note: In case webSocket server has not been terminated properly, terminate the process using:
+```
+sudo pkill -9 python
+```

@@ -3,7 +3,9 @@
 
 import asyncio
 import json
-from typing import Any
+from typing import Any, Tuple
+
+import websockets
 
 from ....util.logger import get_logger
 from ..api.api_request import APIRequest
@@ -45,6 +47,10 @@ class WSServer:
     def isactive(self, stream_name) -> bool:
         return stream_name in self.streams
 
+    def remove_stream(self, stream_name) -> None:
+        if stream_name in self.streams:
+            del self.streams[stream_name]
+
     async def end_stream_listener(self) -> bool:
         """Coroutine for receiving and parsing incoming stream messages
         asynchronously."""
@@ -85,16 +91,22 @@ class WSServer:
         self.streams[request.stream_name] = request
         self.stream_id_to_stream_name[request.stream_id] = request.stream_name
 
-    async def ws_recv(self) -> str:
+    async def ws_recv(self) -> Tuple[str, bool]:
+        recv_success = False
         try:
             msg = await asyncio.wait_for(
                 self.websocket.recv(),
                 timeout=self.request_time_out,
             )
+            recv_success = True
         except asyncio.TimeoutError:
             # Normal timeout
             msg = ""
-        return msg
+        except websockets.exceptions.ConnectionClosedError:
+            # Connection from Client is closed/interrupted
+            msg = ""
+
+        return msg, recv_success
 
     def is_start_stream_request(self, msg: str) -> bool:
         return self.enums.API.START_STREAM_REQUEST in msg
@@ -110,7 +122,7 @@ class WSServer:
         self.websocket = websocket
 
         while True:
-            msg = await self.ws_recv()
+            msg, recv_success = await self.ws_recv()
 
             if self.is_start_stream_request(msg):
                 request = APIRequest(
@@ -155,5 +167,5 @@ class WSServer:
                     logger.info(f"Stream {stream_name} has been closed.")
 
             for sleep_pause_stream in self.sleep_pause_streams:
-                if sleep_pause_stream in msg:
+                if sleep_pause_stream in msg or not recv_success:
                     await asyncio.sleep(self.sleep_pause_time)

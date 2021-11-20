@@ -39,6 +39,16 @@ class WebSocketSession(Session):
         self.thread.join()
         logger.info("WebSocketSession Stop Completed!")
 
-    async def write(self, data: str, sleep_time: float = 0.001) -> None:
-        await self.wsServer.send_samples(data)
+    async def write(self, data: str, sleep_time: float = 0.001) -> bool:
+        # await self.wsServer.send_samples(data)
+        # await asyncio.sleep(sleep_time)
+        write_success = True
+        try:
+            await self.wsServer.send_samples(data)
+            write_success = True
+        except websockets.exceptions.ConnectionClosed as e:
+            logger.warning(e)
+            write_success = False
+
         await asyncio.sleep(sleep_time)
+        return write_success
