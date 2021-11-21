@@ -128,7 +128,7 @@ python -m labgraph.websockets.ws_server.tests.test_server_local
 ```
 Step 2: Run WebSocket Client
 ```
-python -m labgraph.websockets.ws_server.tests.test_server_local
+python -m labgraph.websockets.ws_client.tests.test_ws_node_client
 ```
 Note: In case webSocket server has not been terminated properly, terminate the process using:
 ```
