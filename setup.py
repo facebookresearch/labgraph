@@ -44,5 +44,6 @@ setup(
         "typeguard==2.5.1",
         "typing_extensions>=3.7.4.3",
         "yappi==1.2.5",
+        "pylsl==1.15.0"
     ],
 )

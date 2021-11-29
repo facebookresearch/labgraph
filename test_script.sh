@@ -14,3 +14,4 @@ python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_exception
 python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_launch
 python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_runner
 python3.6 -m pytest --pyargs -v labgraph.zmq_node
+python3.6 -m pytest --pyargs -v labgraph.lsl_node
