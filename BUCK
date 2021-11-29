@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserve
+
 load("//:DEFS", "PLATFORM")
 
 cthulhu_srcs = [

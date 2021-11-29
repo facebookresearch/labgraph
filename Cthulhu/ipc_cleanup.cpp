@@ -1,3 +1,5 @@
+// Copyright 2004-present Facebook. All Rights Reserved.
+
 #define DEFAULT_LOG_CHANNEL "CthulhuIPCClean"
 #include <cthulhu/Framework.h>
 #include <logging/Log.h>
