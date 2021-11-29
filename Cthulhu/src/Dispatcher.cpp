@@ -1,3 +1,5 @@
+// Copyright 2004-present Facebook. All Rights Reserved.
+
 #include <cthulhu/Dispatcher.h>
 
 #define DEFAULT_LOG_CHANNEL "Cthulhu"

@@ -1,3 +1,5 @@
+// Copyright 2004-present Facebook. All Rights Reserved.
+
 #include "ContextRegistryIPC.h"
 #define DEFAULT_LOG_CHANNEL "Cthulhu"
 #include <logging/Log.h>

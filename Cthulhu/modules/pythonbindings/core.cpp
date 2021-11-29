@@ -1,3 +1,5 @@
+// Copyright 2004-present Facebook. All Rights Reserved.
+
 #include <cthulhu/bindings/core.h>
 #include <pybind11/chrono.h>
 #include <pybind11/iostream.h>

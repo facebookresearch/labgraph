@@ -1,3 +1,5 @@
+// Copyright 2004-present Facebook. All Rights Reserved.
+
 #include <cthulhu/StreamType.h>
 
 #include <cthulhu/Framework.h>
