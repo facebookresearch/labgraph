@@ -1,5 +1,3 @@
-// Copyright 2004-present Facebook. All Rights Reserved.
-
 #ifndef CTHULHU_EXTERNAL
 #include <cthulhu/bindings/common_types.h>
 #endif

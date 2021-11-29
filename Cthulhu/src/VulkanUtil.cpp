@@ -1,4 +1,3 @@
-// Copyright 2004-present Facebook. All Rights Reserved.
 
 #include <cthulhu/VulkanUtil.h>
 
@@ -34,6 +33,30 @@ VkResult vkGetMemoryFdKHR(VkDevice device, const VkMemoryGetFdInfoKHR* pInfo, in
   return vkGetMemoryFdKHR2(device, pInfo, pFd);
 }
 #endif // _WIN32
+
+class DeviceLocalBufferMemory {
+ public:
+  DeviceLocalBufferMemory(
+      VkDevice device,
+      VkDeviceMemory memory,
+      const VkAllocationCallbacks* pAllocator)
+      : device_(device), memory_(memory), pAllocator_(pAllocator) {}
+
+  ~DeviceLocalBufferMemory() {
+    if (magic_ == MAGIC) {
+      vkFreeMemory(device_, memory_, pAllocator_);
+    } else {
+      XR_LOGE("Device Local Descriptor must not be written by host");
+    }
+  }
+
+ private:
+  static const unsigned int MAGIC = 0xD10CA1ED; /* device-localed */
+  const unsigned int magic_ = MAGIC;
+  VkDevice device_;
+  VkDeviceMemory memory_;
+  const VkAllocationCallbacks* pAllocator_;
+};
 #endif // CTHULHU_HAS_VULKAN
 
 namespace cthulhu {
@@ -373,16 +396,26 @@ VulkanUtil::map(uint64_t handle, uint32_t nrBytes, uint32_t memoryTypeIndex) {
     return nullptr;
   }
 
-  // Map it to the host
-  void* result = nullptr;
-  if (vkMapMemory(state_->device, bufferMemory, 0, nrBytes, 0, &result) != VK_SUCCESS) {
-    XR_LOGW("Failed to map Vulkan buffer to host memory.");
-    return nullptr;
-  }
+  if (isDeviceLocal(memoryTypeIndex)) {
+    // provide a device-local descriptor that will manage the vkFreeMemory
+    return std::shared_ptr<uint8_t>(
+        (uint8_t*)new DeviceLocalBufferMemory(state_->device, bufferMemory, nullptr),
+        [this](uint8_t* ptr) -> void {
+          DeviceLocalBufferMemory* dlBufferMemory = reinterpret_cast<DeviceLocalBufferMemory*>(ptr);
+          delete dlBufferMemory;
+        });
+  } else {
+    // Map it to the host
+    void* result = nullptr;
+    if (vkMapMemory(state_->device, bufferMemory, 0, nrBytes, 0, &result) != VK_SUCCESS) {
+      XR_LOGW("Failed to map Vulkan buffer to host memory.");
+      return nullptr;
+    }
 
-  return std::shared_ptr<uint8_t>((uint8_t*)result, [this, bufferMemory](uint8_t* ptr) -> void {
-    vkFreeMemory(state_->device, bufferMemory, nullptr);
-  });
+    return std::shared_ptr<uint8_t>((uint8_t*)result, [this, bufferMemory](uint8_t* ptr) -> void {
+      vkFreeMemory(state_->device, bufferMemory, nullptr);
+    });
+  }
 #endif // CTHULHU_HAS_VULKAN
   XR_LOGW("Failed to map GPU buffer. Vulkan support was not included in build.");
   return nullptr;

@@ -1,5 +1,3 @@
-// Copyright 2004-present Facebook. All Rights Reserved.
-
 #ifndef BOOST_INTERPROCESS_ANDROID_SHARED_MEMORY_HPP
 #define BOOST_INTERPROCESS_ANDROID_SHARED_MEMORY_HPP
 
@@ -23,11 +21,12 @@
 #include <cstddef>
 #include <string>
 
-#include <fcntl.h> //O_CREAT, O_*...
+#include <android/sharedmem.h>
+#include <fcntl.h>
 #include <linux/ashmem.h>
-#include <sys/mman.h> //shm_xxx
-#include <sys/stat.h> //mode_t, S_IRWXG, S_IRWXO, S_IRWXU,
-#include <unistd.h> //ftruncate, close
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 //!\file
 //! Describes a shared memory object management class.
@@ -50,20 +49,39 @@ class android_shared_memory {
   //! Creates a shared memory object with name "name" and mode "mode", with the access mode "mode"
   //! If the file previously exists, throws an error.*/
   android_shared_memory(create_only_t, const char* name, mode_t mode) {
-    this->priv_open_or_create(ipcdetail::DoCreate, name, mode);
+    this->priv_open_or_create(ipcdetail::DoCreate, name, mode, 1ul);
   }
 
   //! Tries to create a shared memory object with name "name" and mode "mode", with the
   //! access mode "mode". If the file previously exists, it tries to open it with mode "mode".
   //! Otherwise throws an error.
   android_shared_memory(open_or_create_t, const char* name, mode_t mode) {
-    this->priv_open_or_create(ipcdetail::DoOpenOrCreate, name, mode);
+    this->priv_open_or_create(ipcdetail::DoOpenOrCreate, name, mode, 1ul);
   }
 
   //! Tries to open a shared memory object with name "name", with the access mode "mode".
   //! If the file does not previously exist, it throws an error.
   android_shared_memory(open_only_t, const char* name, mode_t mode) {
-    this->priv_open_or_create(ipcdetail::DoOpen, name, mode);
+    this->priv_open_or_create(ipcdetail::DoOpen, name, mode, 1ul);
+  }
+
+  //! Creates a shared memory object with name "name" and mode "mode", with the access mode "mode"
+  //! If the file previously exists, throws an error.*/
+  android_shared_memory(create_only_t, const char* name, mode_t mode, std::size_t size) {
+    this->priv_open_or_create(ipcdetail::DoCreate, name, mode, size);
+  }
+
+  //! Tries to create a shared memory object with name "name" and mode "mode", with the
+  //! access mode "mode". If the file previously exists, it tries to open it with mode "mode".
+  //! Otherwise throws an error.
+  android_shared_memory(open_or_create_t, const char* name, mode_t mode, std::size_t size) {
+    this->priv_open_or_create(ipcdetail::DoOpenOrCreate, name, mode, size);
+  }
+
+  //! Tries to open a shared memory object with name "name", with the access mode "mode".
+  //! If the file does not previously exist, it throws an error.
+  android_shared_memory(open_only_t, const char* name, mode_t mode, std::size_t size) {
+    this->priv_open_or_create(ipcdetail::DoOpen, name, mode, size);
   }
 
   //! Moves the ownership of "moved"'s shared memory object to *this.
@@ -86,12 +104,12 @@ class android_shared_memory {
   //! Swaps the android_shared_memorys. Does not throw
   void swap(android_shared_memory& moved);
 
+  //! Sets the size of the shared memory mapping
+  void truncate(offset_t length);
+
   //! Erases a shared memory object from the system.
   //! Returns false on error. Never throws
   static bool remove(const char* name);
-
-  //! Sets the size of the shared memory mapping
-  void truncate(offset_t length);
 
   //! Destroys *this and indicates that the calling process is finished using
   //! the resource. All mapped regions are still
@@ -121,7 +139,11 @@ class android_shared_memory {
   void priv_close();
 
   //! Opens or creates a shared memory object.
-  bool priv_open_or_create(ipcdetail::create_enum_t type, const char* filename, mode_t mode);
+  bool priv_open_or_create(
+      ipcdetail::create_enum_t type,
+      const char* filename,
+      mode_t mode,
+      std::size_t size);
 
   file_handle_t m_handle;
   mode_t m_mode;
@@ -143,7 +165,11 @@ inline const char* android_shared_memory::get_name() const {
 }
 
 inline bool android_shared_memory::get_size(offset_t& size) const {
-  return ipcdetail::get_file_size((file_handle_t)m_handle, size);
+  if (m_handle != -1) {
+    size = ASharedMemory_getSize(m_handle);
+    return true;
+  }
+  return false;
 }
 
 inline void android_shared_memory::swap(android_shared_memory& other) {
@@ -162,58 +188,23 @@ inline mode_t android_shared_memory::get_mode() const {
 
 namespace android_shared_memory_detail {} // namespace android_shared_memory_detail
 
-inline int ashmem_open(const char* name, int oflag) {
-  const int fd = open("/dev/ashmem", oflag);
-
-  if (fd < 0) {
-    return fd;
-  }
-
-  if (name != nullptr) {
-    char buf[ASHMEM_NAME_LEN];
-
-    strlcpy(buf, name, sizeof(buf));
-
-    const int ret = ioctl(fd, ASHMEM_SET_NAME, buf);
-
-    if (ret < 0) {
-      close(fd);
-      return ret;
-    }
-  }
-
-  return fd;
-}
-
 inline bool android_shared_memory::priv_open_or_create(
     ipcdetail::create_enum_t type,
     const char* filename,
-    mode_t mode) {
+    mode_t mode,
+    std::size_t size) {
   m_filename = filename;
 
   // Create new mapping
-  int oflag = 0;
-  if (mode == read_only) {
-    oflag |= O_RDONLY;
-  } else if (mode == read_write) {
-    oflag |= O_RDWR;
-  } else {
-    error_info err(mode_error);
-    throw interprocess_exception(err);
-  }
-
   switch (type) {
     case ipcdetail::DoOpen: {
-      // No oflag addition
-      m_handle = ashmem_open(m_filename.c_str(), oflag);
+      // ashmem sections cannot only be opened
+      errno = ENOENT;
+      m_handle = -1;
     } break;
-    case ipcdetail::DoCreate: {
-      // oflag |= (O_CREAT | O_EXCL);
-      m_handle = ashmem_open(m_filename.c_str(), oflag);
-    } break;
+    case ipcdetail::DoCreate:
     case ipcdetail::DoOpenOrCreate: {
-      // Try to create shared memory
-      m_handle = ashmem_open(m_filename.c_str(), oflag);
+      m_handle = ASharedMemory_create(m_filename.c_str(), size);
     } break;
     default: {
       error_info err = other_error;

@@ -33,7 +33,9 @@ T allocateSampleHelper(
   uncastedSample.payload = Framework::instance().memoryPool()->getBufferFromPool(id, payloadSize);
   uncastedSample.numberOfSubSamples = numSubSamples;
 
-  return T{uncastedSample, hasSamplesInContentBlock};
+  T sample{uncastedSample, hasSamplesInContentBlock};
+  sample.allocated();
+  return sample;
 };
 
 // This helper class gets the size of an object if it is an array, othersize returns size 1

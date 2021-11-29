@@ -1,5 +1,3 @@
-// Copyright 2004-present Facebook. All Rights Reserved.
-
 #include <cthulhu/StreamInterface.h>
 
 #define DEFAULT_LOG_CHANNEL "Cthulhu"
@@ -99,6 +97,7 @@ StreamConsumer::StreamConsumer(
     bool async)
     : callback_(callback),
       configCallback_(configCallback),
+      inhibitSampleCallback_(configCallback != nullptr),
       async_(async),
       performanceMonitor_{},
       queueCapacity_(DEFAULT_QUEUE_CAPACITY) {
@@ -111,7 +110,7 @@ StreamConsumer::StreamConsumer(
           while (signal.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
             try {
               Framework::validate();
-            } catch (FrameworkCleanedUpException& e) {
+            } catch (FrameworkCleanedUpException&) {
               break;
             }
 
@@ -123,7 +122,11 @@ StreamConsumer::StreamConsumer(
             while (!tempQueue.empty()) {
               DataVariant& item = tempQueue.front();
               if (item.type == DataVariant::Type::CONFIG) {
-                inhibitSampleCallback_ = !configCallback_(item.config);
+                if (configCallback_ == nullptr) {
+                  XR_LOGW("config received with no handler");
+                } else {
+                  inhibitSampleCallback_ = !configCallback_(item.config);
+                }
               } else if (item.type == DataVariant::Type::SAMPLE) {
                 if (!inhibitSampleCallback_) {
                   performanceMonitor_.startMeasurement();

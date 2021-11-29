@@ -339,7 +339,8 @@ class Context {
   }
 
   virtual ~Context() {
-    if (ctx_ != nullptr) { // Might have become nulled if context is moved
+    // Context might be null if moved.  Registry could have been removed by early cleanup.
+    if (ctx_ != nullptr && Framework::instance().contextRegistry() != nullptr) {
       Framework::instance().contextRegistry()->removeContext(ctx_);
     }
   }

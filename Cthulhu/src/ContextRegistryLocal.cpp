@@ -1,5 +1,3 @@
-// Copyright 2004-present Facebook. All Rights Reserved.
-
 #include "ContextRegistryLocal.h"
 
 #include <algorithm>

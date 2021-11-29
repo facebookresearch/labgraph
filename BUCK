@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# Copyright 2004-present Facebook. All Rights Reserved.
-
 load("//:DEFS", "PLATFORM")
 
 cthulhu_srcs = [
@@ -13,6 +10,7 @@ cthulhu_srcs = [
     "Cthulhu/src/MemoryPoolLocalImpl.cpp",
     "Cthulhu/src/QueueingAligner.cpp",
     "Cthulhu/src/PerformanceMonitor.cpp",
+    "Cthulhu/src/PoolGPUAllocator.cpp",
     "Cthulhu/src/RawDynamic.cpp",
     "Cthulhu/src/Serialization.cpp",
     "Cthulhu/src/StreamConfigEquality.cpp",

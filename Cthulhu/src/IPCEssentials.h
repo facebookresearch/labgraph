@@ -89,13 +89,15 @@ class ReclaimerIPC {
   void operator()(const pointer& p);
 };
 
-using GpuBufferDataWithPID = std::pair<GpuBufferData, uint64_t>;
+struct SharedGpuBufferData : public GpuBufferData {
+  uint64_t pid;
+};
 
 class ReclaimerGPUIPC {
  public:
   typedef typename boost::intrusive::
       pointer_traits<typename ManagedSHM::segment_manager::void_pointer>::template rebind_pointer<
-          GpuBufferDataWithPID>::type pointer;
+          SharedGpuBufferData>::type pointer;
 
  private:
   boost::interprocess::offset_ptr<MemoryPoolIPC> host;
@@ -110,6 +112,6 @@ class ReclaimerGPUIPC {
 
 using SharedPtrIPC = boost::interprocess::shared_ptr<uint8_t, PtrAllocatorIPC, ReclaimerIPC>;
 using SharedPtrGPUIPC =
-    boost::interprocess::shared_ptr<GpuBufferDataWithPID, PtrAllocatorIPC, ReclaimerGPUIPC>;
+    boost::interprocess::shared_ptr<SharedGpuBufferData, PtrAllocatorIPC, ReclaimerGPUIPC>;
 
 } // namespace cthulhu

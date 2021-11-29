@@ -1,5 +1,3 @@
-// Copyright 2004-present Facebook. All Rights Reserved.
-
 #include "TypeRegistryLocal.h"
 
 #define DEFAULT_LOG_CHANNEL "Cthulhu"

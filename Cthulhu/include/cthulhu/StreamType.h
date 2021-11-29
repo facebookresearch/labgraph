@@ -1,5 +1,3 @@
-// Copyright 2004-present Facebook. All Rights Reserved.
-
 #pragma once
 
 #include <cthulhu/FieldData.h>
@@ -86,6 +84,8 @@ class AutoStreamSample {
   AutoStreamSample& operator=(const AutoStreamSample& other) = delete;
 
   virtual ~AutoStreamSample();
+
+  void allocated() {} // non-virtual, called by allocateSampleHelper
 
   const StreamSample& getSample() const;
 

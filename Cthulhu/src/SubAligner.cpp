@@ -171,7 +171,8 @@ void SubAligner::processManifests(
         }
       }
 
-      XR_LOGW(
+      XR_LOGW_EVERY_N_SEC(
+          5.0,
           "Subaligner::processManifests - Finalized an incomplete manifest, missing: {}",
           buffer.data());
       continue;

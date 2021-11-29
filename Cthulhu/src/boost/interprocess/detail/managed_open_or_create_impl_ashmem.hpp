@@ -13,7 +13,6 @@
 //
 // See http://www.boost.org/libs/interprocess for documentation.
 //
-// Copyright 2004-present Facebook. All Rights Reserved.
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef BOOST_INTERPROCESS_MANAGED_OPEN_OR_CREATE_IMPL_ASHMEM
