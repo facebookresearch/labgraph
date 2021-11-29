@@ -33,7 +33,7 @@ struct android_shmem_open_or_create {
   typedef ipcdetail::managed_open_or_create_impl_ashmem<
       android_shared_memory,
       AllocationAlgorithm::Alignment,
-      true,
+      false,
       false>
       type;
 };

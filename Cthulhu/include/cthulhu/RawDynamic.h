@@ -109,10 +109,4 @@ class RawDynamic {
   CpuBuffer getBuffer() const;
 };
 
-using SharedRawDynamicArray = std::shared_ptr<RawDynamic<>>;
-static inline SharedRawDynamicArray makeSharedRawDynamicArray(size_t count) {
-  return std::shared_ptr<RawDynamic<>>(
-      new RawDynamic<>[count](), std::default_delete<RawDynamic<>[]>());
-}
-
 } // namespace cthulhu

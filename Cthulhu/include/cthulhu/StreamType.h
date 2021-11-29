@@ -87,6 +87,8 @@ class AutoStreamSample {
 
   virtual ~AutoStreamSample();
 
+  void allocated() {} // non-virtual, called by allocateSampleHelper
+
   const StreamSample& getSample() const;
 
   void setSample(const StreamSample& sample);

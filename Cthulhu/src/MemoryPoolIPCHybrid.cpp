@@ -11,8 +11,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#else
-#include <unistd.h>
 #endif
 
 namespace cthulhu {
@@ -30,6 +28,7 @@ MemoryPoolIPCHybrid::MemoryPoolIPCHybrid(
     ManagedSHM* shm,
     size_t shmSize,
     size_t shmGPUSize,
+    std::shared_ptr<VulkanUtil> vulkanUtil,
     bool enableAuditor)
     : shmSize_(shmSize),
       shmGPUSize_(shmGPUSize),
@@ -43,7 +42,7 @@ MemoryPoolIPCHybrid::MemoryPoolIPCHybrid(
       shm_->get_segment_manager());
   auditor_ = shm_->find_or_construct<AuditorIPC>(AUDITOR_NAME)(shm_->get_segment_manager());
 
-  vulkanUtil_.reset(new VulkanUtil());
+  vulkanUtil_ = vulkanUtil;
 
   // Setup auditing
   ScopedLockIPC lock(auditor_->mutex);
@@ -68,6 +67,11 @@ MemoryPoolIPCHybrid::MemoryPoolIPCHybrid(
   } else {
     invalidate();
   }
+
+  poolGPUAllocator_ =
+      std::make_unique<PoolGPUAllocator>(poolGPU_, shm_, vulkanUtil_, /* deviceLocal=*/false);
+  poolGPUDeviceLocalAllocator_ = std::make_unique<PoolGPUAllocator>(
+      poolGPUDeviceLocal_, shm_, vulkanUtil_, /* deviceLocal=*/true);
 }
 
 bool MemoryPoolIPCHybrid::nuke(ManagedSHM* shm) {
@@ -177,46 +181,6 @@ CpuBuffer MemoryPoolIPCHybrid::getBufferFromPool(const StreamIDView& id, size_t 
   return memoryPool_->request(nrBytes);
 }
 
-bool MemoryPoolIPCHybrid::findBuffer(
-    size_t nrBytes,
-    boost::interprocess::offset_ptr<MemoryPoolIPC> pool,
-    std::ptrdiff_t& offset_ptr_out,
-    GpuBufferDataWithPID*& ptr_out) {
-  ScopedLockIPC lock(pool->buffers_mutex);
-  auto buffer_it = pool->buffers.find(nrBytes);
-  if (buffer_it == pool->buffers.cend()) {
-    buffer_it = pool->buffers
-                    .emplace(
-                        nrBytes,
-                        MemoryPoolIPC::PtrVectorType(
-                            MemoryPoolIPC::PtrVectorAllocType(shm_->get_segment_manager())))
-                    .first;
-  }
-
-  auto& ptrlist = buffer_it->second;
-  // Iterate through the list until we find one that originated from our process.
-  // Note: It may be useful to restructure our GPU pool to make it faster to find
-  // buffers originating from our process.
-#ifdef _WIN32
-  uint64_t ourPid = (uint64_t)GetCurrentProcessId();
-#else
-  uint64_t ourPid = (uint64_t)getpid();
-#endif
-  auto it = ptrlist.begin();
-  while (it != ptrlist.end()) {
-    auto bufferPtr = reinterpret_cast<GpuBufferDataWithPID*>(shm_->get_address_from_handle(*it));
-    if (bufferPtr->second == ourPid) {
-      ptr_out = bufferPtr;
-      offset_ptr_out = *it;
-      it = ptrlist.erase(it);
-      return true;
-    } else {
-      ++it;
-    }
-  }
-  return false;
-}
-
 GpuBuffer MemoryPoolIPCHybrid::getGpuBufferFromPool(size_t nrBytes, bool deviceLocal) {
   if (!vulkanUtil_->isActive()) {
     XR_LOGW("Failed to generate GPU Buffer. Vulkan is not active.");
@@ -224,50 +188,25 @@ GpuBuffer MemoryPoolIPCHybrid::getGpuBufferFromPool(size_t nrBytes, bool deviceL
   }
 
   std::ptrdiff_t offset_ptr = 0;
-  GpuBufferDataWithPID* ptr = nullptr;
+  SharedGpuBufferData* bufferData = nullptr;
 
   // Check to see if we already have a buffer of this size
-  boost::interprocess::offset_ptr<MemoryPoolIPC> pool =
-      deviceLocal ? poolGPUDeviceLocal_ : poolGPU_;
-  if (!findBuffer(nrBytes, pool, offset_ptr, ptr)) {
-    // Make a new buffer
-    ScopedLockIPC lock(pool->sizes_mutex);
-    if (deviceLocal) {
-      XR_LOGT_EVERY_N(
-          10, "MemoryPoolIPCHybrid - Num GPU Device Local bytes allocated: ", pool->allocated);
-    } else {
-      XR_LOGT_EVERY_N(10, "MemoryPoolIPCHybrid - Num GPU bytes allocated: ", pool->allocated);
-    }
-    if (pool->allocated + nrBytes < shmGPUSize_) {
-      auto vulkanAllocation = vulkanUtil_->allocate(nrBytes, deviceLocal);
-      if (vulkanAllocation.first == 0) {
-        XR_LOGW("Failed to allocate vulkan buffer of size {}.", nrBytes);
-        return GpuBuffer();
-      }
-      // Store a local map of the external memory, which adds a reference for the local process
-      gpuMappedBuffers_[vulkanAllocation.first] =
-          vulkanUtil_->map(vulkanAllocation.first, nrBytes, vulkanAllocation.second);
-#ifdef _WIN32
-      uint64_t pid = (uint64_t)GetCurrentProcessId();
-#else
-      uint64_t pid = (uint64_t)getpid();
-#endif
-      // Put the handle in shared memory
-      ptr = shm_->construct<GpuBufferDataWithPID>(boost::interprocess::anonymous_instance)();
-      ptr->first.handle = vulkanAllocation.first;
-      ptr->first.size = nrBytes;
-      ptr->first.memoryTypeIndex = vulkanAllocation.second;
-      ptr->second = pid;
-      offset_ptr = shm_->get_handle_from_address(ptr);
-      pool->allocated += nrBytes;
-      pool->sizes.emplace(offset_ptr, nrBytes);
-    } else {
+  PoolGPUAllocator& poolAllocator =
+      deviceLocal ? *poolGPUDeviceLocalAllocator_ : *poolGPUAllocator_;
+  bool allocate = poolAllocator.pool()->allocated + nrBytes < shmGPUSize_;
+  std::shared_ptr<uint8_t> mapped;
+  if (!poolAllocator.getBuffer(nrBytes, allocate, offset_ptr, bufferData, mapped)) {
+    if (!allocate) {
       XR_LOGW(
           "Failed to allocate GPU buffer of size {}. Max GPU memory size {} reached.",
           nrBytes,
           shmGPUSize_);
-      return GpuBuffer();
     }
+    return GpuBuffer();
+  }
+
+  if (mapped) {
+    gpuMappedBuffers_[bufferData->handle] = mapped;
   }
 
   std::lock_guard<std::mutex> lock(memoryMutex_);
@@ -275,18 +214,20 @@ GpuBuffer MemoryPoolIPCHybrid::getGpuBufferFromPool(size_t nrBytes, bool deviceL
   // Construct the shared shared pointer
   SharedPtrGPUIPC& buffer =
       *shm_->construct<SharedPtrGPUIPC>(boost::interprocess::anonymous_instance)(
-          ptr, PtrAllocatorIPC(shm_->get_segment_manager()), ReclaimerGPUIPC(pool, offset_ptr));
+          bufferData,
+          PtrAllocatorIPC(shm_->get_segment_manager()),
+          ReclaimerGPUIPC(poolAllocator.pool(), offset_ptr));
 
   // Store the mapping to it
-  handlesGPU_.emplace(ptr->first.handle, buffer);
+  handlesGPU_.emplace(bufferData->handle, buffer);
 
   shm_->destroy_ptr(&buffer);
 
   // Return a local pointer
   return GpuBuffer(
-      &ptr->first,
+      bufferData,
       [this](GpuBufferData* handlePtr) { this->destroyLocal(handlePtr); },
-      deviceLocal ? CpuBuffer() : gpuMappedBuffers_[ptr->first.handle]);
+      deviceLocal ? CpuBuffer() : gpuMappedBuffers_[bufferData->handle]);
 }
 
 CpuBuffer MemoryPoolIPCHybrid::requestSHM(size_t nrBytes) {
@@ -375,64 +316,75 @@ void MemoryPoolIPCHybrid::destroyLocal(uint8_t* ptr) {
   ptrs_.erase(ptr);
 }
 
+uint64_t MemoryPoolIPCHybrid::duplicateBufferHandle(const SharedGpuBufferData& bufferData) {
+  // Clone the handle into our process
+#ifdef _WIN32
+  uint64_t ourPID = (uint64_t)GetCurrentProcessId();
+  HANDLE currentProcHandle = OpenProcess(PROCESS_ALL_ACCESS, true, ourPID);
+  HANDLE otherProcHandle = OpenProcess(PROCESS_DUP_HANDLE, false, bufferData.pid);
+  HANDLE tempHandle;
+  auto dupResult = DuplicateHandle(
+      otherProcHandle,
+      (HANDLE)bufferData.handle,
+      currentProcHandle,
+      &tempHandle,
+      0,
+      false,
+      DUPLICATE_SAME_ACCESS);
+  CloseHandle(currentProcHandle);
+  CloseHandle(otherProcHandle);
+  if (!dupResult) {
+    XR_LOGW(
+        "Failed to duplicate handle {} to process {}. GPU buffer failed to load to this process.",
+        bufferData.handle,
+        ourPID);
+    return INVALID_BUFFER_HANDLE;
+  }
+  return (uint64_t)tempHandle;
+#else
+  char fdPath[64]; // actual maximal length: 37 for 64bit systems
+  snprintf(fdPath, sizeof(fdPath), "/proc/%d/fd/%d", (int)bufferData.pid, (int)bufferData.handle);
+  return open(fdPath, O_RDWR); // TBD: Are these sufficient permissions?
+#endif
+}
+
+uint64_t MemoryPoolIPCHybrid::createLocalHandle(const SharedGpuBufferData& bufferData) {
+  auto it = gpuHandleProcMap_.find(bufferData.handle);
+  if (it == gpuHandleProcMap_.end()) {
+    uint64_t handle = duplicateBufferHandle(bufferData);
+    if (handle == INVALID_BUFFER_HANDLE) {
+      return INVALID_BUFFER_HANDLE;
+    }
+    it = gpuHandleProcMap_.insert(std::pair(bufferData.handle, duplicateBufferHandle(bufferData)))
+             .first;
+  }
+  return it->second;
+}
+
 GpuBuffer MemoryPoolIPCHybrid::createLocal(const SharedPtrGPUIPC& buffer) {
   std::lock_guard<std::mutex> lock(memoryMutex_);
-  auto pointer = buffer.get().get();
-  auto handle = pointer->first.handle;
+  const SharedGpuBufferData& bufferData = *buffer;
 
-  uint64_t newHandle = 0;
-
-  if (gpuHandleProcMap_.find(handle) == gpuHandleProcMap_.end()) {
-    // Clone the handle into our process
-#ifdef _WIN32
-    uint64_t ourPID = (uint64_t)GetCurrentProcessId();
-    HANDLE currentProcHandle = OpenProcess(PROCESS_ALL_ACCESS, true, ourPID);
-    HANDLE otherProcHandle = OpenProcess(PROCESS_DUP_HANDLE, false, pointer->second);
-    HANDLE tempHandle;
-    auto dupResult = DuplicateHandle(
-        otherProcHandle,
-        (HANDLE)handle,
-        currentProcHandle,
-        &tempHandle,
-        0,
-        false,
-        DUPLICATE_SAME_ACCESS);
-    CloseHandle(currentProcHandle);
-    CloseHandle(otherProcHandle);
-    if (!dupResult) {
-      XR_LOGW(
-          "Failed to duplicate handle {} to process {}. GPU buffer failed to load to this process.",
-          handle,
-          ourPID);
-      return GpuBuffer();
-    }
-    newHandle = (uint64_t)tempHandle;
-#else
-    char fdPath[64]; // actual maximal length: 37 for 64bit systems
-    snprintf(fdPath, sizeof(fdPath), "/proc/%d/fd/%d", (int)pointer->second, (int)handle);
-    newHandle = open(fdPath, O_RDWR); // TBD: Are these sufficient permissions?
-#endif
-  } else {
-    newHandle = gpuHandleProcMap_[handle];
+  uint64_t localHandle = createLocalHandle(bufferData);
+  if (localHandle == INVALID_BUFFER_HANDLE) {
+    return GpuBuffer();
   }
 
-  gpuHandleProcMap_[handle] = newHandle;
-
-  handlesGPU_[newHandle] = buffer;
+  handlesGPU_[localHandle] = buffer;
 
   // Map to the CPU in this process if we haven't seen this before
-  if (gpuMappedBuffers_.find(newHandle) == gpuMappedBuffers_.end()) {
-    gpuMappedBuffers_[newHandle] =
-        vulkanUtil_->map(newHandle, pointer->first.size, pointer->first.memoryTypeIndex);
+  if (gpuMappedBuffers_.find(localHandle) == gpuMappedBuffers_.end()) {
+    gpuMappedBuffers_[localHandle] =
+        vulkanUtil_->map(localHandle, bufferData.size, bufferData.memoryTypeIndex);
   }
 
   return GpuBuffer(
-      new GpuBufferData{newHandle, pointer->first.size, pointer->first.memoryTypeIndex},
+      new GpuBufferData{localHandle, bufferData.size, bufferData.memoryTypeIndex},
       [this](GpuBufferData* ptr) {
         this->destroyLocal(ptr);
         delete ptr;
       },
-      gpuMappedBuffers_[newHandle]);
+      gpuMappedBuffers_[localHandle]);
 }
 
 void MemoryPoolIPCHybrid::destroyLocal(GpuBufferData* handlePtr) {
@@ -462,11 +414,12 @@ void MemoryPoolIPCHybrid::cleanPool(
     uint64_t ourPid = ownProc.pid();
     for (auto& buffers : pool->buffers) {
       for (auto& buffer : buffers.second) {
-        GpuBufferDataWithPID data =
-            *reinterpret_cast<GpuBufferDataWithPID*>(shm_->get_address_from_handle(buffer));
-        if (data.second == ourPid) {
-          vulkanUtil_->free(data.first.handle);
-          shm_->destroy_ptr(shm_->get_address_from_handle(buffer));
+        SharedGpuBufferData* data =
+            reinterpret_cast<SharedGpuBufferData*>(shm_->get_address_from_handle(buffer));
+        if (data->pid == ourPid) {
+          vulkanUtil_->free(data->handle);
+          shm_->destroy_ptr(data);
+          pool->allocated -= data->size;
         }
       }
     }
@@ -474,9 +427,7 @@ void MemoryPoolIPCHybrid::cleanPool(
   pool->buffers.clear();
 
   if (clearAllocations) {
-    for (auto& size : pool->sizes) {
-      pool->allocated -= size.second;
-    }
+    pool->allocated = 0;
     pool->sizes.clear();
   }
 }

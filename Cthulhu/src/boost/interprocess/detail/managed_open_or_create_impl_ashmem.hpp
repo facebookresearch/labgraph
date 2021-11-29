@@ -1,3 +1,6 @@
+
+
+
 /**
  * Note: This file is forked from boost/interprocess/detail/managed_open_or_create_impl.hpp
  * It provides a version of the templates that are usable by our android implementation of
@@ -13,7 +16,6 @@
 //
 // See http://www.boost.org/libs/interprocess for documentation.
 //
-// Copyright 2004-present Facebook. All Rights Reserved.
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef BOOST_INTERPROCESS_MANAGED_OPEN_OR_CREATE_IMPL_ASHMEM

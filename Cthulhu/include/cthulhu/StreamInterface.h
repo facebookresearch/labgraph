@@ -22,6 +22,17 @@
 
 namespace cthulhu {
 
+#if defined(_WIN32) && !defined(__clang__)
+#define DLLIMPORT __declspec(dllimport)
+#else
+#define DLLIMPORT
+#endif
+
+using SharedRawDynamicArray = std::shared_ptr<RawDynamic<>>;
+SharedRawDynamicArray DLLIMPORT makeSharedRawDynamicArray(size_t count);
+
+CpuBuffer DLLIMPORT makeSharedCpuBuffer(size_t count);
+
 // StreamID is a string identifier that uniquely identifies a Stream
 using StreamID = std::string;
 
@@ -112,7 +123,7 @@ struct StreamConfig {
   StreamConfig(CpuBuffer parameterData) : parameters(parameterData) {}
   StreamConfig(size_t staticFieldSize, size_t dynamicFieldSize) {
     if (staticFieldSize > 0) {
-      parameters = CpuBuffer(new uint8_t[staticFieldSize](), std::default_delete<uint8_t[]>());
+      parameters = makeSharedCpuBuffer(staticFieldSize);
     }
     if (dynamicFieldSize > 0) {
       dynamicParameters = makeSharedRawDynamicArray(dynamicFieldSize);
@@ -222,7 +233,7 @@ class StreamConsumer {
   SampleCallback callback_;
   ConfigCallback configCallback_;
 
-  mutable bool inhibitSampleCallback_ = false;
+  mutable bool inhibitSampleCallback_;
 
   bool async_;
 

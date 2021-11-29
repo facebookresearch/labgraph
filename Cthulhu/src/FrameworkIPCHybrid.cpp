@@ -65,10 +65,16 @@ Framework::Framework() : storage_(nullptr) {
   if (!std::getenv(DISABLE_SHARED_MEMORY_ENV_VAR)) {
     bool enableAuditor = std::getenv(ENABLE_AUDITOR_ENV_VAR) != nullptr;
     bool memoryValid = false;
+    // so that we're not destroying vulkan connect in between
+    std::shared_ptr<VulkanUtil> vulkanUtil = std::make_shared<VulkanUtil>();
     while (!memoryValid) {
       storage_.reset(new FrameworkStorage());
       memoryPool_ = std::make_unique<MemoryPoolIPCHybrid>(
-          &storage_->sharedMemory, storage_->shmSize, storage_->shmGPUSize, enableAuditor);
+          &storage_->sharedMemory,
+          storage_->shmSize,
+          storage_->shmGPUSize,
+          vulkanUtil,
+          enableAuditor);
       if (memoryPool_->isValid()) {
         memoryValid = true;
       } else {

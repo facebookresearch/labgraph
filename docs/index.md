@@ -27,4 +27,4 @@ The development of LabGraph has been motivated by the following beliefs:
 
 ## Team
 
-LabGraph is currently maintained by Jimmy Feng (primary), Pradeep Damodara, Ryan Catoen and Allen Yin. A non-exhaustive but growing list needs to mention: Dev Chakraborty (primary), Pradeep Damodara, Ryan Catoen, Ruben Sethi, Allen Yin, Rudy Sevile, Sho Nakagome, Ryan Orendorff, Anton Vorontsov, Rosemary Le, Ying Yang, Emily Mugler and Steph Naufel.
+LabGraph is currently maintained by Jimmy Feng (primary), Pradeep Damodara, George Gensure, Ryan Catoen and Allen Yin. A non-exhaustive but growing list needs to mention: Dev Chakraborty (primary), Pradeep Damodara, Dave Kotfis, Ryan Catoen, Ruben Sethi, Allen Yin, Rudy Sevile, Sho Nakagome, Ryan Orendorff, Anton Vorontsov, Rosemary Le, Ying Yang, Emily Mugler and Steph Naufel.

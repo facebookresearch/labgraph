@@ -7,6 +7,7 @@
 
 #include "AuditorIPC.h"
 #include "MemoryPoolIPC.h"
+#include "PoolGPUAllocator.h"
 
 #include <cthulhu/MemoryPoolInterface.h>
 #include <cthulhu/VulkanUtil.h>
@@ -15,10 +16,18 @@ namespace cthulhu {
 
 class MemoryPool;
 struct MemoryPoolIPC;
+class PoolGPUAllocator;
+class VulkanUtil;
+struct AuditorIPC;
 
 class MemoryPoolIPCHybrid : public MemoryPoolInterface {
  public:
-  MemoryPoolIPCHybrid(ManagedSHM* shm, size_t shmSize, size_t shmGPUSize, bool enableAuditor);
+  MemoryPoolIPCHybrid(
+      ManagedSHM* shm,
+      size_t shmSize,
+      size_t shmGPUSize,
+      std::shared_ptr<VulkanUtil> vulkanUtil,
+      bool enableAuditor);
   virtual ~MemoryPoolIPCHybrid();
 
   virtual CpuBuffer getBufferFromPool(const StreamIDView& id, size_t nrBytes) override;
@@ -70,11 +79,9 @@ class MemoryPoolIPCHybrid : public MemoryPoolInterface {
 
   void cleanPool(boost::interprocess::offset_ptr<MemoryPoolIPC> pool, bool clearAllocations);
 
-  bool findBuffer(
-      size_t nrBytes,
-      boost::interprocess::offset_ptr<MemoryPoolIPC> pool,
-      std::ptrdiff_t& offset_ptr_out,
-      GpuBufferDataWithPID*& ptr_out);
+  static uint64_t duplicateBufferHandle(const SharedGpuBufferData& bufferData);
+
+  uint64_t createLocalHandle(const SharedGpuBufferData& bufferData);
 
   CpuBuffer requestSHM(size_t nrBytes);
 
@@ -106,11 +113,16 @@ class MemoryPoolIPCHybrid : public MemoryPoolInterface {
   std::thread auditorThread_;
   std::atomic<bool> stopSignal_;
 
-  std::unique_ptr<VulkanUtil> vulkanUtil_;
+  std::shared_ptr<VulkanUtil> vulkanUtil_;
+
+  std::unique_ptr<PoolGPUAllocator> poolGPUAllocator_;
+  std::unique_ptr<PoolGPUAllocator> poolGPUDeviceLocalAllocator_;
 
   // The percentage of Cthulhu's shared memory that is permitted to be occupied
   // by the memory pool.
   static constexpr float MAX_SHM_USAGE_FRAC = 0.9;
+
+  static const uint64_t INVALID_BUFFER_HANDLE = 2147483647; // std::numeric_limits<uint64_t>::max();
 };
 
 } // namespace cthulhu
