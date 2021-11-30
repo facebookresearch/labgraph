@@ -1,13 +1,9 @@
-
-
-
 /**
  * Note: This file is forked from boost/interprocess/detail/managed_open_or_create_impl.hpp
  * It provides a version of the templates that are usable by our android implementation of
  * managed shared memory, by modifying the 3rd argument of the MappedRegion c'tor in line 291 and
  * 338.
  */
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // (C) Copyright Ion Gaztanaga 2006-2012. Distributed under the Boost
@@ -16,6 +12,7 @@
 //
 // See http://www.boost.org/libs/interprocess for documentation.
 //
+// Copyright 2004-present Facebook. All Rights Reserved.
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef BOOST_INTERPROCESS_MANAGED_OPEN_OR_CREATE_IMPL_ASHMEM
