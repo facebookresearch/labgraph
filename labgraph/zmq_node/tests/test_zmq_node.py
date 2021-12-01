@@ -162,16 +162,14 @@ def test_zmq_poller_node() -> None:
     runner = LocalRunner(module=graph)
 
     samples = [bytes([i]) for i in range(1, NUM_MESSAGES + 1)]
-    p = Process(target=write_samples_to_zmq,
-                args=(address, samples, ZMQ_TOPIC))
+    p = Process(target=write_samples_to_zmq,args=(address, samples, ZMQ_TOPIC))
     p.start()
     runner.run()
     p.join()
 
     with open(output_filename, "br") as f:
         data = f.read()
-    assert set(samples) == set(data.strip(
-        DATA_DELIMITER).split(DATA_DELIMITER))
+    assert set(samples) == set(data.strip(DATA_DELIMITER).split(DATA_DELIMITER))
 
 
 @local_test
@@ -201,8 +199,7 @@ def test_zmq_sender_node() -> None:
     runner = LocalRunner(module=graph)
 
     p = Process(
-        target=recv_samples_from_zmq, args=(
-            address, ZMQ_TOPIC, output_filename)
+        target=recv_samples_from_zmq, args=(address, ZMQ_TOPIC, output_filename)
     )
     p.start()
     runner.run()
