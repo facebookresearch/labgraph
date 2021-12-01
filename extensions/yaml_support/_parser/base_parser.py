@@ -8,5 +8,5 @@ class BaseParser(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def parse(self, code:str) -> List[Any]:
+    def parse(self, code: str) -> List[Any]:
         raise NotImplementedError()

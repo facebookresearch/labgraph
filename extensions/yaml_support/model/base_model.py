@@ -3,15 +3,13 @@ from abc import ABCMeta, abstractmethod
 
 class BaseModel(metaclass=ABCMeta):
     """
-    An abstraction for models. 
+    An abstraction for models.
     A model is a class that stores data related to a python object
     """
-    
     @abstractmethod
-    def save(self,path:str) -> None:
+    def save(self, path: str) -> None:
         """
         Saves the data stored by the model into a file
-        
         Args:
             path: The path of the file where the model should be stored.
         """
