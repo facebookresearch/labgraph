@@ -19,6 +19,7 @@ from labgraph.graphs import (
 )
 
 from labgraph.runners import LocalRunner, NormalTermination, ParallelRunner
+from labgraph.util.logger import get_logger
 from labgraph.util.testing import get_test_filename, local_test
 from labgraph.devices.protocols.lsl import LSLMessage
 from labgraph.devices.protocols.lsl.lsl_poller_node import LSLPollerConfig, LSLPollerNode
@@ -26,6 +27,7 @@ from labgraph.devices.protocols.lsl.lsl_sender_node import LSLSenderConfig, LSLS
 
 NUM_MESSAGES = 10
 SAMPLE_RATE = 10
+logger = get_logger(__name__)
 
 DATA_DELIMITER = "\n"
 samples = [0.1, 1.1, 2.3, 4.4, 5.5, 6.6, 7.5, 7.7, 8.8, 9.9]
@@ -85,13 +87,14 @@ class MySource(Node):
 
 # send messages
 def write_sample_to_lsl() -> None:
-    srate = 100
-    name = 'Mock LSL Sender'
+    sample_rate = 100
+    name = 'Mock_Signal'
     type = 'EEG'
     n_channels = 10
-    info = StreamInfo(name, type, n_channels, srate, 'float32', 'myuid34234')
+    info = StreamInfo(name, type, n_channels, sample_rate,
+                      'float32', 'myuid34234')
     outlet = StreamOutlet(info)
-    print("now sending data...")
+    logger.log(1, "now sending data...")
     max_iter = 300
     iter = 0
     while iter < max_iter:
@@ -175,8 +178,8 @@ def test_lsl_sender_node() -> None:
     output_filename = get_test_filename()
     graph = LSLSenderGraph()
     graph.configure(LSLSenderConfig(
-        name='Test',
-        type='TEST',
+        stream_name='Test',
+        stream_type='TEST',
         n_channels=NUM_MESSAGES,
         unique_identifier='12345QE'
     ))
@@ -211,8 +214,8 @@ def test_lsl_send_and_poll() -> None:
             self.DF_SOURCE.configure(MySourceConfig(should_terminate=True))
             self.LSL_SENDER.configure(
                 LSLSenderConfig(
-                    name='Test',
-                    type='EEG',
+                    stream_name='Test',
+                    stream_type='EEG',
                     n_channels=NUM_MESSAGES,
                     unique_identifier='12345QE'
                 )
@@ -249,5 +252,5 @@ def test_lsl_send_and_poll() -> None:
     with open(output_filename, "r") as f:
         data = f.read()
     recieved_data = set(data.strip(DATA_DELIMITER).split(DATA_DELIMITER))
-    assert len(recieved_data) > 0
+    assert len(recieved_data) == NUM_MESSAGES
     assert len(samples) == len(recieved_data)

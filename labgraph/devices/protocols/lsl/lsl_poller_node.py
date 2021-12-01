@@ -8,6 +8,8 @@ import asyncio
 
 logger = get_logger(__name__)
 
+POLL_TIME = 0.1
+
 
 class LSLPollerConfig(Config):
     type: str = 'labgraph'
@@ -35,4 +37,4 @@ class LSLPollerNode(Node):
         while True:
             sample, timestamp = self.inlet.pull_sample()
             yield self.topic, LSLMessage(sample)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(POLL_TIME)
