@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
-from typing import TypeVar, List
+from typing import List, Any
 
-T = TypeVar("T")
 
 class BaseParser(metaclass=ABCMeta):
     """
@@ -9,5 +8,5 @@ class BaseParser(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def parse(self, code:str) -> List[T]:
-        pass
+    def parse(self, code:str) -> List[Any]:
+        raise NotImplementedError()

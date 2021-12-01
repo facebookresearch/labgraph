@@ -1,8 +1,5 @@
 from typed_ast import ast3
-from .base_parser import (
-    BaseParser,
-    T
-)
+from .base_parser import BaseParser
 from extensions.yaml_support.model.lg_unit_model import (LabGraphUnitsModel)
 from extensions.yaml_support.enums.lg_units_enum import LabGraphBuiltinUnits
 
@@ -16,8 +13,10 @@ from typed_ast.ast3 import (
     AnnAssign, 
 )
 
-from typing import Generic, List, Dict
+from typing import TypeVar, Generic, List, Dict
 
+
+T = TypeVar("T")
 
 class LabGraphUnitsParser(BaseParser, NodeVisitor, Generic[T]):
     """
