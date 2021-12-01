@@ -1,11 +1,12 @@
 from pylsl import StreamInfo, StreamOutlet, StreamInlet, resolve_stream
+from labgraph.runners.parallel_runner import ParallelRunner
 import pytest
 import asyncio
 import time
 from multiprocessing import Process
 from typing import Sequence
 
-from ...graphs import (
+from labgraph.graphs import (
     AsyncPublisher,
     Config,
     Connections,
@@ -17,18 +18,17 @@ from ...graphs import (
     subscriber
 )
 
-from ...runners import LocalRunner, NormalTermination, ParallelRunner
-from ...util.testing import get_test_filename, local_test
-from ..lsl_message import LSLMessage
-from ..lsl_poller_node import LSLPollerConfig, LSLPollerNode
-from ..lsl_sender_node import LSLSenderConfig, LSLSenderNode
+from labgraph.runners import LocalRunner, NormalTermination, ParallelRunner
+from labgraph.util.testing import get_test_filename, local_test
+from labgraph.devices.protocols.lsl import LSLMessage
+from labgraph.devices.protocols.lsl.lsl_poller_node import LSLPollerConfig, LSLPollerNode
+from labgraph.devices.protocols.lsl.lsl_sender_node import LSLSenderConfig, LSLSenderNode
 
 NUM_MESSAGES = 10
 SAMPLE_RATE = 10
 
 DATA_DELIMITER = "\n"
 samples = [0.1, 1.1, 2.3, 4.4, 5.5, 6.6, 7.5, 7.7, 8.8, 9.9]
-print(f' original {samples}')
 
 
 class MySinkConfig(Config):

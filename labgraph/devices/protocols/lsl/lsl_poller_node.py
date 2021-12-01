@@ -1,7 +1,8 @@
 from pylsl import StreamInlet, resolve_stream
-from ..graphs import AsyncPublisher, Config, Node, Topic, publisher
-from ..util.logger import get_logger
-from ..lsl_node import LSLMessage
+from labgraph.graphs import AsyncPublisher, Config, Node, Topic, publisher
+from labgraph.util.logger import get_logger
+from labgraph.devices.protocols.lsl import LSLMessage
+
 import asyncio
 
 

@@ -1,9 +1,10 @@
 import asyncio
 from pylsl import StreamOutlet, StreamInfo
 
-from ..graphs import Config, Node, Topic, subscriber
-from ..util.logger import get_logger
-from ..lsl_node import LSLMessage
+from labgraph.graphs import Config, Node, Topic, subscriber
+from labgraph.util.logger import get_logger
+from labgraph.devices.protocols.lsl import LSLMessage
+
 
 logger = get_logger(__name__)
 
