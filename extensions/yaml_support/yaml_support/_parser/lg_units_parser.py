@@ -1,7 +1,7 @@
 from typed_ast import ast3
 from .base_parser import BaseParser
-from extensions.yaml_support.model.lg_unit_model import (LabGraphUnitsModel)
-from extensions.yaml_support.enums.lg_units_enum import LabGraphBuiltinUnits
+from extensions.yaml_support.yaml_support.model.lg_unit_model import (LabGraphUnitsModel)
+from extensions.yaml_support.yaml_support.enums.lg_units_enum import LabGraphBuiltinUnits
 
 from typed_ast.ast3 import (
     AsyncFunctionDef,
@@ -100,10 +100,11 @@ class LabGraphUnitsParser(BaseParser, NodeVisitor, Generic[T]):
                         connections: List[str] = []
                         # construct a list of connections
                         for _child in child.body:
-                            for elts in _child.value.elts:
-                                for elt in elts.elts:
-                                    type = self.__construct_type(elt, '')
-                                    connections.append(type)
+                            if hasattr(_child, 'value'):
+                                for elts in _child.value.elts:
+                                    for elt in elts.elts:
+                                        type = self.__construct_type(elt, '')
+                                        connections.append(type)
 
                         # transform the list of connections to a dict
                         # each connection is represented as key-value
