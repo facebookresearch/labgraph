@@ -8,11 +8,10 @@ import asyncio
 
 logger = get_logger(__name__)
 
-POLL_TIME = 0.1
-
 
 class LSLPollerConfig(Config):
     type: str = 'labgraph'
+    poll_time: float = 0.1
 
 
 class LSLPollerNode(Node):
@@ -23,6 +22,9 @@ class LSLPollerNode(Node):
     Args:
         type: The name the type assigned to incoming stream
         (default 'labgraph')
+        poll_time: The amount of time we want the node to
+        wait before attempting to pull a sample from the
+        lsl stream
     """
     topic = Topic(LSLMessage)
     config: LSLPollerConfig
@@ -37,4 +39,4 @@ class LSLPollerNode(Node):
         while True:
             sample, timestamp = self.inlet.pull_sample()
             yield self.topic, LSLMessage(sample)
-            await asyncio.sleep(POLL_TIME)
+            await asyncio.sleep(self.config.poll_time)

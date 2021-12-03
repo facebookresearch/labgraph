@@ -1,5 +1,4 @@
 from pylsl import StreamInfo, StreamOutlet, StreamInlet, resolve_stream
-from labgraph.runners.parallel_runner import ParallelRunner
 import pytest
 import asyncio
 import time
@@ -22,8 +21,14 @@ from labgraph.runners import LocalRunner, NormalTermination, ParallelRunner
 from labgraph.util.logger import get_logger
 from labgraph.util.testing import get_test_filename, local_test
 from labgraph.devices.protocols.lsl import LSLMessage
-from labgraph.devices.protocols.lsl.lsl_poller_node import LSLPollerConfig, LSLPollerNode
-from labgraph.devices.protocols.lsl.lsl_sender_node import LSLSenderConfig, LSLSenderNode
+from labgraph.devices.protocols.lsl.lsl_poller_node import (
+    LSLPollerConfig,
+    LSLPollerNode
+)
+from labgraph.devices.protocols.lsl.lsl_sender_node import (
+    LSLSenderConfig,
+    LSLSenderNode
+)
 
 NUM_MESSAGES = 10
 SAMPLE_RATE = 10
@@ -89,7 +94,7 @@ class MySource(Node):
 def write_sample_to_lsl() -> None:
     sample_rate = 100
     name = 'Mock_Signal'
-    type = 'EEG'
+    type = 'mock_type'
     n_channels = 10
     info = StreamInfo(name, type, n_channels, sample_rate,
                       'float32', 'myuid34234')
@@ -104,8 +109,7 @@ def write_sample_to_lsl() -> None:
 
 
 def recv_samples_from_lsl(output_fname: str) -> None:
-    print("looking for an EEG Stream")
-    streams = resolve_stream('type', 'TEST')
+    streams = resolve_stream('type', 'mock_type')
     inlet = StreamInlet(streams[0])
 
     with open(output_fname, "w+") as output_file:
@@ -130,7 +134,7 @@ def test_lsl_poller_node() -> None:
         def setup(self) -> None:
             self.MY_SOURCE.configure(
                 LSLPollerConfig(
-                    type='EEG'
+                    type='mock_type'
                 )
             )
             self.MY_SINK.configure(
@@ -179,7 +183,7 @@ def test_lsl_sender_node() -> None:
     graph = LSLSenderGraph()
     graph.configure(LSLSenderConfig(
         stream_name='Test',
-        stream_type='TEST',
+        stream_type='mock_type',
         n_channels=NUM_MESSAGES,
         unique_identifier='12345QE'
     ))
