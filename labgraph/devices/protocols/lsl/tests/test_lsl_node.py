@@ -218,15 +218,15 @@ def test_lsl_send_and_poll() -> None:
             self.DF_SOURCE.configure(MySourceConfig(should_terminate=True))
             self.LSL_SENDER.configure(
                 LSLSenderConfig(
-                    stream_name='Test',
-                    stream_type='EEG',
+                    stream_name='mock name',
+                    stream_type='mock type',
                     n_channels=NUM_MESSAGES,
                     unique_identifier='12345QE'
                 )
             )
             self.LSL_POLLER.configure(
                 LSLPollerConfig(
-                    type='EEG'
+                    type='mock type'
                 )
             )
             self.DF_SINK.configure(

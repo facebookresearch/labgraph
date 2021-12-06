@@ -162,7 +162,7 @@ def test_zmq_poller_node() -> None:
     runner = LocalRunner(module=graph)
 
     samples = [bytes([i]) for i in range(1, NUM_MESSAGES + 1)]
-    p = Process(target=write_samples_to_zmq,args=(address, samples, ZMQ_TOPIC))
+    p = Process(target=write_samples_to_zmq, args=(address, samples, ZMQ_TOPIC))
     p.start()
     runner.run()
     p.join()
