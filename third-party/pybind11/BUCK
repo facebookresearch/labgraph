@@ -4,6 +4,6 @@ cxx_library(
     public_include_directories = ["include"],
     preferred_linkage = "static",
     exported_headers = glob(["include/pybind11/**/*.h"]),
-    deps = ["//third-party/python:python3.6"],
+    deps = ["//third-party/python:python"],
     visibility = ["PUBLIC"],
 )
