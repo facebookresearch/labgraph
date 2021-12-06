@@ -19,11 +19,14 @@ from ...messages.types import (
     BytesType,
     CFloatType,
     CIntType,
+    DataclassType,
+    DictType,
     DynamicType,
     FieldType,
     FloatType,
     IntEnumType,
     IntType,
+    ListType,
     NumpyDynamicType,
     NumpyType,
     StrDynamicType,
@@ -31,11 +34,18 @@ from ...messages.types import (
     StrType,
     T,
 )
-from ...util.error import LabGraphError
+from ...util.error import LabgraphError
 from ..logger import Logger
 
 
 HDF5_PATH_DELIMITER = "/"
+SERIALIZABLE_DYNAMIC_TYPES = (
+    ListType,
+    DataclassType,
+    DictType,
+    NumpyDynamicType,
+    StrEnumType,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -92,14 +102,12 @@ class HDF5Logger(Logger):
                     # Convert dynamic-length bytes fields into numpy arrays so h5py can
                     # read/write them
                     message_fields = list(message.astuple())
+                    fields = list(message.__class__.__message_fields__.values())
                     for j, value in enumerate(message_fields):
-                        if not isinstance(
-                            list(message.__class__.__message_fields__.values())[
-                                j
-                            ].data_type,
-                            DynamicType,
-                        ):
+                        if not isinstance(fields[j].data_type, DynamicType):
                             continue
+                        if isinstance(fields[j].data_type, SERIALIZABLE_DYNAMIC_TYPES):
+                            value = fields[j].data_type.preprocess(value)
                         if isinstance(value, bytes):
                             message_fields[j] = np.array(bytearray(value))
                         elif isinstance(value, bytearray):
@@ -124,15 +132,11 @@ class HDF5Logger(Logger):
 def get_numpy_type_for_field_type(
     field_type: FieldType[T],
 ) -> Union[Tuple[np.dtype], Tuple[np.dtype, Tuple[int, ...]]]:
-    if (
-        isinstance(field_type, StrType)
-        or isinstance(field_type, BytesType)
-        or isinstance(field_type, StrEnumType)
-    ):
+    if isinstance(field_type, StrType) or isinstance(field_type, BytesType):
         encoding = (
-            field_type.encoding if field_type in (StrType, StrEnumType) else "ascii"
+            field_type.encoding if isinstance(field_type, StrType) else "ascii"  # type: ignore
         )
-        return (h5py.string_dtype(encoding=encoding, length=field_type.length),)
+        return (h5py.string_dtype(encoding=encoding, length=field_type.length),)  # type: ignore
     elif isinstance(field_type, IntType) or isinstance(field_type, IntEnumType):
         return (get_numpy_type_for_int_type(field_type),)
     elif isinstance(field_type, FloatType):
@@ -144,7 +148,7 @@ def get_numpy_type_for_field_type(
     elif isinstance(field_type, DynamicType):
         return (get_dynamic_type(field_type),)
 
-    raise LabGraphError(f"No equivalent numpy type for field type: {field_type}")
+    raise LabgraphError(f"No equivalent numpy type for field type: {field_type}")
 
 
 def get_numpy_type_for_int_type(int_type: Union[IntType, IntEnumType[T_I]]) -> np.dtype:
@@ -171,7 +175,5 @@ def get_numpy_type_for_float_type(float_type: FloatType) -> np.dtype:
 def get_dynamic_type(field_type: FieldType[Any]) -> np.dtype:
     if isinstance(field_type, StrDynamicType):
         return h5py.string_dtype(encoding=field_type.encoding)
-    elif isinstance(field_type, NumpyDynamicType):
-        return h5py.vlen_dtype(field_type.dtype)
     else:
         return h5py.vlen_dtype(np.uint8)

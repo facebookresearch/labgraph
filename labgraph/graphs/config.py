@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Any, List, Optional
 
 from ..messages.message import Field, Message
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 
 
 class Config(Message):
@@ -59,7 +59,7 @@ def _add_field_to_argument_parser(
             required=field.required,
         )
     else:
-        raise LabGraphError(
+        raise LabgraphError(
             "Invalid type for argument parsing for config field. "
             f"'{field_name}' has type '{python_type.__name__}'"
         )

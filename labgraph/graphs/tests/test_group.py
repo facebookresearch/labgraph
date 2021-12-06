@@ -6,7 +6,7 @@ from typing import Any, Dict, Set, Tuple, Type
 import pytest
 
 from ...messages.message import Message
-from ...util.error import LabGraphError
+from ...util.error import LabgraphError
 from ..group import Connections, Group
 from ..method import AsyncPublisher, NodeMethod, Transformer, publisher, subscriber
 from ..module import Module
@@ -245,7 +245,7 @@ class BadPublishersGroup(Group):
 
 
 def test_bad_publishers_group() -> None:
-    with pytest.raises(LabGraphError) as err:
+    with pytest.raises(LabgraphError) as err:
         _ = BadPublishersGroup()
 
     assert (

@@ -7,7 +7,7 @@ from copy import deepcopy
 from typing import Any, Dict, NamedTuple, Optional, Tuple, Type, Union, cast
 
 from ..messages.message import Message
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 
 
 PATH_DELIMITER = "/"

@@ -64,7 +64,7 @@ def main(
         f"--{ProcessManagerState.SUBPROCESS_ARG}"
     )
 
-    # Get the Python class for the LabGraph module
+    # Get the Python class for the Labgraph module
     module_cls = get_module_class(*module.rsplit(".", 1))
 
     # Restore the config and state for the module

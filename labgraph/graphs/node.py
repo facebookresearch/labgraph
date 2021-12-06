@@ -4,7 +4,7 @@
 from copy import deepcopy
 from typing import Any, Dict, Optional, Tuple
 
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from .config import Config
 from .method import _METADATA_LABEL, NodeMethod, get_method_metadata
 from .module import Module, ModuleMeta
@@ -55,7 +55,7 @@ class NodeMeta(ModuleMeta):
                             if topic is subscribed_topic
                             else "published"
                         )
-                        raise LabGraphError(
+                        raise LabgraphError(
                             f"Invalid topic {topic_verb} by {cls.__name__}."
                             f"{field_name} - set the topic as a class variable "
                             f"in {cls.__name__}"
@@ -73,7 +73,7 @@ class NodeMeta(ModuleMeta):
 
                     for other_method_name, other_method in other_methods.items():
                         if get_method_metadata(other_method).is_main:
-                            raise LabGraphError(
+                            raise LabgraphError(
                                 f"Cannot have multiple methods decorated with @main in "
                                 f"{name}: found methods '{field_name}' and "
                                 f"'{other_method_name}'"

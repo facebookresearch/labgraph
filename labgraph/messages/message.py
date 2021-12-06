@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
-# Defines simple messaging constructs for LabGraph
+# Defines simple messaging constructs for Labgraph
 
 import dataclasses
 import hashlib
+import importlib
 import logging
 import struct
 from collections import OrderedDict
-from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
+from enum import Enum
+from typing import Any, Dict, Generic, List, Optional, Tuple, Type, TypeVar, Union
 
 from .._cthulhu.bindings import (
     Field as CthulhuField,
@@ -17,26 +19,24 @@ from .._cthulhu.bindings import (
     TypeDefinition,
     typeRegistry,
 )
-from ..util.error import LabGraphError
-from .types import DEFAULT_BYTE_ORDER, FieldType, StructType, get_field_type
+from ..util.error import LabgraphError
+from .types import (
+    DEFAULT_BYTE_ORDER,
+    FieldType,
+    LOCAL_INTERNAL_FIELDS,
+    StructType,
+    get_field_type,
+)
 
 
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
-# Internal fields that are present on Message instances but are not included when
-# serializing the message for streaming
-LOCAL_INTERNAL_FIELDS = (
-    "__sample__",
-    "__original_message__",
-    "__original_message_type__",
-)
-
 
 class Field(Generic[T]):
     """
-    Represents a field in a LabGraph message.
+    Represents a field in a Labgraph message.
 
     Args:
         name: The name of the field.
@@ -246,7 +246,7 @@ class MessageMeta(type):
         for i, (_, field) in enumerate(cls.__message_fields__.items()):
             if field.name == field_name:
                 return i
-        raise LabGraphError(f"{cls.__name__} has no field '{field_name}'")
+        raise LabgraphError(f"{cls.__name__} has no field '{field_name}'")
 
 
 class IsOriginalMessage:
@@ -258,7 +258,7 @@ M = TypeVar("M", bound="Message", covariant=True)
 
 class Message(metaclass=MessageMeta):
     """
-    Represents a LabGraph message. A message is a collection of data that can be sent
+    Represents a Labgraph message. A message is a collection of data that can be sent
     between nodes via topics. The fields available to every message of a certain type
     are defined via type annotations on the corresponding subclass of `Message`.
     Subclasses recursively include their superclasses' fields.
@@ -457,7 +457,7 @@ class Message(metaclass=MessageMeta):
                 ][0]
                 result = getattr(self.__original_message__, original_field_name)
                 if not field.data_type.isinstance(result):
-                    raise LabGraphError(
+                    raise LabgraphError(
                         f"Could not convert from {message_cls.__name__}."
                         f"{original_field_name} to {cls.__name__}.{name}: invalid "
                         f"value {result}"
@@ -493,7 +493,7 @@ class Message(metaclass=MessageMeta):
 
 class TimestampedMessage(Message):
     """
-    Represents a simple timestamped LabGraph message.  All messages which
+    Represents a simple timestamped Labgraph message.  All messages which
     may be aligned using a timestamp should inherit from this class.
     """
 

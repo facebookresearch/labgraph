@@ -4,6 +4,7 @@
 from typing import Any, Dict
 
 from ...messages.message import Message
+from ...util.error import LabgraphError
 from ..graph import Graph
 from ..group import Connections, Group
 from ..method import AsyncPublisher, publisher, subscriber
@@ -70,7 +71,7 @@ def test_incomplete_graph(mocker: Any) -> None:
         "\t- MY_COMPONENT/MY_CHILD2/MY_NODE1/A has no publishers\n"
         "\t- MY_COMPONENT/MY_CHILD2/MY_NODE2/B has no subscribers\n"
         "This could mean that there are publishers and/or subscribers of Cthulhu "
-        "streams that LabGraph doesn't know about, and/or that data in some topics is "
+        "streams that Labgraph doesn't know about, and/or that data in some topics is "
         "being discarded."
     )
 

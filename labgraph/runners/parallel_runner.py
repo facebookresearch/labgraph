@@ -54,7 +54,7 @@ class ParallelRunner(Runner):
 
     def run(self) -> None:
         """
-        Starts the LabGraph graph. Returns when the graph has terminated.
+        Starts the Labgraph graph. Returns when the graph has terminated.
         """
         self._graph.setup()
         self._create_logger()
@@ -192,7 +192,7 @@ class ParallelRunner(Runner):
         except (ImportError, RuntimeError):
             raise RuntimeError(
                 f"Putting {cls.__name__} in the main scope is preventing its use with "
-                f"df.{self.__class__.__name__}. Please consider either a) creating "
+                f"lg.{self.__class__.__name__}. Please consider either a) creating "
                 "another module to use as the main module or b) using __main__.py "
                 "instead.\nhttps://docs.python.org/3.6/library/__main__.html"
             )
@@ -200,7 +200,7 @@ class ParallelRunner(Runner):
 
 def run(graph_type: Type[Graph]) -> None:
     """
-    Entry point for running LabGraph graphs. Call `run` with a LabGraph graph type to
+    Entry point for running Labgraph graphs. Call `run` with a Labgraph graph type to
     run a new graph of that type.
     """
     config_type = graph_type.__config_type__

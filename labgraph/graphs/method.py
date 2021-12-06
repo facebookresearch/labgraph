@@ -17,7 +17,7 @@ from typing import (
 
 from typing_extensions import Protocol
 
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from .topic import Topic
 
 
@@ -27,7 +27,7 @@ _METADATA_LABEL = "_METADATA"
 class AsyncPublisher(Protocol):
     """
     Convenience return type for async publisher methods. An async method that yields
-    tuples of LabGraph topics and messages can be typed as returning this.
+    tuples of Labgraph topics and messages can be typed as returning this.
     For example:
 
     ```
@@ -57,7 +57,7 @@ MainType = Callable[..., None]
 
 class NodeMethod(ABC):
     """
-    Represents a method on a Node that has been decorated by LabGraph. Subclasses
+    Represents a method on a Node that has been decorated by Labgraph. Subclasses
     include topic paths, if applicable.
     """
 
@@ -71,7 +71,7 @@ class NodeMethod(ABC):
 @dataclass
 class MethodMetadata:
     """
-    Represents metadata on a method that is created by a LabGraph decorator. The
+    Represents metadata on a method that is created by a Labgraph decorator. The
     `MethodMetadata` is used to validate the decorator usage and then construct a
     `NodeMethod`.
     """
@@ -119,43 +119,43 @@ class MethodMetadata:
         elif self.is_main:
             return Main(name=self.name)
         else:
-            raise LabGraphError("Unexpected NodeMethod type")
+            raise LabgraphError("Unexpected NodeMethod type")
 
     def validate(self) -> None:
         for i, topic1 in enumerate(self.published_topics):
             for j, topic2 in enumerate(self.published_topics):
                 if i != j and topic1 is topic2:
-                    raise LabGraphError(
+                    raise LabgraphError(
                         f"Method '{self.name}' got two @publisher decorators for the "
                         "same topic"
                     )
 
         if len(self.published_topics) > 0:
             if self.is_background:
-                raise LabGraphError(
+                raise LabgraphError(
                     f"Method '{self.name}' cannot have both a @{publisher.__name__} "
                     f"decorator and a @{background.__name__} decorator"
                 )
             if self.is_main:
-                raise LabGraphError(
+                raise LabgraphError(
                     f"Method '{self.name}' cannot have both a @{publisher.__name__} "
                     f"decorator and a @{main.__name__} decorator"
                 )
 
         if self.subscribed_topic is not None:
             if self.is_background:
-                raise LabGraphError(
+                raise LabgraphError(
                     f"Method '{self.name}' cannot have both a @{subscriber.__name__} "
                     f"decorator and a @{background.__name__} decorator"
                 )
             if self.is_main:
-                raise LabGraphError(
+                raise LabgraphError(
                     f"Method '{self.name}' cannot have both a @{subscriber.__name__} "
                     f"decorator and a @{main.__name__} decorator"
                 )
 
         if self.is_background and self.is_main:
-            raise LabGraphError(
+            raise LabgraphError(
                 f"Method '{self.name}' cannot have both a @{background.__name__} "
                 f"decorator and a @{main.__name__} decorator"
             )
@@ -178,7 +178,7 @@ def get_method_metadata(method: Callable[..., Any]) -> MethodMetadata:
 
 class Publisher(NodeMethod):
     """
-    Represents a LabGraph method decorated by `@publisher`.
+    Represents a Labgraph method decorated by `@publisher`.
     """
 
     published_topic_paths: Tuple[str, ...]
@@ -205,7 +205,7 @@ def publisher(topic: Topic) -> Callable[[PublisherType], PublisherType]:
 
 class Subscriber(NodeMethod):
     """
-    Represents a LabGraph method decorated by `@subscriber`.
+    Represents a Labgraph method decorated by `@subscriber`.
     """
 
     subscribed_topic_path: str
@@ -235,7 +235,7 @@ def subscriber(topic: Topic) -> Callable[[SubscriberType], SubscriberType]:
             or method.__code__.co_varnames[1] != list(annotations.keys())[0]
             # TODO: We could also check the return type here
         ):
-            raise LabGraphError(
+            raise LabgraphError(
                 f"Expected subscriber '{method.__name__}' to have signature def "
                 f"{method.__name__}(self, message: {topic.message_type.__name__}) -> "
                 "None"
@@ -243,7 +243,7 @@ def subscriber(topic: Topic) -> Callable[[SubscriberType], SubscriberType]:
 
         metadata = get_method_metadata(method)
         if metadata.subscribed_topic is not None:
-            raise LabGraphError(
+            raise LabgraphError(
                 f"Method '{metadata.name}' already has a @{subscriber.__name__} "
                 "decorator"
             )
@@ -257,7 +257,7 @@ def subscriber(topic: Topic) -> Callable[[SubscriberType], SubscriberType]:
 
 class Transformer(Publisher, Subscriber):
     """
-    Represents a LabGraph method decorated by both `@publisher` and `@subscriber`.
+    Represents a Labgraph method decorated by both `@publisher` and `@subscriber`.
     """
 
     def __init__(
@@ -272,7 +272,7 @@ class Transformer(Publisher, Subscriber):
 
 class Background(NodeMethod):
     """
-    Represents a LabGraph method decorated by `@background`.
+    Represents a Labgraph method decorated by `@background`.
     """
 
     def __init__(self, name: str) -> None:
@@ -288,7 +288,7 @@ def background(method: BackgroundType) -> BackgroundType:
     """
     metadata = get_method_metadata(method)
     if metadata.is_background:
-        raise LabGraphError(
+        raise LabgraphError(
             f"Method '{metadata.name}' already has a @{background.__name__} decorator"
         )
     metadata.is_background = True
@@ -298,7 +298,7 @@ def background(method: BackgroundType) -> BackgroundType:
 
 class Main(NodeMethod):
     """
-    Represents a LabGraph method decorated by `@main`.
+    Represents a Labgraph method decorated by `@main`.
     """
 
     def __init__(self, name: str) -> None:
@@ -315,7 +315,7 @@ def main(method: MainType) -> MainType:
     """
     metadata = get_method_metadata(method)
     if metadata.is_main:
-        raise LabGraphError(
+        raise LabgraphError(
             f"Method '{metadata.name}' already has a @{main.__name__} decorator"
         )
     metadata.is_main = True

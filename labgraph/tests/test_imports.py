@@ -4,7 +4,7 @@
 
 def test_imports() -> None:
     """
-    Tests that we can import top-level LabGraph objects correctly.
+    Tests that we can import top-level Labgraph objects correctly.
     """
 
     from .. import (  # noqa: F401
@@ -19,7 +19,7 @@ def test_imports() -> None:
         Connections,
         CPPNodeConfig,
         DeferredMessage,
-        LabGraphError,
+        LabgraphError,
         Event,
         EventGraph,
         EventPublishingHeap,

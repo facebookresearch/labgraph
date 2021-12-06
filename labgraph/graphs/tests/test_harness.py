@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
+import asyncio
 import dataclasses
 
 import pytest
 
 from ...messages.message import Message
+from ...util.testing import get_event_loop
 from ..config import Config
 from ..method import AsyncPublisher, publisher, subscriber
 from ..node import Node
@@ -130,6 +132,10 @@ def test_run_with_harness_max_num_results() -> None:
     # Check that using max_num_results with a non-generator raises
     with pytest.raises(TypeError):
         run_with_harness(MyNode, _not_a_generator, max_num_results=1)  # type: ignore
+    loop = get_event_loop()
+    for task in asyncio.Task.all_tasks(loop=loop):
+        task.cancel()
+    loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 def test_run_async_max_num_results() -> None:
@@ -146,6 +152,10 @@ def test_run_async_max_num_results() -> None:
     # Check that using max_num_results with a non-generator raises
     with pytest.raises(TypeError):
         run_async(_not_a_generator, max_num_results=1)  # type: ignore
+    loop = get_event_loop()
+    for task in asyncio.Task.all_tasks(loop=loop):
+        task.cancel()
+    loop.run_until_complete(loop.shutdown_asyncgens())
 
 
 async def _not_a_generator() -> None:

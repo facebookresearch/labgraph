@@ -4,7 +4,7 @@
 import pytest
 
 from ...messages.message import Message
-from ...util.error import LabGraphError
+from ...util.error import LabgraphError
 from ..method import subscriber
 from ..node import Node
 from ..topic import Topic
@@ -19,7 +19,7 @@ def test_duplicate_subscriber() -> None:
     Tests that an error is thrown when multiple subscriber decorators are applied to a
     method.
     """
-    with pytest.raises(LabGraphError) as err:
+    with pytest.raises(LabgraphError) as err:
 
         class MyNode(Node):
             A = Topic(MyMessage)
@@ -39,7 +39,7 @@ def test_subscriber_signature() -> None:
     Tests that an error is thrown when a subscriber has an invalid signature for message
     callbacks.
     """
-    with pytest.raises(LabGraphError) as err:
+    with pytest.raises(LabgraphError) as err:
 
         class MyNode(Node):
             A = Topic(MyMessage)

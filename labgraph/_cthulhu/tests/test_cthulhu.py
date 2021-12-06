@@ -8,7 +8,7 @@ import pytest
 from ...messages.message import Message
 from ...util.random import random_string
 from ...util.testing import local_test
-from ..cthulhu import Consumer, LabGraphCallbackParams, Producer, register_stream
+from ..cthulhu import Consumer, LabgraphCallbackParams, Producer, register_stream
 
 
 RANDOM_ID_LENGTH = 128
@@ -23,7 +23,7 @@ class MyMessage(Message):
 @local_test
 def test_producer_and_consumer() -> None:
     """
-    Tests that we can use the LabGraph wrappers around the Cthulhu APIs to publish
+    Tests that we can use the Labgraph wrappers around the Cthulhu APIs to publish
     and subscribe to messages.
     """
     stream_name = random_string(length=RANDOM_ID_LENGTH)
@@ -33,7 +33,7 @@ def test_producer_and_consumer() -> None:
 
     with Producer(stream_interface=stream_interface) as producer:
 
-        def callback(params: LabGraphCallbackParams[MyMessage]) -> None:
+        def callback(params: LabgraphCallbackParams[MyMessage]) -> None:
             received_messages.append(params.message)
 
         with Consumer(stream_interface=stream_interface, sample_callback=callback):
@@ -51,7 +51,7 @@ def test_producer_and_consumer() -> None:
 @local_test
 def test_complex_graph() -> None:
     """
-    Tests that we can use the LabGraph wrappers around the Cthulhu APIs to stream
+    Tests that we can use the Labgraph wrappers around the Cthulhu APIs to stream
     messages in a more complex graph.
     """
     stream_name1 = random_string(length=RANDOM_ID_LENGTH)
@@ -65,14 +65,14 @@ def test_complex_graph() -> None:
 
         with Producer(stream_interface=stream2) as producer2:
 
-            def transform_callback(params: LabGraphCallbackParams[MyMessage]) -> None:
+            def transform_callback(params: LabgraphCallbackParams[MyMessage]) -> None:
                 producer2.produce_message(
                     MyMessage(int_field=params.message.int_field * 2)
                 )
 
             with Consumer(stream_interface=stream1, sample_callback=transform_callback):
 
-                def sink_callback(params: LabGraphCallbackParams[MyMessage]) -> None:
+                def sink_callback(params: LabgraphCallbackParams[MyMessage]) -> None:
                     received_messages.append(params.message)
 
                 with Consumer(stream_interface=stream2, sample_callback=sink_callback):

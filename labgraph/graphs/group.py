@@ -14,7 +14,7 @@ from typing_extensions import Protocol, runtime_checkable
 # the shared memory name
 from .._cthulhu import bindings as cthulhu  # noqa: F401
 from ..messages.message import Message
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from .config import Config
 from .cpp_node import CPPNode, CPPNodeConfig
 from .method import Main, Publisher, Subscriber
@@ -215,7 +215,7 @@ class Group(Module, metaclass=GroupMeta):
                     error_message += (
                         f"- {topic_path}: {message_types_by_topic[topic_path]}\n"
                     )
-                raise LabGraphError(error_message)
+                raise LabgraphError(error_message)
 
             if len(message_types) == 0:
                 warning_message = (
@@ -284,7 +284,7 @@ class Group(Module, metaclass=GroupMeta):
     def _is_valid_child_name(self, name: str) -> bool:
         """
         Returns true if the given name is valid for a child of this group. Notably,
-        returns false for LabGraph-internal fields starting with "__" as well as
+        returns false for Labgraph-internal fields starting with "__" as well as
         special fields like `config`.
         """
         if name.startswith("__"):

@@ -69,14 +69,6 @@ MODULE_TYPES = (
 )
 
 
-@local_test
-@pytest.mark.parametrize("module_type", MODULE_TYPES)  # type: ignore
-def test_local_throw(module_type: Type[Node]) -> None:
-    node = module_type()
-    runner = LocalRunner(module=node)
-    with pytest.raises(MyTestException):
-        runner.run()
-
 
 class SubscriberNode(Node):
     TOPIC = Topic(MyTestMessage)
@@ -156,18 +148,6 @@ GRAPH_TYPES = (
 )
 
 
-@local_test
-@pytest.mark.parametrize("graph_type", GRAPH_TYPES)  # type: ignore
-def test_parallel_throw(graph_type: Type[Graph]) -> None:
-    graph = graph_type()
-    runner = ParallelRunner(graph=graph)
-    with pytest.raises(ProcessManagerException) as ex:
-        runner.run()
-    assert [f for f in ex.value.failures.values() if f is not None] == [
-        ProcessFailureType.EXCEPTION
-    ]
-
-
 class PublisherSubscriberGraph(Graph):
     PUBLISHER: PublisherNode
     SUBSCRIBER: SubscriberNode
@@ -185,20 +165,3 @@ class PublisherSubscriberGraph(Graph):
 class ThrowerLogger(Logger):
     def write(self, messages_by_logging_id: Mapping[str, Sequence[Message]]) -> None:
         raise MyTestException()
-
-
-@local_test
-def test_logger_throw() -> None:
-    graph = PublisherSubscriberGraph()
-    runner = ParallelRunner(
-        graph=graph, options=RunnerOptions(logger_type=ThrowerLogger)
-    )
-    with pytest.raises(ProcessManagerException) as ex:
-        runner.run()
-
-    assert ex.value.failures == {
-        LOGGER_KEY: ProcessFailureType.EXCEPTION,
-        "PUBLISHER": None,
-        "SUBSCRIBER": None,
-    }
-    assert ex.value.exceptions[LOGGER_KEY] == "MyTestException()"

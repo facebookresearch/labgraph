@@ -27,11 +27,11 @@ from typing import (
 import yappi
 from labgraph_cpp import NodeBootstrapInfo, NodeTopic  # type: ignore
 
-# HACK: Import from LabGraph's wrapper of Cthulhu before importing dynamic libs to set
+# HACK: Import from Labgraph's wrapper of Cthulhu before importing dynamic libs to set
 # the shared memory name
 from .._cthulhu.cthulhu import (
     Consumer,
-    LabGraphCallbackParams,
+    LabgraphCallbackParams,
     Mode,
     Producer,
     format_performance_summary,
@@ -95,7 +95,7 @@ class LocalRunnerState:
 
 class LocalRunner(Runner):
     """
-    A utility for running LabGraph modules. Given a module, runs the computation it
+    A utility for running Labgraph modules. Given a module, runs the computation it
     describes by creating two threads, one for its foreground processing and one for
     its event loop processing.
 
@@ -125,7 +125,7 @@ class LocalRunner(Runner):
 
     def run(self) -> None:
         """
-        Starts the LabGraph module. Returns when the module has terminated.
+        Starts the Labgraph module. Returns when the module has terminated.
         """
         try:
             if should_profile():
@@ -240,7 +240,7 @@ class LocalRunner(Runner):
 
     def _setup_cthulhu(self) -> None:
         """
-        Sets up Cthulhu as the transport for the LabGraph graph. Creates streams only
+        Sets up Cthulhu as the transport for the Labgraph graph. Creates streams only
         if the module has no parent graph. Then creates producers and consumers
         according to the publishers and subscribers in the module.
         """
@@ -355,7 +355,7 @@ class LocalRunner(Runner):
         assert MessageType is not None
         if self._options.aligner is not None:
             # Type with extra information for the aligner
-            MessageType = LabGraphCallbackParams[MessageType]  # type: ignore
+            MessageType = LabgraphCallbackParams[MessageType]  # type: ignore
 
         def callback(message: MessageType) -> None:  # type: ignore
             with self._state.lock:
@@ -569,6 +569,10 @@ class _AsyncThread(threading.Thread):
             logger.debug(f"{self.module}:background thread:terminate aligner")
             self.options.aligner.wait_for_completion()
         logger.debug(f"{self.module}:background thread:shutting down async gens")
+
+        # https://bugs.python.org/issue38559
+        for task in asyncio.Task.all_tasks(loop=loop):
+            task.cancel()
         loop.run_until_complete(loop.shutdown_asyncgens())
 
         logger.debug(f"{self.module}:background thread:waiting for pending tasks")

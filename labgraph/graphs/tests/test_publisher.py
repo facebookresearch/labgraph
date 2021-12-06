@@ -4,7 +4,7 @@
 import pytest
 
 from ...messages.message import Message
-from ...util.error import LabGraphError
+from ...util.error import LabgraphError
 from ..method import AsyncPublisher, publisher
 from ..topic import Topic
 
@@ -14,7 +14,7 @@ class MyMessage(Message):
 
 
 def test_duplicate_publisher() -> None:
-    with pytest.raises(LabGraphError) as err:
+    with pytest.raises(LabgraphError) as err:
         A = Topic(MyMessage)
 
         @publisher(A)

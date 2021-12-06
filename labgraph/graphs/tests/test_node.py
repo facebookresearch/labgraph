@@ -6,7 +6,7 @@ from typing import Dict, Type
 import pytest
 
 from ...messages.message import Message
-from ...util.error import LabGraphError
+from ...util.error import LabgraphError
 from ..method import (
     AsyncPublisher,
     NodeMethod,
@@ -77,7 +77,7 @@ def test_node_methods(node_type: Type[Node], methods: Dict[str, NodeMethod]) -> 
 
 def test_node_invalid_published_topic() -> None:
     bad_topic = Topic(MyMessage)
-    with pytest.raises(LabGraphError) as err:
+    with pytest.raises(LabgraphError) as err:
 
         class BadTopicNode(Node):
             @publisher(bad_topic)
@@ -92,7 +92,7 @@ def test_node_invalid_published_topic() -> None:
 
 def test_node_invalid_subscribed_topic() -> None:
     bad_topic = Topic(MyMessage)
-    with pytest.raises(LabGraphError) as err:
+    with pytest.raises(LabgraphError) as err:
 
         class BadTopicNode(Node):
             @subscriber(bad_topic)
@@ -118,7 +118,7 @@ class BadPublishersNode(Node):
 
 
 def test_bad_publishers_node() -> None:
-    with pytest.raises(LabGraphError) as err:
+    with pytest.raises(LabgraphError) as err:
         _ = BadPublishersNode()
 
     assert (
