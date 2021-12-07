@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserved.
+
 import unittest
 import os
 import pathlib
@@ -22,7 +25,9 @@ class TestLabgraphYamlAPI(unittest.TestCase):
     def test_loader_load_from_file_success(self) -> None:
         local_dir = os.path.join(self.tests_dir, "test_py_code.py")
         loader = PythonFileLoader()
-        loaded_code = loader.load_from_file(local_dir)
+        loaded_code = '\n'.join(
+            loader.load_from_file(local_dir).split('\n')[3:]
+        )
         expected_code = """class MyClass:\n    pass\n"""
         self.assertMultiLineEqual(expected_code, loaded_code)
 

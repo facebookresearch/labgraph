@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserved.
+
 import labgraph as lg
 from .test_lg_unit_message import MyMessage
 from .test_lg_unit_config import MyConfig

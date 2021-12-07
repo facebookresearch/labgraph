@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserved.
+
 from .base_loader import BaseLoader
 from .errors.errors import PythonFileLoaderError
 import os

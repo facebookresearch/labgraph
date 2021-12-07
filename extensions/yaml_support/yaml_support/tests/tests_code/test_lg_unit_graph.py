@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserved.
+
 import labgraph as lg
 from .test_lg_unit_node import MyNode
 from .test_lg_unit_group import MyGroup

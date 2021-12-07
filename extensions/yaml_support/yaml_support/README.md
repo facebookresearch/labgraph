@@ -22,6 +22,6 @@ python setup.py install
 To make sure things are working you can run
 
 ```
-python -m extensions.yaml_support.yaml_support.tests.test_lg_yaml_ap
+python -m extensions.yaml_support.yaml_support.tests.test_lg_yaml_api
 ```
 

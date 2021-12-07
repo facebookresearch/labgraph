@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserved.
+
 from typed_ast import ast3
 from .base_parser import BaseParser
 from extensions.yaml_support.yaml_support.model.lg_unit_model import (LabGraphUnitsModel)

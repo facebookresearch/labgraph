@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserved.
+
 from .model.lg_unit_model import LabGraphUnitsModel
 from ._parser.lg_units_parser import LabGraphUnitsParser
 from .loader.python_file_loader import PythonFileLoader

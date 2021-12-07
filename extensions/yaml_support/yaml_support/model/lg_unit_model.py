@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright 2004-present Facebook. All Rights Reserved.
+
 from .base_model import BaseModel
 from extensions.yaml_support.yaml_support.serializer.yaml_serializer import (
     YamlSerializer
