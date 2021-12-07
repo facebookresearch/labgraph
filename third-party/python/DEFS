@@ -18,7 +18,7 @@ def _config_var(executable, key):
 
 
 def config_var(key):
-    for executable in (python3", "python" + PYTHON_VERSION):
+    for executable in ("python3", "python" + PYTHON_VERSION):
         if not shutil.which(executable):
             continue
         if _config_var(executable, "py_version_short") != PYTHON_VERSION:
