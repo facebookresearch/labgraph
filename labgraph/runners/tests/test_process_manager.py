@@ -56,7 +56,6 @@ def proc(
     """
     A minimal version of a process managed by a `ProcessManager`. Used for testing the
     `ProcessManager`. The process simply updates its phase and sleeps.
-
     Args:
         state: The `ProcessManager`'s state.
         name: The name of the process.
@@ -129,6 +128,32 @@ def proc(
             time.sleep(PROCESS_SLEEP_TIME)
 
 
+@local_test
+def test_normal() -> None:
+    """
+    Tests that we can run multiple processes that terminate normally.
+    """
+    manager = ProcessManager(
+        processes=(
+            ProcessInfo(
+                module=__name__,
+                name="proc1",
+                args=("--manager-name", "test_manager", "--shutdown", "NORMAL"),
+            ),
+            ProcessInfo(
+                module=__name__,
+                name="proc2",
+                args=("--manager-name", "test_manager", "--shutdown", "NORMAL"),
+            ),
+        ),
+        name="test_manager",
+        startup_period=TEST_STARTUP_PERIOD,
+        shutdown_period=TEST_SHUTDOWN_PERIOD,
+    )
+
+    manager.run()
+
+
 @pytest.mark.parametrize(
     "crash_phase",
     (
@@ -138,6 +163,39 @@ def proc(
         ProcessPhase.STOPPING,
     ),
 )
+@local_test
+def test_crash(crash_phase: ProcessPhase) -> None:
+    """
+    Tests that we can run multiple processes where one of them crashes.
+    """
+    manager = ProcessManager(
+        processes=(
+            ProcessInfo(
+                module=__name__,
+                name="proc1",
+                args=(
+                    "--manager-name",
+                    "test_manager",
+                    "--shutdown",
+                    "CRASH",
+                    "--last-phase",
+                    crash_phase.name,
+                ),
+            ),
+            ProcessInfo(
+                module=__name__,
+                name="proc2",
+                args=("--manager-name", "test_manager", "--shutdown", "NORMAL"),
+            ),
+        ),
+        name="test_manager",
+        startup_period=TEST_STARTUP_PERIOD,
+        shutdown_period=TEST_SHUTDOWN_PERIOD,
+    )
+
+    with pytest.raises(ProcessManagerException) as ex:
+        manager.run()
+    assert ex.value.failures == {"proc1": ProcessFailureType.CRASH, "proc2": None}
 
 
 @pytest.mark.parametrize(
@@ -149,6 +207,39 @@ def proc(
         ProcessPhase.STOPPING,
     ),
 )
+@local_test
+def test_exception(exception_phase: ProcessPhase) -> None:
+    """
+    Tests that we can run multiple processes where one of them raises an exception.
+    """
+    manager = ProcessManager(
+        processes=(
+            ProcessInfo(
+                module=__name__,
+                name="proc1",
+                args=(
+                    "--manager-name",
+                    "test_manager",
+                    "--shutdown",
+                    "EXCEPTION",
+                    "--last-phase",
+                    exception_phase.name,
+                ),
+            ),
+            ProcessInfo(
+                module=__name__,
+                name="proc2",
+                args=("--manager-name", "test_manager", "--shutdown", "NORMAL"),
+            ),
+        ),
+        name="test_manager",
+        startup_period=TEST_STARTUP_PERIOD,
+        shutdown_period=TEST_SHUTDOWN_PERIOD,
+    )
+
+    with pytest.raises(ProcessManagerException) as ex:
+        manager.run()
+    assert ex.value.failures == {"proc1": ProcessFailureType.EXCEPTION, "proc2": None}
 
 
 @pytest.mark.parametrize(
@@ -160,6 +251,39 @@ def proc(
         ProcessPhase.STOPPING,
     ),
 )
+@local_test
+def test_hang(hang_phase: ProcessPhase) -> None:
+    """
+    Tests that we can run multiple processes where one of them hangs.
+    """
+    manager = ProcessManager(
+        processes=(
+            ProcessInfo(
+                module=__name__,
+                name="proc1",
+                args=(
+                    "--manager-name",
+                    "test_manager",
+                    "--shutdown",
+                    "HANG",
+                    "--last-phase",
+                    hang_phase.name,
+                ),
+            ),
+            ProcessInfo(
+                module=__name__,
+                name="proc2",
+                args=("--manager-name", "test_manager", "--shutdown", "NORMAL"),
+            ),
+        ),
+        name="test_manager",
+        startup_period=TEST_STARTUP_PERIOD,
+        shutdown_period=TEST_SHUTDOWN_PERIOD,
+    )
+
+    with pytest.raises(ProcessManagerException) as ex:
+        manager.run()
+    assert ex.value.failures == {"proc1": ProcessFailureType.HANG, "proc2": None}
 
 
 @click.command()
