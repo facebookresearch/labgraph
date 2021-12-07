@@ -3,7 +3,7 @@
 
 from typed_ast import ast3
 from .base_parser import BaseParser
-from extensions.yaml_support.yaml_support.model.lg_unit_model import (LabGraphUnitsModel)
+from extensions.yaml_support.yaml_support.model.lg_unit_model import LabGraphUnitsModel
 from extensions.yaml_support.yaml_support.enums.lg_units_enum import LabGraphBuiltinUnits
 
 from typed_ast.ast3 import (
@@ -15,7 +15,7 @@ from typed_ast.ast3 import (
     Assign,
     AnnAssign,
 )
-from typing import TypeVar, Generic, List, Dict
+from typing import Any, TypeVar, Generic, List, Dict
 
 
 T = TypeVar("T")
@@ -25,7 +25,7 @@ class LabGraphUnitsParser(BaseParser, NodeVisitor, Generic[T]):
     """
     Parses the LabGraph classes
     """
-    def __init__(self, element_type: T = LabGraphBuiltinUnits):
+    def __init__(self, element_type: T = LabGraphBuiltinUnits) -> None:
         super().__init__()
         self.__classes: List[element_type] = []
 
@@ -164,7 +164,7 @@ class LabGraphUnitsParser(BaseParser, NodeVisitor, Generic[T]):
             self.__classes.append(class_model)
             self.generic_visit(node)
 
-    def __construct_type(self, value, type):
+    def __construct_type(self, value: Any, type: str) -> str:
         """
         Recursive method that helps to construct a string
         that represents a complex datatype of a class member or a method

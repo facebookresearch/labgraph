@@ -8,7 +8,7 @@ setup(
     version="1.0.0",
     description="A LabgraphUnits-YAML parser",
     packages=find_packages(),
-    python_requires=">=3.6, <3.7",
+    python_requires=">=3.6",
     install_requires=[
         "typed-ast==1.4.3",
         "PyYAML==6.0",

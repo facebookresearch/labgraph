@@ -9,7 +9,7 @@ import ntpath
 import os
 
 
-def yamlify(python_file: str, yaml_file: str = "") -> None:
+def yamlify(python_file: str, yaml_file: str = "") -> str:
     """
     Takes .py file and parse it to .yaml file
 

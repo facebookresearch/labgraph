@@ -4,15 +4,9 @@
 import unittest
 import os
 import pathlib
-from extensions.yaml_support.yaml_support.loader.python_file_loader import (
-    PythonFileLoader
-)
-from extensions.yaml_support.yaml_support.loader.errors.errors import (
-    PythonFileLoaderError
-)
-from extensions.yaml_support.yaml_support._parser.lg_units_parser import (
-    LabGraphUnitsParser
-)
+from extensions.yaml_support.yaml_support.loader.python_file_loader import PythonFileLoader
+from extensions.yaml_support.yaml_support.loader.errors.errors import PythonFileLoaderError
+from extensions.yaml_support.yaml_support._parser.lg_units_parser import LabGraphUnitsParser
 
 
 class TestLabgraphYamlAPI(unittest.TestCase):

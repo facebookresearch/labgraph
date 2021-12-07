@@ -42,7 +42,7 @@ class LabGraphUnitsModel(BaseModel):
     def methods(self) -> Dict[str, Dict[str, Any]]:
         return self.__methods
 
-    def save(self, path: str) -> bool:
+    def save(self, path: str) -> None:
         if self.base in (
             LabGraphBuiltinUnits.MESSAGE,
             LabGraphBuiltinUnits.CONFIG,
