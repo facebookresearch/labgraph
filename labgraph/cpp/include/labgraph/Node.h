@@ -10,7 +10,7 @@ namespace labgraph {
 /**
  * struct NodeTopic
  *
- * Describes a mapping between a LabGraph topic and a Cthulhu stream.
+ * Describes a mapping between a Labgraph topic and a Cthulhu stream.
  */
 struct NodeTopic {
   std::string topicName;
@@ -20,11 +20,11 @@ struct NodeTopic {
 /**
  * struct NodeBootstrapInfo
  *
- * Contains all information needed to bootstrap a LabGraph C++ node into a state ready
- * for execution in an existing LabGraph graph.
+ * Contains all information needed to bootstrap a Labgraph C++ node into a state ready
+ * for execution in an existing Labgraph graph.
  */
 struct NodeBootstrapInfo {
-  std::vector<NodeTopic> topics; // Mapping of LabGraph topics to Cthulhu streams
+  std::vector<NodeTopic> topics; // Mapping of Labgraph topics to Cthulhu streams
 };
 
 typedef std::function<void()> Publisher;
@@ -67,26 +67,26 @@ struct TransformerInfo {
 /**
  * class Node
  *
- * Describes a C++ node in a LabGraph graph.
+ * Describes a C++ node in a Labgraph graph.
  */
 class Node {
  public:
   Node();
   virtual ~Node();
 
-  /*** Setup function that is run when the LabGraph graph is starting up. */
+  /*** Setup function that is run when the Labgraph graph is starting up. */
   virtual void setup();
 
   /**
-   * Entry point that is run in the LabGraph graph to start all the node's publishers.
+   * Entry point that is run in the Labgraph graph to start all the node's publishers.
    */
   void run();
 
-  /*** Cleanup function that is run when the LabGraph graph is shutting down. */
+  /*** Cleanup function that is run when the Labgraph graph is shutting down. */
   virtual void cleanup();
 
   /**
-   * Bootstrapping function that is run by the LabGraph graph to connect this node's
+   * Bootstrapping function that is run by the Labgraph graph to connect this node's
    * topics with their corresponding Cthulhu streams.
    */
   void bootstrap(NodeBootstrapInfo& bootstrapInfo);

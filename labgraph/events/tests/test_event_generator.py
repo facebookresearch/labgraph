@@ -7,7 +7,7 @@ import pytest
 
 from ...graphs import Topic
 from ...messages import Message, TimestampedMessage
-from ...util.error import LabGraphError
+from ...util.error import LabgraphError
 from .. import (
     BaseEventGenerator,
     DeferredMessage,
@@ -93,7 +93,7 @@ def test_event_init_negative_duration(mocker: Any) -> None:
         MyMessage, "unittest_args", kwargs_field="unittest_kwargs"
     )
     topic = Topic(MyMessage)
-    with pytest.raises(LabGraphError):
+    with pytest.raises(LabgraphError):
         _ = Event(message, topic, 0.0, -1.0)
 
 
@@ -124,7 +124,7 @@ def test_event_graph_init_bad_start_event(mocker: Any) -> None:
     )
     topic = Topic(MyMessage)
     event = Event(message, topic, -1.0)
-    with pytest.raises(LabGraphError):
+    with pytest.raises(LabgraphError):
         _ = EventGraph(event)
 
 
@@ -157,7 +157,7 @@ def test_event_graph_accumulated_time_no_previous(mocker: Any) -> None:
     graph = EventGraph(start)
     parent = Event(message, topic, 0.0, 1.0)
     child = Event(message, topic, 0.0, 1.0)
-    with pytest.raises(LabGraphError):
+    with pytest.raises(LabgraphError):
         graph.add_event_at_end(child, parent)
 
 
@@ -171,7 +171,7 @@ def test_event_graph_accumulated_time_before_start(mocker: Any) -> None:
     parent = Event(message, topic, 0.0, 1.0)
     child = Event(message, topic, -3.0, 1.0)
     graph.add_event_at_end(parent, start)
-    with pytest.raises(LabGraphError):
+    with pytest.raises(LabgraphError):
         graph.add_event_at_end(child, parent)
 
 

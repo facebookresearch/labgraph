@@ -2,7 +2,7 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 # This is a wrapper around cthulhubindings to randomize the name of the shared memory it
-# uses. This allows us to keep shared memory for different LabGraph graphs separate
+# uses. This allows us to keep shared memory for different Labgraph graphs separate
 # when they are running simultaneously.
 
 import os

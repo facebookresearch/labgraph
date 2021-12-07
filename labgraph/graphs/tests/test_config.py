@@ -5,7 +5,7 @@ from enum import Enum, IntEnum
 
 import pytest
 
-from ...util import LabGraphError
+from ...util import LabgraphError
 from ..config import Config
 from ..node import Node
 
@@ -89,7 +89,7 @@ def test_node_no_config() -> None:
     """
     node = MyNode()
 
-    with pytest.raises(LabGraphError) as err:
+    with pytest.raises(LabgraphError) as err:
         node.setup()
 
     assert (

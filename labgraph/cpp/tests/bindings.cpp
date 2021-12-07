@@ -8,7 +8,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(MyCPPNodes, m) {
-  m.doc() = "LabGraph C++: MyCPPNodes unit test";
+  m.doc() = "Labgraph C++: MyCPPNodes unit test";
 
   std::vector<std::string> sourceTopics = {"A"};
   labgraph::bindNode<MyCPPSource>(m, "MyCPPSource", sourceTopics)

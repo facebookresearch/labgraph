@@ -2,12 +2,14 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 import asyncio
+import time
 
 import zmq
 import zmq.asyncio
 from zmq.utils.monitor import parse_monitor_message
 
 from ..graphs import Config, Node, Topic, background, subscriber
+from ..util.error import LabgraphError
 from ..util.logger import get_logger
 from ..zmq_node import ZMQMessage
 from .constants import ZMQEvent
@@ -25,8 +27,8 @@ class ZMQSenderConfig(Config):
 
 class ZMQSenderNode(Node):
     """
-    Represents a node in a LabGraph graph that subscribes to messages in a
-    LabGraph topic and forwards them by writing to a ZMQ socket.
+    Represents a node in a Labgraph graph that subscribes to messages in a
+    Labgraph topic and forwards them by writing to a ZMQ socket.
 
     Args:
         write_addr: The address to which ZMQ data should be written.

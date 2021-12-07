@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, Optional, Set, Tuple, Type, TypeVar
 import typeguard
 
 from ..messages.message import Message
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from ..util.random import random_string
 from .config import Config
 from .method import (
@@ -63,7 +63,7 @@ class ModuleMeta(ABCMeta):
 
                 # Raise if names of topics in multiple base classes collide
                 if topic_name in cls.__topics__:
-                    raise LabGraphError(
+                    raise LabgraphError(
                         f"Base classes of {cls.__name__} have conflicting topics named "
                         f"{topic_name}"
                     )
@@ -78,7 +78,7 @@ class ModuleMeta(ABCMeta):
             # Raise if a topic object was already used by a module (i.e., its _name) was
             # set
             if field_value._name is not None:
-                raise LabGraphError(
+                raise LabgraphError(
                     "Duplicate topic object found: please assign different Topic "
                     f"objects to values {field_value.name} and {cls.__name__}."
                     f"{field_name}"
@@ -88,7 +88,7 @@ class ModuleMeta(ABCMeta):
 
             # Raise if a topic name collides with a superclass's topic name
             if field_name in cls.__topics__:
-                raise LabGraphError(
+                raise LabgraphError(
                     f"Topic {cls.__name__}/{field_name} hides superclass's topic"
                 )
 
@@ -105,7 +105,7 @@ class ModuleMeta(ABCMeta):
 
 class Module(ABC, metaclass=ModuleMeta):
     """
-    An abstraction for a LabGraph component that can be run within a single process.
+    An abstraction for a Labgraph component that can be run within a single process.
     """
 
     state: State
@@ -163,7 +163,7 @@ class Module(ABC, metaclass=ModuleMeta):
                 # message type with fields that all have default values)
                 self._config = self.__class__.__config_type__()
             except TypeError:
-                raise LabGraphError(
+                raise LabgraphError(
                     f"Configuration not set. Call {self.__class__.__name__}.configure() to set the "
                     "configuration."
                 )
@@ -302,7 +302,7 @@ class Module(ABC, metaclass=ModuleMeta):
         main_methods = self._get_methods_of_type(Main)
         if len(main_methods) > 1:
             method_names = ", ".join(main_methods.keys())
-            raise LabGraphError(
+            raise LabgraphError(
                 "Cannot have multiple methods decorated with @main in nodes in the "
                 f"same process: found methods {method_names}"
             )
@@ -318,7 +318,7 @@ class Module(ABC, metaclass=ModuleMeta):
         for stream in self.__streams__.values():
             if topic_path in stream.topic_paths:
                 return stream
-        raise LabGraphError(f"Topic '{topic_path}' is not in a stream")
+        raise LabgraphError(f"Topic '{topic_path}' is not in a stream")
 
     def _get_topic_path(self, topic: Topic) -> str:
         """
@@ -328,7 +328,7 @@ class Module(ABC, metaclass=ModuleMeta):
             if topic is candidate_topic:
                 return topic_path
 
-        raise LabGraphError(
+        raise LabgraphError(
             f"Could not find topic '{topic.name}' in module {self.__class__.__name__}"
         )
 
@@ -343,7 +343,7 @@ class Module(ABC, metaclass=ModuleMeta):
             if candidate_module is module:
                 return module_path
 
-        raise LabGraphError(
+        raise LabgraphError(
             f"Could not find module '{module.__class__.__name__}' ({module.id}) in "
             f"module {self.__class__.__name__}"
         )
@@ -381,4 +381,4 @@ class Module(ABC, metaclass=ModuleMeta):
                 error_message += "\n".join(
                     sorted(f"- {path}" for path in publisher_paths)
                 )
-                raise LabGraphError(error_message)
+                raise LabgraphError(error_message)

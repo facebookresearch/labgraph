@@ -42,7 +42,7 @@ class LoggerConfig(Config):
             disk. Defaults to 1 second. If `None`, the logger will only flush when the
             buffer is full.
         streams_by_logging_id:
-            A dictionary of the LabGraph stream objects by logging id. When specified,
+            A dictionary of the Labgraph stream objects by logging id. When specified,
             the logger will subscribe to the Cthulhu streams itself. This should always
             be provided unless the logger is being unit tested.
     """
@@ -125,7 +125,7 @@ class Logger(Node):
     def _get_logger_callback(
         self, logging_id: str, stream: Stream
     ) -> Callable[[Message], None]:
-        # We add the correct type annotation so LabGraph knows what message type to
+        # We add the correct type annotation so Labgraph knows what message type to
         # deserialize to
         assert stream.message_type is not None
         MessageType: Type[Message] = stream.message_type

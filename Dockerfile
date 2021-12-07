@@ -50,8 +50,8 @@ WORKDIR "/opt/labgraph"
 COPY . .
 
 # Build LabGraph Wheel
-RUN python3.6 setup.py install --user
-RUN python3.6 setup.py sdist bdist_wheel
+RUN python3.6 setup_py36.py install --user
+RUN python3.6 setup_py36.py sdist bdist_wheel
 RUN python3.6 -m pip install auditwheel
 RUN auditwheel repair dist/*whl -w dist/
 

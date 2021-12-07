@@ -13,7 +13,7 @@ from ..loggers.hdf5.logger import HDF5Logger
 from ..loggers.logger import Logger, LoggerConfig
 from ..messages.message import Message
 from ..messages.types import BytesType
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from ..util.logger import get_logger
 from .aligner import Aligner
 from .process_manager import ProcessManagerState

@@ -14,7 +14,7 @@ class NormalTermination(Exception):
 
 class ExceptionMessage(Message):
     """
-    Holds the bytes for a thrown exception in a LabGraph message.
+    Holds the bytes for a thrown exception in a Labgraph message.
     Convenient for passing exceptions between processes.
     """
 

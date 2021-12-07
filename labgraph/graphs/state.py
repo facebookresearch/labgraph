@@ -18,7 +18,7 @@ class StateMeta(type):
 
 class State(metaclass=StateMeta):
     """
-    Represents the state of a LabGraph module. State objects are useful when we would
+    Represents the state of a Labgraph module. State objects are useful when we would
     like the module to use some memory to run its algorithm while also being able to:
 
     - bootstrap that module into some state in the "middle" of its algorithm

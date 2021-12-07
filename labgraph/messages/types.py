@@ -1,18 +1,27 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
+import dataclasses
 import pickle
 import struct
 from abc import ABC, abstractmethod, abstractproperty
 from enum import Enum
 from io import BytesIO
-from typing import Any, Generic, Optional, Tuple, Type, TypeVar
+from typing import Any, Dict, Generic, List, Optional, Tuple, Type, TypeVar
 
 import numpy as np
 import typeguard
 
 
+DEFAULT_LEN_LENGTH = 10
 DEFAULT_STR_LENGTH = 128
+# Internal fields that are present on Message instances but are not included when
+# serializing the message for streaming
+LOCAL_INTERNAL_FIELDS = (
+    "__sample__",
+    "__original_message__",
+    "__original_message_type__",
+)
 
 
 class ByteOrder(str, Enum):
@@ -60,7 +69,7 @@ T = TypeVar("T")
 
 class FieldType(ABC, Generic[T]):
     """
-    Represents a LabGraph field type. Subclasses implement methods that describe how to
+    Represents a Labgraph field type. Subclasses implement methods that describe how to
     check for instances of the type and serialize the type.
     """
 
@@ -306,49 +315,6 @@ class StrType(StructType[str]):
         return str
 
 
-T_S = TypeVar("T_S", bound=Enum)  # Enumerated string type
-
-
-class StrEnumType(StructType[T_S]):
-    """
-    Represents an enumerated string type.
-
-    Args:
-        encoding: The encoding to use to serialize strings for this field.
-    """
-
-    length: int
-    encoding: str
-
-    def __init__(self, enum_type: Type[T_S], encoding: str = "utf-8") -> None:
-        self.length = max(len(item.value) for item in enum_type)
-        self.encoding = encoding
-        self.enum_type = enum_type
-
-    @property
-    def format_string(self) -> str:
-        return f"{self.length}s"
-
-    def isinstance(self, obj: Any) -> bool:
-        return isinstance(obj, self.enum_type)
-
-    @property
-    def description(self) -> str:
-        return self.enum_type.__name__
-
-    def preprocess(self, value: T_S) -> bytes:
-        str_value: str = value.value
-        return str_value.encode(self.encoding)
-
-    def postprocess(self, value: bytes) -> T_S:
-        str_value = value.decode(self.encoding).rstrip("\0")
-        return self.enum_type(str_value)
-
-    @property
-    def python_type(self) -> type:
-        return self.enum_type
-
-
 class BytesType(StructType[bytes]):
     """
     Represents a bytes type.
@@ -461,6 +427,47 @@ class DynamicType(FieldType[T]):
         return None
 
 
+T_S = TypeVar("T_S", bound=Enum)  # Enumerated string type
+
+
+class StrEnumType(DynamicType[T_S]):
+    """
+    Represents an enumerated string type.
+
+    Args:
+        encoding: The encoding to use to serialize strings for this field.
+    """
+
+    def __init__(self, enum_type: Type[T_S], encoding: str = "utf-8") -> None:
+        self.enum_type = enum_type
+        self.encoding = encoding
+
+    def isinstance(self, obj: Any) -> bool:
+        return isinstance(obj, self.enum_type)
+
+    @property
+    def description(self) -> str:
+        return self.enum_type.__name__
+
+    def preprocess(self, obj: T_S) -> bytes:
+        type_ = pickle.dumps(type(obj))
+        type_len = get_len_bytes(type_)
+        str_ = bytes(obj.value, encoding=self.encoding)
+        str_len = get_len_bytes(str_)
+        return type_len + type_ + str_len + str_
+
+    def postprocess(self, obj_bytes: bytes) -> T_S:
+        raw, curr = get_next_bytes(obj_bytes, 0)
+        type_ = pickle.loads(raw)
+        raw, curr = get_next_bytes(obj_bytes, curr)
+        str_ = raw.decode(self.encoding)
+        return type_(str_)
+
+    @property
+    def python_type(self) -> type:
+        return self.enum_type
+
+
 class ObjectDynamicType(DynamicType[Any]):
     """
     Represents a dynamic field type for any object. This is a fallback type for when we
@@ -486,39 +493,41 @@ class ObjectDynamicType(DynamicType[Any]):
 class NumpyDynamicType(DynamicType[np.ndarray]):
     """
     Represents a numpy dynamic field type.
-
-    Args:
-        dtype: The dtype of a numpy array of this type.
     """
-
-    dtype: np.dtype
-
-    def __init__(self, dtype: np.dtype = np.float64) -> None:
-        self.dtype = dtype
 
     @property
     def python_type(self) -> type:
         return np.ndarray  # type: ignore
 
     def isinstance(self, obj: Any) -> bool:
-        return isinstance(obj, np.ndarray) and obj.dtype == self.dtype
+        return isinstance(obj, np.ndarray)
 
     def preprocess(self, obj: np.ndarray) -> bytes:
         assert self.isinstance(obj)
+        values = []
+        dtype_bytes = get_packed_value(ObjectDynamicType(), obj.dtype)
+        dtype_len = get_len_bytes(dtype_bytes)
+        values.extend([dtype_len, dtype_bytes])
         buf = BytesIO()
         np.save(buf, obj)
         buf.seek(0)
-        return buf.read()
+        array_bytes = buf.read()
+        array_len = get_len_bytes(array_bytes)
+        values.extend([array_len, array_bytes])
+        return b"".join(values)
 
     def postprocess(self, obj_bytes: bytes) -> np.ndarray:
-        buf = BytesIO(obj_bytes)
+        raw, curr = get_next_bytes(obj_bytes, 0)
+        dtype = get_unpacked_value(ObjectDynamicType(), raw)
+        raw, curr = get_next_bytes(obj_bytes, curr)
+        buf = BytesIO(raw)
         arr = np.load(buf)
         assert isinstance(arr, np.ndarray)
-        return arr.astype(self.dtype)
+        return arr.astype(dtype)
 
     @property
     def description(self) -> str:
-        return f"numpy.ndarray({self.dtype})"
+        return "numpy.ndarray"
 
 
 class StrDynamicType(DynamicType[str]):
@@ -561,6 +570,152 @@ class BytesDynamicType(DynamicType[bytes]):
         return "bytes"
 
 
+class ListType(DynamicType[List[T]]):
+    """
+    Represents a list dynamic field type.
+    """
+
+    type_: Type[T]
+
+    def __init__(self, type_: Type[T]) -> None:
+        self.type_ = type_
+        self._sub_type = get_field_type(self.type_)
+
+    @property
+    def python_type(self) -> type:
+        return list
+
+    def isinstance(self, obj: Any) -> bool:
+        return isinstance(obj, list)
+
+    def preprocess(self, obj: List[T]) -> bytes:
+        values = [get_len_bytes(obj)]
+        for item in obj:
+            value = get_packed_value(self._sub_type, item)
+            value_len = get_len_bytes(value)
+            values.append(value_len)
+            values.append(value)
+        return b"".join(values)
+
+    def postprocess(self, obj_bytes: bytes) -> List[T]:
+        obj_len = int(obj_bytes[0:DEFAULT_LEN_LENGTH])
+        curr = DEFAULT_LEN_LENGTH
+        values = []
+        for _ in range(obj_len):
+            raw, curr = get_next_bytes(obj_bytes, curr)
+            values.append(get_unpacked_value(self._sub_type, raw))
+        return values
+
+    @property
+    def description(self) -> str:
+        return f"typing.List[{self.type_}]"
+
+
+V = TypeVar("V")
+
+
+class DictType(DynamicType[Dict[T, V]]):
+    """
+    Represents a list dynamic field type.
+    """
+
+    type_: Tuple[Type[T], Type[V]]
+
+    def __init__(self, type_: Tuple[Type[T], Type[V]]) -> None:
+        self.type_ = type_
+        self._key_type = get_field_type(self.type_[0])
+        self._val_type = get_field_type(self.type_[1])
+
+    @property
+    def python_type(self) -> type:
+        return dict
+
+    def isinstance(self, obj: Any) -> bool:
+        return isinstance(obj, dict)
+
+    def preprocess(self, obj: Dict[T, V]) -> bytes:
+        values = [bytes(str(len(obj)).rjust(DEFAULT_LEN_LENGTH, "0"), encoding="ascii")]
+        for key, val in obj.items():
+            key_bytes = get_packed_value(self._key_type, key)
+            val_bytes = get_packed_value(self._val_type, val)
+            key_len = get_len_bytes(key_bytes)
+            val_len = get_len_bytes(val_bytes)
+            values.extend([key_len, key_bytes, val_len, val_bytes])
+        return b"".join(values)
+
+    def postprocess(self, obj_bytes: bytes) -> Dict[T, V]:
+        obj_len = int(obj_bytes[0:DEFAULT_LEN_LENGTH])
+        curr = DEFAULT_LEN_LENGTH
+        values = {}
+        for _ in range(obj_len):
+            raw, curr = get_next_bytes(obj_bytes, curr)
+            key = get_unpacked_value(self._key_type, raw)
+            raw, curr = get_next_bytes(obj_bytes, curr)
+            val = get_unpacked_value(self._val_type, raw)
+            values[key] = val
+        return values
+
+    @property
+    def description(self) -> str:
+        return f"typing.Dict[{self.type_[0]}, {self.type_[1]}]"
+
+
+class DataclassType(DynamicType[T]):
+    """
+    Represents a dataclass dynamic field type.
+    """
+
+    type_: Type[T]
+
+    def __init__(self, type_: Type[T]) -> None:
+        self.type_ = type_
+
+    @property
+    def python_type(self) -> type:
+        return self.type_
+
+    def isinstance(self, obj: Any) -> bool:
+        return isinstance(obj, self.type_)
+
+    def preprocess(self, obj: T) -> bytes:
+        type_ = pickle.dumps(type(obj))
+        type_len = get_len_bytes(type_)
+        values = [type_len, type_]
+        for field in dataclasses.fields(obj):
+            if field.name in LOCAL_INTERNAL_FIELDS:
+                continue
+            sub_type = get_field_type(field.type)
+            value = get_packed_value(sub_type, getattr(obj, field.name))
+            value_len = get_len_bytes(value)
+            values.append(value_len)
+            values.append(value)
+        return b"".join(values)
+
+    def postprocess(self, obj_bytes: bytes) -> T:
+        raw, curr = get_next_bytes(obj_bytes, 0)
+        type_ = pickle.loads(raw)
+        init_values = {}
+        non_init_values = {}
+        for field in dataclasses.fields(type_):
+            if field.name in LOCAL_INTERNAL_FIELDS:
+                continue
+            sub_type = get_field_type(field.type)
+            raw, curr = get_next_bytes(obj_bytes, curr)
+            value = get_unpacked_value(sub_type, raw)
+            if field.init:
+                init_values[field.name] = value
+            else:
+                non_init_values[field.name] = value
+        obj = type_(**init_values)
+        for field_name, value in non_init_values.items():
+            setattr(obj, field_name, value)
+        return obj
+
+    @property
+    def description(self) -> str:
+        return f"{self.type_}(...))"
+
+
 PRIMITIVE_TYPES = {
     int: IntType,
     float: FloatType,
@@ -572,15 +727,29 @@ PRIMITIVE_TYPES = {
 
 def get_field_type(python_type: Type[T]) -> FieldType[T]:
     """
-    Returns a `FieldType` that contains all the information LabGraph needs for a field.
+    Returns a `FieldType` that contains all the information Labgraph needs for a field.
 
     Args:
         `python_type`: A Python type to get a `FieldType` for.
     """
 
-    if not isinstance(python_type, type):
+    if isinstance(python_type, FieldType):
+        return python_type
+    if python_type.__module__ == "typing":
+        # TODO: Switch to `typing.get_origin` for py38
+        origin = getattr(python_type, "__origin__", None)
+        if origin in (list, List):
+            # TODO: Switch to `typing.get_args` for py38
+            return ListType(python_type.__args__[0])  # type: ignore
+        elif origin in (dict, Dict):
+            # TODO: Switch to `typing.get_args` for py38
+            return DictType(python_type.__args__)  # type: ignore
         return ObjectDynamicType()
-    if issubclass(python_type, Enum):
+    elif not isinstance(python_type, type):
+        return ObjectDynamicType()
+    elif dataclasses.is_dataclass(python_type):
+        return DataclassType(python_type)
+    elif issubclass(python_type, Enum):
         if issubclass(python_type, str):
             return StrEnumType(python_type)  # type: ignore
         elif issubclass(python_type, int):
@@ -595,3 +764,29 @@ def get_field_type(python_type: Type[T]) -> FieldType[T]:
         return NumpyDynamicType()
 
     return ObjectDynamicType()
+
+
+def get_len_bytes(obj: Any) -> bytes:
+    return bytes(str(len(obj)).rjust(DEFAULT_LEN_LENGTH, "0"), encoding="ascii")
+
+
+def get_next_bytes(obj: bytes, curr: int) -> Tuple[bytes, int]:
+    length = int(obj[curr : curr + DEFAULT_LEN_LENGTH])
+    curr += DEFAULT_LEN_LENGTH
+    raw = obj[curr : curr + length]
+    curr += length
+    return (raw, curr)
+
+
+def get_packed_value(type_: FieldType[T], value: Any) -> bytes:
+    value = type_.preprocess(value)
+    if isinstance(type_, StructType):
+        value = struct.pack(type_.format_string, value)
+    return value
+
+
+def get_unpacked_value(type_: FieldType[T], value: bytes) -> Any:
+    if isinstance(type_, StructType):
+        value = struct.unpack(type_.format_string, value)[0]
+    value = type_.postprocess(value)  # type: ignore
+    return value

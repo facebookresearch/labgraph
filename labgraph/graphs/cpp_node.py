@@ -6,11 +6,11 @@ from typing import Any, List, Optional, Type
 
 from labgraph_cpp import Node as _Node, NodeBootstrapInfo  # type: ignore
 
-# HACK: Import from LabGraph's wrapper of Cthulhu before importing dynamic libs to set
+# HACK: Import from Labgraph's wrapper of Cthulhu before importing dynamic libs to set
 # the shared memory name
 from .._cthulhu import bindings  # noqa: F401
 from ..messages.message import Message
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from .config import Config
 from .method import Subscriber, background
 from .node import Node

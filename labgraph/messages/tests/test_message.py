@@ -3,6 +3,7 @@
 
 # Unit tests for the Message class.
 
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List
 
@@ -129,7 +130,7 @@ class MyDynamicNumpyIntMessage(Message):
     """
 
     field1: str
-    field2: NumpyDynamicType(dtype=np.int64)  # type: ignore
+    field2: np.ndarray
     field3: int
 
 
@@ -140,7 +141,16 @@ class MyDynamicMessage(Message):
 
     field1: Dict[str, Any]
     field2: int
-    field3: List[Any]
+    field3: List[int]
+
+
+@dataclass
+class MyDataclass:
+    sub_field1: int
+
+
+class MyDataclassMessage(Message):
+    field1: MyDataclass
 
 
 class MyInvalidDefaultMessage(Message):
@@ -394,16 +404,6 @@ def test_dynamic_numpy_field_with_type() -> None:
     assert message.field3 == 5
 
 
-def test_dynamic_numpy_field_with_invalid_type() -> None:
-    """
-    Tests that we throw an error when we construct a message type with an incorrect
-    dtype for the dynamic numpy field.
-    """
-
-    with pytest.raises(TypeError):
-        MyDynamicNumpyIntMessage(field1="hello", field2=np.random.rand(3, 3), field3=5)
-
-
 def test_static_to_dynamic_conversion() -> None:
     """
     Tests that we can convert a static field to a dynamic field between equivalent
@@ -440,11 +440,20 @@ def test_dynamic_fields() -> None:
     """
     field1 = {"key1": 5, "key2": "value2"}
     field2 = 12
-    field3 = [5, "hello", 6.2]
+    field3 = [5, 6, 7]
     message = MyDynamicMessage(field1=field1, field2=field2, field3=field3)
     assert message.field1 == field1
     assert message.field2 == field2
     assert message.field3 == field3
+
+
+def test_dataclass_fields() -> None:
+    """
+    Tests that we can serialize some more dynamic field types.
+    """
+    field1 = MyDataclass(sub_field1=7)
+    message = MyDataclassMessage(field1=field1)
+    assert message.field1 == field1
 
 
 def test_invalid_default_field() -> None:

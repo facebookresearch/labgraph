@@ -27,7 +27,7 @@ def get_module_class(python_module: str, python_class: str) -> Type[Module]:
                     break
         else:
             raise NameError(
-                f"Could not find LabGraph a class in module `{python_module}`` with "
+                f"Could not find Labgraph a class in module `{python_module}`` with "
                 f"the following class.__name__: `{real_class_name}`. "
                 f"If it refers to an anonymous class, consider moving it "
                 f"to the module scope of {python_module}."

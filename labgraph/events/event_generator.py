@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional, Tuple, Type
 
 from ..graphs.topic import Topic
 from ..messages.message import Message, TimestampedMessage
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from ..util.min_heap import MinHeap
 
 
@@ -61,7 +61,7 @@ class Event:
 
     def __post_init__(self) -> None:
         if self.duration < 0.0:
-            raise LabGraphError("event cannot have a negative duration.")
+            raise LabgraphError("event cannot have a negative duration.")
 
     def __hash__(self) -> int:  # Needed for usage as dictionary key
         return hash(id(self))
@@ -126,7 +126,7 @@ class EventGraph:
         Adds `event` to the heap as the first event of the graph.
         """
         if event.delay != 0.0:
-            raise LabGraphError("start_event cannot have a non-zero delay.")
+            raise LabgraphError("start_event cannot have a non-zero delay.")
         self._push_heap_entry(event, 0.0)
 
     def _get_accumulated_time(
@@ -134,12 +134,12 @@ class EventGraph:
     ) -> float:
         accumulated_time = self._accumulated_times.get(previous_event)
         if accumulated_time is None:
-            raise LabGraphError("previous_event has not been inserted yet.")
+            raise LabgraphError("previous_event has not been inserted yet.")
         if add_duration:
             accumulated_time += previous_event.duration
         accumulated_time += event.delay
         if accumulated_time < 0.0:
-            raise LabGraphError("event occurs before start time.")
+            raise LabgraphError("event occurs before start time.")
         return accumulated_time
 
     def _push_heap_entry(self, event: Event, accumulated_time: float) -> None:

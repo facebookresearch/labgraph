@@ -12,7 +12,7 @@ namespace py = pybind11;
 namespace labgraph {
 
 void bindings(py::module_& m) {
-  m.doc() = "LabGraph C++: C++ nodes for LabGraph";
+  m.doc() = "Labgraph C++: C++ nodes for Labgraph";
 
   py::class_<Node>(m, "Node")
       .def("setup", &Node::setup)

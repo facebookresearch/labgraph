@@ -2,7 +2,7 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 from abc import abstractmethod
-from time import time  # TODO: Replace with LabGraph clock
+from time import time  # TODO: Replace with Labgraph clock
 from typing import Any, Dict, List, Tuple
 
 from ..graphs.method import AsyncPublisher, get_method_metadata

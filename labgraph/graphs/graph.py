@@ -3,7 +3,7 @@
 
 from typing import Any, Dict, Optional, Sequence, Tuple
 
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from ..util.logger import get_logger
 from .config import Config
 from .group import Group, GroupMeta
@@ -29,7 +29,7 @@ class GraphMeta(GroupMeta):
         if hasattr(cls, "__annotations__"):
             if "config" in cls.__annotations__:
                 if not issubclass(cls.__annotations__["config"], Config):
-                    raise LabGraphError(
+                    raise LabgraphError(
                         "The config for a Graph must be a subclass of Config, got "
                         f"{cls.__annotations__['config']}"
                     )
@@ -101,11 +101,11 @@ class Graph(Group, metaclass=GraphMeta):
             message += "".join(sorted(submessages))
             message += (
                 "This could mean that there are publishers and/or subscribers of "
-                "Cthulhu streams that LabGraph doesn't know about, and/or that data "
+                "Cthulhu streams that Labgraph doesn't know about, and/or that data "
                 "in some topics is being discarded.\n"
             )
 
-            # TODO: We warn instead of raising an error because LabGraph currently
+            # TODO: We warn instead of raising an error because Labgraph currently
             # tries to run any publishers/subscribers it knows about as async functions,
             # so for now we keep it ignorant of C++ publisher/subcriber methods.
             logger.warning(message.strip())

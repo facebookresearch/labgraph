@@ -7,9 +7,9 @@ import time
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
 
-from .._cthulhu.cthulhu import LabGraphCallback, LabGraphCallbackParams
+from .._cthulhu.cthulhu import LabgraphCallback, LabgraphCallbackParams
 from ..messages.message import TimestampedMessage
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
 from ..util.min_heap import MinHeap
 
 
@@ -33,11 +33,11 @@ class Aligner(ABC):
     """
 
     @abstractmethod
-    def register(self, stream_id: str, callback: LabGraphCallback) -> None:
+    def register(self, stream_id: str, callback: LabgraphCallback) -> None:
         pass
 
     @abstractmethod
-    def push(self, params: LabGraphCallbackParams[Any]) -> None:
+    def push(self, params: LabgraphCallbackParams[Any]) -> None:
         pass
 
     @abstractmethod
@@ -54,7 +54,7 @@ class Aligner(ABC):
 
 
 TimestampedHeapEntry = Tuple[
-    float, int, str, LabGraphCallbackParams[TimestampedMessage]
+    float, int, str, LabgraphCallbackParams[TimestampedMessage]
 ]
 
 TimestampedHeap = MinHeap[TimestampedHeapEntry]
@@ -87,20 +87,20 @@ class TimestampAligner(Aligner):
         # Lag (in seconds) during which incoming messages are buffered
         self.lag: float = lag
         # Callbacks keyed by the id of the stream they're subscribing to
-        self.callbacks: Dict[str, List[LabGraphCallback]] = collections.defaultdict(
+        self.callbacks: Dict[str, List[LabgraphCallback]] = collections.defaultdict(
             list
         )
 
         self.active: bool = True  # Current state of associated runner
         self.terminate: bool = False  # Flag to quit immediately
 
-    def register(self, stream_id: str, callback: LabGraphCallback) -> None:
+    def register(self, stream_id: str, callback: LabgraphCallback) -> None:
         self.callbacks[stream_id].append(callback)
 
-    def push(self, params: LabGraphCallbackParams[TimestampedMessage]) -> None:
+    def push(self, params: LabgraphCallbackParams[TimestampedMessage]) -> None:
         message = params.message
         if params.stream_id is None:
-            raise LabGraphError(
+            raise LabgraphError(
                 "TimestampAligner::push expected stream id, but got None."
             )
         heap_entry: TimestampedHeapEntry = (

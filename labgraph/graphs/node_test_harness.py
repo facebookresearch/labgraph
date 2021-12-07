@@ -38,7 +38,7 @@ T = TypeVar("T", bound=Tuple[Topic, Message])  # Type yielded by async functions
 
 class NodeTestHarness(Generic[N]):
     """
-    Utility class for testing LabGraph nodes. This allows a user to test some behavior
+    Utility class for testing Labgraph nodes. This allows a user to test some behavior
     of a node in an asyncio event loop, with the harness taking care of setting up and
     cleaning up the node.
 

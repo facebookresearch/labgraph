@@ -56,7 +56,6 @@ def proc(
     """
     A minimal version of a process managed by a `ProcessManager`. Used for testing the
     `ProcessManager`. The process simply updates its phase and sleeps.
-
     Args:
         state: The `ProcessManager`'s state.
         name: The name of the process.

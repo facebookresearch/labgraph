@@ -6,7 +6,8 @@ from types import TracebackType
 from typing import Callable, Generic, Optional, Type, TypeVar
 
 from ..messages.message import Message
-from ..util.error import LabGraphError
+from ..util.error import LabgraphError
+from ..util.typing import is_generic_subclass
 from .bindings import (  # type: ignore
     PerformanceSummary,
     StreamConsumer,
@@ -22,7 +23,7 @@ from .bindings import (  # type: ignore
 T = TypeVar("T")
 
 
-class LabGraphCallbackParams(Generic[T]):
+class LabgraphCallbackParams(Generic[T]):
     def __init__(self, message: T, stream_id: Optional[str]) -> None:
         self.message = message
         self.stream_id = stream_id
@@ -31,7 +32,7 @@ class LabGraphCallbackParams(Generic[T]):
     stream_id: Optional[str]
 
 
-LabGraphCallback = Callable[..., None]
+LabgraphCallback = Callable[..., None]
 CthulhuCallback = Callable[[StreamSample], None]
 
 
@@ -43,17 +44,17 @@ class Mode(Enum):
 class Consumer(StreamConsumer):  # type: ignore
     """
     Convenience wrapper of Cthulhu's `StreamConsumer` that allows us to specify a
-    callback accepting LabGraph `Message`s.
+    callback accepting Labgraph `Message`s.
 
     Args:
         stream_interface: The stream interface to use.
-        sample_callback: The callback to use (uses LabGraph messages).
+        sample_callback: The callback to use (uses Labgraph messages).
     """
 
     def __init__(
         self,
         stream_interface: StreamInterface,
-        sample_callback: LabGraphCallback,
+        sample_callback: LabgraphCallback,
         mode: Mode = Mode.SYNC,
         stream_id: Optional[str] = None,
     ) -> None:
@@ -66,9 +67,9 @@ class Consumer(StreamConsumer):  # type: ignore
         )
         self.stream_id = stream_id
 
-    def _to_cthulhu_callback(self, callback: LabGraphCallback) -> CthulhuCallback:
+    def _to_cthulhu_callback(self, callback: LabgraphCallback) -> CthulhuCallback:
         """
-        Given a LabGraph callback, creates a Cthulhu callback (accepting
+        Given a Labgraph callback, creates a Cthulhu callback (accepting
         `StreamSample`s).
         """
 
@@ -83,23 +84,23 @@ class Consumer(StreamConsumer):  # type: ignore
             message_types = [
                 arg_type
                 for arg_type in annotated_types.values()
-                if issubclass(arg_type, Message)
-                or issubclass(arg_type, LabGraphCallbackParams)
+                if is_generic_subclass(arg_type, LabgraphCallbackParams)
+                or issubclass(arg_type, Message)
             ]
             assert len(message_types) == 1
 
             message_type = message_types[0]
-            if issubclass(message_type, Message):
-                message = message_type(__sample__=sample)
-                callback(message)
-            elif issubclass(message_type, LabGraphCallbackParams):
+            if is_generic_subclass(message_type, LabgraphCallbackParams):
                 (arg_type,) = message_type.__args__
                 message = arg_type(__sample__=sample)
-                params = LabGraphCallbackParams(message, self.stream_id)
+                params = LabgraphCallbackParams(message, self.stream_id)
                 callback(params)
+            elif issubclass(message_type, Message):
+                message = message_type(__sample__=sample)
+                callback(message)
             else:
                 raise TypeError(
-                    f"Expected callback taking type '{Message.__name__}' or '{LabGraphCallbackParams.__name__}', got '{message_type.__name__}'"
+                    f"Expected callback taking type '{Message.__name__}' or '{LabgraphCallbackParams.__name__}', got '{message_type.__name__}'"
                 )
 
         return wrapped_callback
@@ -118,7 +119,7 @@ class Consumer(StreamConsumer):  # type: ignore
 
 class Producer(StreamProducer):  # type: ignore
     """
-    Convenience wrapper of Cthulhu's `StreamProducer` that accepts a LabGraph message.
+    Convenience wrapper of Cthulhu's `StreamProducer` that accepts a Labgraph message.
 
     Args:
         stream_interface: The stream interface to use.
@@ -134,7 +135,7 @@ class Producer(StreamProducer):  # type: ignore
 
     def produce_message(self, message: Message) -> None:
         """
-        Produces a LabGraph message to the Cthulhu stream.
+        Produces a Labgraph message to the Cthulhu stream.
 
         Args:
             message: The message to produce.
@@ -155,7 +156,7 @@ class Producer(StreamProducer):  # type: ignore
 
 def register_stream(name: str, message_type: Type[Message]) -> StreamInterface:
     """
-    Registers a stream with a LabGraph message type to the Cthulhu stream registry.
+    Registers a stream with a Labgraph message type to the Cthulhu stream registry.
 
     Args:
         name: The name of the stream.
@@ -168,7 +169,7 @@ def register_stream(name: str, message_type: Type[Message]) -> StreamInterface:
         type_id = existing_stream.description.type
         existing_type = typeRegistry().findTypeID(type_id)
         if existing_type.typeName != message_type.versioned_name:
-            raise LabGraphError(
+            raise LabgraphError(
                 f"Tried to register stream '{name}' with type "
                 f"'{message_type.versioned_name}', but it already exists with type "
                 f"'{existing_type.typeName}'"

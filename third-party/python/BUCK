@@ -18,7 +18,7 @@ if PLATFORM == "win":
     )
 
     prebuilt_cxx_library(
-        name = "python" + PYTHON_VERSION,
+        name = "python",
         header_dirs = [":python" + PYTHON_VERSION + "_include"],
         static_lib = ":python" + PYTHON_VERSION + "_lib",
         preferred_linkage = "static",
@@ -33,7 +33,7 @@ else:
     )
 
     prebuilt_cxx_library(
-        name = "python" + PYTHON_VERSION,
+        name = "python",
         header_dirs = [":python" + PYTHON_VERSION + "_include"],
         shared_lib = ":python" + PYTHON_VERSION + "_lib",
         preferred_linkage = "shared",

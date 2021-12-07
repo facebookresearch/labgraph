@@ -8,6 +8,7 @@ import zmq.asyncio
 from zmq.utils.monitor import parse_monitor_message
 
 from ..graphs import AsyncPublisher, Config, Node, Topic, background, publisher
+from ..util.error import LabgraphError
 from ..util.logger import get_logger
 from ..zmq_node import ZMQMessage
 from .constants import ZMQEvent
