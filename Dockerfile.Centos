@@ -41,4 +41,4 @@ RUN chmod 2777 /usr/local/var/run/watchman
 # Copy LabGraph files
 WORKDIR "/opt/labgraph"
 COPY . .
-RUN python3.6 setup.py install --user
+RUN python3.6 setup_py36.py install --user
