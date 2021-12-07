@@ -14,7 +14,7 @@ __all__ = [
     "Connections",
     "CPPNodeConfig",
     "DeferredMessage",
-    "LabGraphError",
+    "LabgraphError",
     "Event",
     "EventGraph",
     "EventPublishingHeap",
@@ -108,4 +108,4 @@ from .runners import (
     TimestampAligner,
     run,
 )
-from .util import LabGraphError
+from .util import LabgraphError
