@@ -7,8 +7,8 @@ LabGraph is a streaming framework built by the Facebook Reality Labs Research te
 ### Method 1 - using PyPI (Recommended)
 
 **Prerequisites**:
-- Python3.6+ (Python 3.8 recommended)
-- Mac (Big Sur), Windows and Linux (CentOS 7, CentOS 8, Ubuntu 20.04; Python3.6 only)
+- [Python3.6+](https://www.python.org/downloads/) (Python 3.8 recommended)
+- Mac (Big Sur, Monterey), Windows and Linux (CentOS 7, CentOS 8, Ubuntu 20.04; Python3.6 only)
 - Based on [PyPa](https://github.com/pypa/manylinux), the following Linux systems are also supported: Fedora 32+, Mageia 8+, openSUSE 15.3+, Photon OS 4.0+ (3.0+ with updates), Ubuntu 20.04+
 
 ```
@@ -20,7 +20,7 @@ pip install labgraph
 **Prerequisites**:
 
 - [Buck](https://buck.build/setup/getting_started.html) ([Watchman](https://facebook.github.io/watchman/docs/install) also recommended)
-- [Python3.6-Python3.10](https://www.python.org/downloads/release/)
+- [Python3.6-Python3.10](https://www.python.org/downloads/)
 - **Windows only:** [Build Tools for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019)
 
 ```
