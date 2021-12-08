@@ -11,11 +11,7 @@ jobs:
           python-version: 3.6
       - name: install yaml_support dependencies
         run: |
-          pip install "labgraph==1.0.2"
-          pip install "numpy==1.16.4"
-          pip install "PyYAML==6.0"
-          pip install "StrEnum==0.4.7"
-          pip install "typed_ast==1.4.3"
+          pip install extensions/yaml_support
       - name: run yaml_support tests
         run: |
           python -m extensions.yaml_support.yaml_support.tests.test_lg_yaml_api
