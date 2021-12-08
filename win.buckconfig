@@ -4,7 +4,7 @@
   cxxpp = win/cxxpp.bat
   cxxpp_type = windows
   cxx = win/cxx.bat
-  cxxflags = /std:c++17 /EHsc
+  cxxflags = /std:c++17 /EHsc /external:W0
   cxx_type = windows
   ld = win/ld.bat
   linker_platform = windows
