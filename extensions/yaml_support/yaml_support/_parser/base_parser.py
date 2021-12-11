@@ -2,8 +2,8 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 from abc import ABCMeta, abstractmethod
-from typing import List, Any
-
+from typing import List
+from extensions.yaml_support.yaml_support.model.base_model import BaseModel
 
 class BaseParser(metaclass=ABCMeta):
     """
@@ -11,5 +11,5 @@ class BaseParser(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def parse(self, code: str) -> List[Any]:
+    def parse(self, code: str) -> List[BaseModel]:
         raise NotImplementedError()

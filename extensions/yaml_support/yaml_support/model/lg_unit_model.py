@@ -69,7 +69,7 @@ class LabGraphUnitsModel(BaseModel):
 
     def __save_module(self, file) -> None:
 
-        obj: Dict[str, Dict[Any]] = {
+        obj: Dict[str, Dict[str, Any]] = {
             f"{self.name}": {
                 "type": self.base
             }
