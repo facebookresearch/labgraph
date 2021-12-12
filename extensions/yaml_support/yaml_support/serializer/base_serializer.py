@@ -2,7 +2,7 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 from abc import ABCMeta, abstractstaticmethod
-from typing import Dict, Any
+from typing import Dict
 
 
 class BaseSerializer(metaclass=ABCMeta):
@@ -10,7 +10,7 @@ class BaseSerializer(metaclass=ABCMeta):
     An abstraction for serializers.
     """
     @abstractstaticmethod
-    def serialize(obj: Dict[str, Dict[str, Any]], path: str) -> None:
+    def serialize(obj: Dict[str, dict], path: str) -> None:
         """
         Serializes a dict and save it into a file
         Args:

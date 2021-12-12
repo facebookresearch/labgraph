@@ -5,7 +5,6 @@ from typed_ast import ast3
 from .base_parser import BaseParser
 from extensions.yaml_support.yaml_support.model.lg_unit_model import LabGraphUnitsModel
 from extensions.yaml_support.yaml_support.enums.lg_units_enum import LabGraphBuiltinUnits
-
 from typed_ast.ast3 import (
     AsyncFunctionDef,
     NodeVisitor,
@@ -15,10 +14,21 @@ from typed_ast.ast3 import (
     Assign,
     AnnAssign,
 )
-from typing import Any, TypeVar, Generic, List, Dict
+from typing import TypeVar, Generic, List, Dict, Union
 
 
 T = TypeVar("T")
+AssignmentContextExpr = Union[
+    ast3.Attribute,
+    ast3.Subscript,
+    ast3.Starred,
+    ast3.Name,
+    ast3.NameConstant,
+    ast3.List,
+    ast3.Tuple,
+    ast3.Index,
+    None
+]
 
 
 class LabGraphUnitsParser(BaseParser, NodeVisitor, Generic[T]):
@@ -34,12 +44,12 @@ class LabGraphUnitsParser(BaseParser, NodeVisitor, Generic[T]):
         self.visit(ast)
         return self.__classes
 
-    def visit_Module(self, node) -> None:
+    def visit_Module(self, node: Module) -> None:
         assert isinstance(node, Module)
         for child in node.body:
             self.visit(child)
 
-    def visit_ClassDef(self, node) -> None:
+    def visit_ClassDef(self, node: ClassDef) -> None:
         assert isinstance(node, ClassDef)
 
         # finds the type of the base class
@@ -164,7 +174,7 @@ class LabGraphUnitsParser(BaseParser, NodeVisitor, Generic[T]):
             self.__classes.append(class_model)
             self.generic_visit(node)
 
-    def __construct_type(self, value: Any, type: str) -> str:
+    def __construct_type(self, value: AssignmentContextExpr, type: str) -> str:
         """
         Recursive method that helps to construct a string
         that represents a complex datatype of a class member or a method

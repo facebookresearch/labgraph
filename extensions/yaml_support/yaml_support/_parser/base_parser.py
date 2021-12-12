@@ -5,6 +5,7 @@ from abc import ABCMeta, abstractmethod
 from typing import List
 from extensions.yaml_support.yaml_support.model.base_model import BaseModel
 
+
 class BaseParser(metaclass=ABCMeta):
     """
     An abstraction for parsers

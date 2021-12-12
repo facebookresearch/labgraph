@@ -4,7 +4,10 @@
 from .base_model import BaseModel
 from extensions.yaml_support.yaml_support.serializer.yaml_serializer import YamlSerializer
 from extensions.yaml_support.yaml_support.enums.lg_units_enum import LabGraphBuiltinUnits
-from typing import Dict, Any
+from typing import Dict, Union
+
+
+MethodsType = Dict[str, Union[dict, list, str]]
 
 
 class LabGraphUnitsModel(BaseModel):
@@ -20,7 +23,7 @@ class LabGraphUnitsModel(BaseModel):
         self.__name: str = name
         self.__base: str = base
         self.__members: Dict[str, str] = {}
-        self.__methods: Dict[str, Dict[str, Any]] = {}
+        self.__methods: MethodsType = {}
 
     @property
     def name(self) -> str:
@@ -35,7 +38,7 @@ class LabGraphUnitsModel(BaseModel):
         return self.__members
 
     @property
-    def methods(self) -> Dict[str, Dict[str, Any]]:
+    def methods(self) -> MethodsType:
         return self.__methods
 
     def save(self, path: str) -> None:
@@ -51,7 +54,6 @@ class LabGraphUnitsModel(BaseModel):
             LabGraphBuiltinUnits.GROUP,
             LabGraphBuiltinUnits.GRAPH
         ):
-
             self.__save_module(path)
 
     def __save_message(self, file) -> None:
@@ -65,7 +67,7 @@ class LabGraphUnitsModel(BaseModel):
 
     def __save_module(self, file) -> None:
 
-        obj: Dict[str, Dict[str, Any]] = {
+        obj = {
             f"{self.name}": {
                 "type": self.base
             }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
-from typing import Any, Dict
+from typing import Dict
 from .base_serializer import BaseSerializer
 import yaml
 import os
@@ -13,7 +13,7 @@ class YamlSerializer(BaseSerializer):
     Represents a YAML serializer
     """
     @staticmethod
-    def serialize(obj: Dict[str, Dict[str, Any]], path: str) -> None:
+    def serialize(obj: Dict[str, Dict[str, dict]], path: str) -> None:
         """
         Serializes a model and save it a YAML file (.yaml)
         """

@@ -2,10 +2,9 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 import labgraph as lg
-from typing import Any
 
 
 class MyConfig(lg.Config):
-    field_1: Any
-    field_2: Any
-    field_3: Any
+    field_1: float
+    field_2: float
+    field_3: float
