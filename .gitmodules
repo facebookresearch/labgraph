@@ -1,3 +1,3 @@
-[submodule "devices/hardware/delsys/delsysAPI"]
-	path = devices/hardware/delsys/delsysAPI
+[submodule "devices/hardware/delsys/delsys/delsysAPI"]
+	path = devices/hardware/delsys/delsys/delsysAPI
 	url = https://github.com/delsys-inc/Delsys-Python-Demo.git
