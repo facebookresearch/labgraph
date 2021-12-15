@@ -12,6 +12,8 @@ Make sure to install labgraph before proceeding
 
 ```
 cd labgraph/extensions/labgraph_protocol
+# HACK: PyQt5-sip has to be installed before PyQt5
+pip install PyQt5-sip==4.19.18
 python setup.py install
 ```
 

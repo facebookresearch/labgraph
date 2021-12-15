@@ -13,6 +13,7 @@ setup(
     install_requires=[
         "dataclasses==0.6",
         "labgraph>=2.0.0",
+        "PyQt5-sip==4.19.18",
         "PyQt5==5.13.0",
     ],
     include_package_data=True,
