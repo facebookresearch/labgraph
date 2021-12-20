@@ -1,0 +1,3 @@
+include labgraph_protocol/examples/audio_player.mp3
+include labgraph_protocol/examples/display_image.jpg
+include labgraph_protocol/examples/video_player.mp4
