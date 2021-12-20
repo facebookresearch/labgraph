@@ -16,12 +16,20 @@ from labgraph_protocol.qt_stimulus import QtStimulus
 from labgraph_protocol.qt_widgets import MainWindow
 from PyQt5 import QtCore, QtWidgets
 
+
+class _FullScreen:
+    def __eq__(self, other: typing.Any) -> bool:
+        return isinstance(other, type(self))
+
+
+FULLSCREEN = _FullScreen()
 PUBLISH_LOOP_TIME = 0.001
+WINDOW_SIZE_T = typing.Union[typing.Tuple[int, int], _FullScreen]
 
 
 class QtNodeConfig(lg.Config):
     module: str
-    window_size: typing.Tuple[int, int] = (640, 480)
+    window_size: WINDOW_SIZE_T = (640, 480)
 
 
 class QtNodeState(lg.State):
@@ -29,7 +37,7 @@ class QtNodeState(lg.State):
     keypress_callbacks: typing.Optional[
         typing.Dict[int, typing.Callable[..., typing.Any]]
     ] = None
-    view: typing.Optional[QtWidgets.QGraphicsView] = None
+    view: typing.Optional[MainWindow] = None
     current_trial: typing.Optional[Trial] = None
     current_trial_started: bool = False
     shutdown: bool = False
@@ -53,15 +61,16 @@ class QtNode(lg.Node):
     def run(self) -> None:
         self.state.app = QtWidgets.QApplication([])
         self.state.app.setStyle("Macintosh")
-        window = MainWindow(self.state.keypress_callbacks)
-        window.resize(*self.config.window_size)
-        self.state.view = QtWidgets.QGraphicsView(parent=window)
+        self.state.view = MainWindow(self.state.keypress_callbacks)
+        if self.config.window_size == FULLSCREEN:
+            self.state.view.showFullScreen()
+        else:
+            self.state.view.resize(*self.config.window_size)
         scene = QtWidgets.QGraphicsScene()
-        rect = window.rect()
+        rect = self.state.view.rect()
         scene.setSceneRect(rect.x(), rect.y(), rect.width(), rect.height())
         self.state.view.setScene(scene)
         self.state.view.show()
-        window.show()
         timer = QtCore.QTimer()
         timer.setInterval(1)  # Timeout is in ms
         timer.timeout.connect(self._update)
