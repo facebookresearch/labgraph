@@ -9,14 +9,19 @@ from labgraph_protocol.protocol_node import (
     ProtocolNode,
     ProtocolNodeConfig,
 )
-from labgraph_protocol.qt_node import QtNode, QtNodeConfig
+from labgraph_protocol.qt_node import (
+    FULLSCREEN,
+    QtNode,
+    QtNodeConfig,
+    WINDOW_SIZE_T,
+)
 
 PROTOCOL_MODULE = "labgraph_protocol.examples.{0}"
 
 
 class UIGraphConfig(lg.Config):
     protocol_name: str
-    window_size: typing.Tuple[int, int]
+    window_size: WINDOW_SIZE_T
 
 
 class UIGraph(lg.Graph):
@@ -51,10 +56,12 @@ class UIGraph(lg.Graph):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("protocol_name")
+    parser.add_argument("--fullscreen", action="store_true")
     args = parser.parse_args()
+    window_size = FULLSCREEN if args.fullscreen else (1280, 720)
     graph = UIGraph()
     graph.configure(
-        UIGraphConfig(protocol_name=args.protocol_name, window_size=(1280, 720))
+        UIGraphConfig(protocol_name=args.protocol_name, window_size=window_size)
     )
     runner = lg.ParallelRunner(graph=graph)
     runner.run()

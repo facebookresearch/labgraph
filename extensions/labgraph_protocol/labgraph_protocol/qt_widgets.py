@@ -7,7 +7,7 @@ from PyQt5 import QtCore, QtGui, QtMultimedia, QtMultimediaWidgets, QtWidgets
 
 
 # Main window
-class MainWindow(QtWidgets.QWidget):
+class MainWindow(QtWidgets.QGraphicsView):
     def __init__(
         self, keypress_callbacks: typing.Dict[int, typing.Callable[..., typing.Any]]
     ) -> None:
