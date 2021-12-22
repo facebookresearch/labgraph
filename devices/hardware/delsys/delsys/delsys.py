@@ -7,14 +7,12 @@ import clr
 import numpy as np
 from collections import deque
 
-clr.AddReference("delsysAPI/resources/DelsysAPI")
+clr.AddReference("devices/hardware/delsys/delsys/delsysAPI/resources/DelsysAPI")
 clr.AddReference("System.Collections")
 
 from Aero import AeroPy  # type: ignore # noqa: E402
 from System.Collections.Generic import List  # type: ignore # noqa: E402
 from System import Int32  # type: ignore # noqa: E402
-
-
 
 
 class Delsys():
@@ -174,7 +172,3 @@ class Delsys():
 
     def getSampleCount(self):
         return self.sampleCount
-
-# if __name__ == '__main__':
-
-#     Delsys()

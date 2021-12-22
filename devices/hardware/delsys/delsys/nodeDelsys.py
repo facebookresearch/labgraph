@@ -5,10 +5,6 @@ import asyncio
 import numpy as np
 import labgraph as lg
 
-# from delsysAPI.AeroPy.TrignoBase import *  # noqa: F403
-# from delsysAPI.DataCollector import CollectDataController
-# # from messages.lgMessages import messageDelsys, messageUI
-# from delsysAPI..AeroPy.
 from .helpers.Rate import Rate
 from .delsys import Delsys
 
@@ -81,7 +77,7 @@ class nodeDelsys(lg.Node):
 
     # A subscriber method that simply receives data and updates the node's state
     @lg.subscriber(INPUT)
-    def getDelsysState(self, message: messageDelsysState) -> None:
+    async def getDelsysState(self, message: messageDelsysState) -> None:
         self.state.Connect = message.setConnectState
         self.state.Pair = message.setConnectState
         self.state.Scan = message.setScanState
