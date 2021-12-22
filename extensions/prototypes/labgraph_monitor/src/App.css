@@ -1,0 +1,21 @@
+table{
+  border: 1px solid black;
+  text-align: center;
+  margin-right:10px;
+  margin-top: 20px;
+}
+
+th, td{
+  border: 1px solid black;
+  text-align: center;
+} 
+
+.annotations{
+  align-items: center;
+  margin-right:50px;
+  margin-top: 15px;
+}
+
+.table-div{
+  float:right;
+}
