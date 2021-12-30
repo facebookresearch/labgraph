@@ -1,24 +1,19 @@
 # LabGraph Monitor
 
-LabGraph Monitor helps visualize the graph built. Inorder to run the application, you will need to first set it up using React using the below steps:
+LabGraph Monitor helps visualize the graph built. In order to run the application, you will need to first set it up using React using the below steps:
 
-First, incase you do not have npm installed, follow the below steps to get started:
+In case you do not have npm installed, follow the below steps to get started:
 
 Download Node.js from [here](https://nodejs.org/en/download/) 
 
-Once it is installed, you can verify that node and npm got downloaded successfully by running the following: 
+Once Node is installed, you can verify that node/npm was installed successfully by running the following: 
 
 ```
 node -v
-```
-
-```
 npm -v
 ```
 
-The above should display the version of node/npm that got installed 
-
-Example:
+The above should display the version of node/npm that were installed. For example:
 
 ```
 6.14.13
@@ -31,8 +26,8 @@ Note: npx is a package that comes with npm 5.2+
 npx create-react-app labgraph_monitor_extension
 ```
 
-Next, you will need to install dagre library and ReactFlow that help in layouting the graph. 
-Run the below code to install them
+Next, you will need to install the dagre library and ReactFlow that help in layouting the graph. 
+Run the code below to install them
 ```
 npm i dagre
 ```
