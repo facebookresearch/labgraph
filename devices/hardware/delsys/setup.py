@@ -12,5 +12,6 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "labgraph>=1.0.2",
+        "pythonnet",
     ],
 )
