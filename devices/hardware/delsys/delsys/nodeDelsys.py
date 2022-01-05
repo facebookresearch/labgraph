@@ -41,7 +41,6 @@ class stateDelsys(lg.State):
 
 
 # ================================= DELSYS DATA PUBLISHER ====================================
-# A data source node that generates random noise to a single output topic
 class nodeDelsys(lg.Node):
     INPUT = lg.Topic(messageDelsysState)
     OUTPUT = lg.Topic(messageEMG)
