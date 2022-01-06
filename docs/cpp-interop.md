@@ -6,7 +6,7 @@ Sometimes, Python just isn't fast enough to be able to process real-time signals
 
 LabGraph comes with a `labgraph_cpp` library which allows us to define nodes directly in C++. Then, with the help of [pybind11](https://github.com/pybind/pybind11), we can embed that node in a LabGraph graph just as we would a Python node.
 
-```
+```c++
 // MyCPPSource.h
 #pragma once
 #include <labgraph/Node.h>
@@ -21,7 +21,7 @@ class MyCPPSource : public labgraph::Node {
 ```
 
 
-```
+```c++
 // MyCPPSource.cpp
 #include "MyCPPSource.h"
 #include "TestSample.h"
@@ -46,7 +46,7 @@ In the header and implementation above, we are defining `MyCPPSource`, which is 
 
 
 
-```
+```c++
 #include <labgraph/bindings.h>
 #include <pybind11/pybind11.h>
 #include "MyCPPSource.h"
@@ -70,7 +70,7 @@ Finally, we can use `MyCPPSource` in a LabGraph graph:
 
 
 
-```
+```python
 from MyCPPNodes import MyCPPSource
 class MyGraph(df.Graph):
   CPP_SOURCE: MyCPPSource

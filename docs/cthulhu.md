@@ -30,7 +30,7 @@ A sample of a stream has 4 components:
 
 A user can define a sample format by inheriting from cthulhu::AutoStreamSample:
 
-```
+```c++
 class ImageData : public AutoStreamSample {
   using T = ImageData;
 
@@ -59,7 +59,7 @@ class ImageData : public AutoStreamSample {
 
 If a stream has no Content Block, it is called a "Basic Stream." And your journey ends here. Put this in a header, and call the basic registration function from the corresponding cpp source file:
 
-```
+```c++
 CTHULHU_REGISTER_BASIC_STREAM_TYPE(Image, cthulhu::ImageData);
 ```
 
@@ -73,7 +73,7 @@ If your stream includes a Content Block, it must also provide a Configuration wh
 
 Here is an example:
 
-```
+```c++
 enum class PixelFormat : uint32_t { INVALID = 0, MONO_8 = 1, MONO_10 = 2, YUY2 = 3, COUNT };
 
 class ImageFormat : public AutoStreamConfig {
@@ -107,7 +107,7 @@ class ImageFormat : public AutoStreamConfig {
 ```
 
 This stream can then be registered as an ordinary stream type:
-```
+```c++
 CTHULHU_REGISTER_STREAM_TYPE(Image, cthulhu::ImageData, cthulhu::ImageFormat);
 ```
 
@@ -123,7 +123,7 @@ Nodes are a logical unit of compute within the pipeline which receives N data st
 
 Here's an example of the most basic pub/sub behavior using a "Basic" stream type with sample type BasicSample:
 
-```
+```c++
 cthulhu::Context myContext("my_context");
 
 std::function<void(const BasicSample&)> cb =
@@ -141,7 +141,7 @@ But what if we had a heavy consuming function that needed its own thread or woul
 
 For usage of only single input or single output Nodes and basic stream types, this API looks a lot like basic pub/sub. Next, let's explore how we use an ordinary stream that uses both Config and Samples:
 
-```
+```c++
 // Subscribers must now specify two callbacks, one for sample and one for config
 // The config callback returns bool. With
 std::function<void(const cthulhu::ImageData&)> cb =
@@ -176,7 +176,7 @@ Calls to publish() and configure() are not thread safe. Thus, you should only pu
 
 So far, we've only explored single input and single output Nodes. Next, let's look at a Transformer with both an input and an output:
 
-```
+```c++
 std::function<void(const cthulhu::ImageData&, cthulhu::ImageData&)> cb =
     [](const cthulhu::ImageData& image, cthulhu::ImageData& imageOut) -> void {};
 std::function<bool(const cthulhu::ImageFormat&, cthulhu::ImageFormat&)> configCb =
@@ -197,7 +197,7 @@ Similar to Subscriber, this can be given TransformerOptions optionally to specif
 
 Finally, the most complex case of multi-input, multi-output, here is an example:
 
-```
+```c++
 std::function<void(const std::vector<cthulhu::ImageData>&, std::vector<cthulhu::ImageData>&)> cb =
     [](
         const std::vector<cthulhu::ImageData>& imagesIn,
@@ -219,11 +219,11 @@ Underneath the hood, Cthulhu is creating Producers and Consumers for each of the
 ## Clock
 
 Cthulhu also provides a clock interface, useful for system simulation. A user should query time through cthulhu:
-```
+```c++
 auto time = cthulhu::clock()->getTime();
 ```
 By default, this will just return wall time. However, a single context name can be given clock authority to control time. This should be whichever context is being used to control the flow of data via Publishers.
-```
+```c++
 int main() {
   // Declare use of simulated time, with clock_owner as the context
   cthulhu::ClockAuthority fac(true, "clock_owner");
