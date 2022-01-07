@@ -1,13 +1,13 @@
 # WebSockets API Error Codes
 
 **`ErrorEvent`**
-```
+```json
 {
   "api_version": 0.1,
   "api_event": {
     "request_id": [REQUEST_ID],
     "error_event": {
-      "error_code": [ERROR-CODE]
+      "error_code": [ERROR-CODE],
       "desc": [DESCRIPTION-OF-ERROR]
     }
   }

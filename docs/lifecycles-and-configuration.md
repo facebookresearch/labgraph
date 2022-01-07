@@ -12,7 +12,7 @@ A node, group, or graph (a module) goes through the following steps in its lifet
 
 LabGraph provides a way to concisely specify configuration that is given to a graph and forwarded to its descendant nodes. We start by defining a configuration type:
 
-```
+```python
 class MyNodeConfig(df.Config):
   num_trials: int
   participant_name: str
@@ -23,7 +23,7 @@ class MyNodeConfig(df.Config):
 
 We specify the configuration for a `Node`, `Group`, or `Graph` by giving it a `config` type annotation:
 
-```
+```python
 class MyNode(df.Node):
   config: MyNodeConfig
 
@@ -31,7 +31,7 @@ class MyNode(df.Node):
 ```
 Then we can configure it by calling `configure()` on it. We configure a node or group in the `setup()` method of its containing group:
 
-```
+```python
 class MyGroupConfig(df.Config):
   ...
 
@@ -47,17 +47,17 @@ class MyGroup(df.Config):
 ```
 The exception to this is graphs, which we can construct and configure directly:
 
-```
+```python
 my_graph = MyGraph()
 my_graph.configure(MyGraphConfig(...))
 ```
 Rather than hard-coding the top-level configuration like this, though, we can automatically build the configuration from from command-line arguments like so:
 
-```
+```python
 my_config = MyGraphConfig.fromargs()
 ```
 The `df.run` function actually gets configuration using `fromargs()`, so we can also just run a graph using command-line arguments like so:
 
-```
+```python
 df.run(MyGraph)
 ```

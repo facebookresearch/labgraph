@@ -13,7 +13,7 @@ LabGraph Messages are how we define data types for use in our computational grap
 
 Here is a simple example of connectability:
 
-```
+```python
 class MyMessage1(df.Message):
   field1: int
   field2: df.NumpyType(shape=(100, 100))

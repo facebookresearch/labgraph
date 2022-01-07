@@ -17,7 +17,7 @@ In this overview we will use a toy example of a simple visualization. The exampl
 
 A **message** is a piece of data with a consistent structure. For example:
 
-```
+```python
 import numpy as np
 import labgraph.v1 as lg
 
@@ -34,7 +34,7 @@ This should look familiar if you are familiar with [dataclasses](https://docs.py
 
 To create a message, we simply create an instance of the `RandomMessage` class:
 
-```
+```python
 import time
 random_message = RandomMessage(
     timestamp=time.time(), data=np.random.rand(100)
@@ -43,13 +43,13 @@ random_message = RandomMessage(
 ```
 Suppose we were running an experiment where someone presses a button, and we wanted to include the state of the button with every frame. We could just add a `button_pressed` field to `RandomMessage`, but this would couple `RandomMessage` with that experiment and make reusing it with other experiments harder. Instead, we can **compose message types** via class inheritance (in the same way that the `dataclasses` module allows):
 
-```
+```python
 class CustomMessage(RandomMessage):
   button_pressed: bool
 ```
 Then `CustomMessage` retains all the fields of `RandomMessage`, and we can instantiate it like so:
 
-```
+```python
 custom_message = CustomMessage(
   timestamp=time.time(),
   data=np.random.rand(100),
@@ -74,7 +74,7 @@ A **node** is a class that describes a self-contained algorithm that operates on
 
 Nodes describe their algorithms using methods that are marked with special LabGraph decorators. Here is an example of a node that takes a rolling average of some data:
 
-```
+```python
 class RollingState(lg.State):
     messages: List[RandomMessage] = field(default_factory=list)
 
@@ -121,7 +121,7 @@ A **group** is a container that includes some functionality that can be reused m
 
 Suppose we wanted a way to quickly package together a data source and a transformation of that data. Here is a `Generator` node, as well as a group that packages it with `RollingAverager` above:
 
-```
+```python
 class GeneratorConfig(lg.Config):
     sample_rate: float
     num_features: int
@@ -177,7 +177,7 @@ Now we can use `AveragedNoise` as if it were a node – it is a self-contained m
 
 A **graph** is a complete set of topics and nodes that describes a functioning system. It is actually a group, but it is assumed to be the outermost container for the description of a system. Suppose we want to display a live visualization using our group from earlier. We can define a graph as follows:
 
-```
+```python
 class Demo(lg.Graph):
     AVERAGED_NOISE: AveragedNoise
     PLOT: Plot
@@ -204,7 +204,7 @@ class Demo(lg.Graph):
 
 Then we can run the graph using the `lg.run()` tool:
 
-```
+```python
 if __name__ == "__main__":
   lg.run(Demo)
 ```
