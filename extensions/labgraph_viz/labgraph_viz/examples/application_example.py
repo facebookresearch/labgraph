@@ -47,8 +47,8 @@ class Generator(lg.Node):
     async def generate_noise(self) -> lg.AsyncPublisher:
         while True:
             yield self.BARPLOT_OUTPUT, BarPlotMessage(
-                domain=np.arange(self.config.num_features + 1),
-                range=np.random.rand(self.config.num_features),
+                domain=np.arange(self.config.num_features + 1, dtype=np.int32),
+                range=np.random.rand(self.config.num_features).astype(np.float64),
             )
             await asyncio.sleep(1 / self.config.sample_rate)
 
@@ -107,7 +107,7 @@ class SimpleVizGroup(lg.Group):
 
         # Add plots to application
         self.application.plots = [self.line_plot, self.bar_plot]
-    
+
     # Connect the Generator outputs to the Plot inputs
     def connections(self) -> lg.Connections:
         return (

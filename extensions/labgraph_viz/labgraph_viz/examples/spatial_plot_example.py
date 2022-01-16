@@ -84,15 +84,15 @@ class SimpleVizGroup(lg.Group):
                 labels={"bottom": "Bottom Label", "left": "Left Label"},
                 points={
                     "sources": SpatialPlotPoints(
-                        x=[2.5],
-                        y=[2.5],
+                        x=np.array([2.5]),
+                        y=np.array([2.5]),
                         style=SpatialPlotStyle(
                             symbol="s", symbolSize=20
                         ),
                     ),
                     "detectors": SpatialPlotPoints(
-                        x=[1,1,2,2,3,3,4,4],
-                        y=[2,3,1,4,1,4,2,3],
+                        x=np.array([1,1,2,2,3,3,4,4]),
+                        y=np.array([2,3,1,4,1,4,2,3]),
                         style=SpatialPlotStyle(
                             symbol="d", symbolSize=20
                         ),

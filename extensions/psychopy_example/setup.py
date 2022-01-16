@@ -3,7 +3,6 @@
 
 from setuptools import find_packages, setup
 
-
 setup(
     name="psychopy_example",
     version="1.0.0",
@@ -28,3 +27,4 @@ setup(
         "psychopy~=3.2.4",
     ],
 )
+

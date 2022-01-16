@@ -19,7 +19,7 @@ NUM_FEATURES = 1024
 
 # Message for heat map data
 class HeatMapMessage(lg.Message):
-    channel_map: lg.NumpyDynamicType(dtype=np.int32)
+    channel_map: lg.NumpyDynamicType()
     data: np.ndarray
 
 
@@ -113,7 +113,7 @@ class SimpleVizGroup(lg.Group):
         )
         self.WINDOW.HEATMAP = self.HEATMAP
         self.WINDOW.COLOR_MAP = self.COLOR_MAP
-    
+
     # Connect the message to both the heat map and color map
     def connections(self) -> lg.Connections:
         return (

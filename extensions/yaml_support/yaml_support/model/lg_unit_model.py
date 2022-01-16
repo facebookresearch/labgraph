@@ -2,8 +2,8 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 from .base_model import BaseModel
-from extensions.yaml_support.yaml_support.serializer.yaml_serializer import YamlSerializer
-from extensions.yaml_support.yaml_support.enums.lg_units_enum import LabGraphBuiltinUnits
+from ..serializer.yaml_serializer import YamlSerializer
+from ..enums.lg_units_enum import LabGraphBuiltinUnits
 from typing import Dict, Union
 
 

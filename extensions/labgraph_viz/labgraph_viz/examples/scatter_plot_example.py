@@ -18,8 +18,8 @@ NUM_FEATURES = 100
 
 # Message for bar plot data
 class RandomMessage(lg.Message):
-    red: Dict[str, int]
-    green: Dict[str, int]
+    red: Dict[str, np.ndarray]
+    green: Dict[str, np.ndarray]
 
 
 # Configuration for the generator

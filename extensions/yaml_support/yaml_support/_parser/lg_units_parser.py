@@ -3,8 +3,8 @@
 
 from typed_ast import ast3
 from .base_parser import BaseParser
-from extensions.yaml_support.yaml_support.model.lg_unit_model import LabGraphUnitsModel
-from extensions.yaml_support.yaml_support.enums.lg_units_enum import LabGraphBuiltinUnits
+from ..model.lg_unit_model import LabGraphUnitsModel
+from ..enums.lg_units_enum import LabGraphBuiltinUnits
 from typed_ast.ast3 import (
     AsyncFunctionDef,
     NodeVisitor,

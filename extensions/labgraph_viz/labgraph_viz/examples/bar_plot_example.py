@@ -38,8 +38,8 @@ class Generator(lg.Node):
     async def generate_noise(self) -> lg.AsyncPublisher:
         while True:
             yield self.OUTPUT, RandomMessage(
-                domain=np.arange(self.config.num_features + 1),
-                range=np.random.rand(self.config.num_features),
+                domain=np.arange(self.config.num_features + 1, dtype=np.int32),
+                range=np.random.rand(self.config.num_features).astype(np.float64),
             )
             await asyncio.sleep(1 / self.config.sample_rate)
 

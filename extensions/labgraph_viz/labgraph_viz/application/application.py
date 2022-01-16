@@ -50,7 +50,7 @@ class Application(lg.Node):
         else:
             for plot in self.plots:
                 plot.stop()
-    
+
     # Using a very simple layout
     # You can subclass and override this method to use another layout
     def setup_window(self) -> None:
