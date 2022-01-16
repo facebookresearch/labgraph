@@ -1,4 +1,11 @@
 /**
+
+Copyright (c) Facebook, Inc. and its affiliates.
+This source code is licensed under the MIT license found in the
+LICENSE file in the root directory of this source tree.
+*/
+
+/**
  * Converts the data from server to connections array
  * @param {Array} data - data received from server through websocket
  * @return {Array} An array having arrays of connections

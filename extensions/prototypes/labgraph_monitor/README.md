@@ -26,10 +26,14 @@ Note: npx is a package that comes with npm 5.2+
 npx create-react-app labgraph_monitor_extension
 ```
 
-Next, you will need to install the dagre library and ReactFlow that help in layouting the graph. 
+Next, you will need to install the dagre library, websocket, and ReactFlow that help in layouting the graph. 
 Run the code below to install them
 ```
 npm i dagre
+```
+
+```
+npm install websocket
 ```
 
 ```
@@ -59,3 +63,4 @@ npm start
 ```
 
 With that, LabGraph Monitor is ready! Before you see the graph displayed in your browser, you will need to start the backend server. 
+
