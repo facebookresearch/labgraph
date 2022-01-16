@@ -10,12 +10,18 @@ LICENSE file in the root directory of this source tree.
  * @param {Array} data - data received from server through websocket
  * @return {Array} An array having arrays of connections
  */
-function dataToConnections(data){
+ function dataToConnections(data){
     const connections = {}
-    for (const [a, b] of data) {
-        connections[Object.keys(a)[0]] = [
-            Object.keys(b)[0]
-        ]
+    for (const array of data) {
+        for (let index = 1; index < array.length; index++){
+            const parent = Object.keys(array[0])[0]
+            const childNode = Object.keys(array[index])[0]
+            if (connections[parent]){
+                connections[parent].push(childNode)
+            } else{
+                connections[parent] = [childNode]
+            }
+        }
     }
     return connections
 }
@@ -26,13 +32,17 @@ function dataToConnections(data){
  * @return {Array} An array having arrays of Objects representation of data from server. 
  * Every object represents a node and has properties such as inputs, outputs, config.. for that node
  */
-function dataToObjects(data){
-    const connections = {}
-    for (const [a, b] of data) {
-        connections[Object.keys(a)[0]] = a[Object.keys(a)[0]]
-        connections[Object.keys(b)[0]] = b[Object.keys(b)[0]]
+ function dataToObjects(data){
+    const objects = {}
+    for (const array of data) {
+        const parent = array[0]
+        objects[Object.keys(parent)[0]] = parent[Object.keys(parent)[0]]
+        for (let index = 1; index < array.length; index++){
+            const childNode = array[index]
+            objects[Object.keys(childNode)[0]] = childNode[Object.keys(childNode)[0]]
+        }
     }
-    return connections
+    return objects
 }
 
 /**

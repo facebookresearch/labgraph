@@ -66,10 +66,12 @@ With that, LabGraph Monitor is ready! Before you see the graph displayed in your
 
 ## Running an example
 
-Inorder to run a sample graph, you can go to the mock_data.js file found under labgraph_monitor/examples/mock_data.js and replace the current code in App.js with the mock_data.js code. Next, you can start the application using
+Inorder to run a sample graph, you can go to the simpleVizGraph.js file found under labgraph_monitor/examples/simpleVizGraph.js and replace the current code in App.js with the simpleVizGraph.js code. Next, you can start the application using
 
 ```
 npm start
 ```
 
-This code shows the sample graph of the simple_viz.py example found under labgraph/examples of the main repository. It works by having the expected JSON data the server should send using the parser and rendering it through our React application. 
+This code shows the sample graph of the simple_viz.py example found under labgraph/examples of the main repository. It works by having the expected JSON data the server should send using the parser and rendering it through our React application.
+
+You can also try other another example by following the above steps on the mockDataGraph.js found under labgraph_monitor/examples/mockDataGraph.js
