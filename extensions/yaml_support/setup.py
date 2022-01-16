@@ -10,10 +10,10 @@ setup(
     packages=find_packages(),
     python_requires=">=3.6",
     install_requires=[
-        "labgraph==1.0.2",
-        "numpy==1.16.4",
-        "PyYAML==6.0",  
-        "StrEnum==0.4.7",
-        "typed_ast==1.4.3"
+        "labgraph>=1.0.2",
+        "numpy>=1.16.4",
+        "PyYAML>=6.0",
+        "StrEnum>=0.4.7",
+        "typed_ast>=1.4.3"
     ],
 )

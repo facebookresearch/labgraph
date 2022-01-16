@@ -13,6 +13,7 @@ Make sure to install labgraph before proceeding
 ```
 cd labgraph/extensions/labgraph_viz
 python setup.py install
+python setup.py sdist bdist_wheel
 ```
 
 ### Testing:

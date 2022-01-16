@@ -14,7 +14,7 @@ CONFIG_FILE = {
     "Windows": "win.buckconfig",
 }.get(platform.system(), "unix.buckconfig")
 
-if platform.system() == 'Linux' and platform.linux_distribution()[0] == 'CentOS Linux':
+if platform.system() == 'Linux':
     CONFIG_FILE = "manylinux.buckconfig"
 
 class BuckExtension(Extension):

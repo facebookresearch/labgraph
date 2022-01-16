@@ -59,7 +59,6 @@ DEFAULT_QUEUE_CAPACITY = 10000
 
 EXCEPTION_STREAM_SUFFIX = "_EXCEPTION"
 
-
 @dataclass
 class LocalRunnerState:
     """
@@ -490,6 +489,11 @@ class _AsyncThread(threading.Thread):
         # e.g., in the `LocalRunner`.
 
         import asyncio
+        # asyncio.Task.all_tasks deprecated in python3.7
+        try:
+            asyncio.all_tasks
+        except AttributeError as e:
+            asyncio.all_tasks = asyncio.Task.all_tasks
 
         # Create event loop
         loop = asyncio.new_event_loop()
@@ -571,7 +575,7 @@ class _AsyncThread(threading.Thread):
         logger.debug(f"{self.module}:background thread:shutting down async gens")
 
         # https://bugs.python.org/issue38559
-        for task in asyncio.Task.all_tasks(loop=loop):
+        for task in asyncio.all_tasks(loop=loop):
             task.cancel()
         loop.run_until_complete(loop.shutdown_asyncgens())
 
@@ -580,7 +584,7 @@ class _AsyncThread(threading.Thread):
         while True:
             time.sleep(ASYNCIO_SHUTDOWN_POLL_TIME)
             pending = [
-                task for task in asyncio.Task.all_tasks(loop=loop) if not task.done()
+                task for task in asyncio.all_tasks(loop=loop) if not task.done()
             ]
             if len(pending) == 0:
                 logger.debug(f"{self.module}:background thread:closing event loop")
@@ -643,6 +647,11 @@ class _AsyncThread(threading.Thread):
         self, publisher_method: Callable[[], AsyncIterable[Tuple[Topic, Message]]]
     ) -> None:
         import asyncio
+        # asyncio.Task.all_tasks deprecated in python3.7
+        try:
+            asyncio.all_tasks
+        except AttributeError as e:
+            asyncio.all_tasks = asyncio.Task.all_tasks
 
         async for topic, message in publisher_method():
             topic_path = self.module._get_topic_path(topic)
@@ -739,6 +748,11 @@ class _AsyncThread(threading.Thread):
             loop: The event loop to schedule the callbacks on.
         """
         import asyncio
+        # asyncio.Task.all_tasks deprecated in python3.7
+        try:
+            asyncio.all_tasks
+        except AttributeError as e:
+            asyncio.all_tasks = asyncio.Task.all_tasks
 
         def callback(message: Message) -> None:
             if loop.is_closed():
