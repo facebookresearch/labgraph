@@ -29,10 +29,11 @@ ant
 ln -s /opt/buck/bin/buck /usr/bin/buck
 
 # Install Watchman
-cd /opt/watchman
+cd /opt/
 wget https://github.com/facebook/watchman/releases/download/v2020.09.21.00/watchman-v2020.09.21.00-linux.zip
 unzip watchman-v2020.09.21.00-linux.zip
-cd /opt/watchman/watchman-v2020.09.21.00-linux
+rm watchman-v2020.09.21.00-linux.zip
+cd /opt/watchman-v2020.09.21.00-linux
 mkdir -p /usr/local/{bin,lib} /usr/local/var/run/watchman
 cp bin/* /usr/local/bin
 cp lib/* /usr/local/lib

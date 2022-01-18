@@ -32,7 +32,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk"
 # Build Buck
 WORKDIR "/opt/buck"
 RUN ant
-Run ln -s /opt/buck/bin/buck /usr/bin/buck
+RUN ln -s /opt/buck/bin/buck /usr/bin/buck
 
 # Install Watchman
 WORKDIR "/opt/watchman"

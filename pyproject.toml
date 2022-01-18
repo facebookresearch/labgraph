@@ -7,10 +7,11 @@ test-requires = "pytest"
 # Run the project tests against the installed wheel using `nose`
 test-command = "python -m pytest --pyargs -v labgraph --ignore=labgraph/devices"
 # Increase pip debugging output
-build-verbosity = 3
-skip = ["cp27-*", "cp34-*", "cp35-*", "pp*", "*-win32"]
-manylinux-x86_64image = "manylinux2014"
-manylinux-i686-image= "manylinux2014"
+build-verbosity = 2
+build = ["cp36-*", "cp37-*", "cp38-*", "cp39-*", "cp310-*"]
+skip = ["pp*", "*-win32"]
+manylinux-x86_64-image = "quay.io/pypa/manylinux2014_x86_64:latest"
+manylinux-i686-image= "quay.io/pypa/manylinux2014_i686:latest"
 
 [tool.cibuildwheel.linux]
 # Run a script that's inside your project
@@ -19,10 +20,11 @@ before-all = "bash scripts/prepare_for_build_linux.sh"
 [tool.cibuildwheel.macos]
 # Run a script that's inside your project
 before-all = "bash scripts/prepare_for_build_macos.sh"
+environment = { MACOSX_DEPLOYMENT_TARGET="10.15" }
 
 [tool.cibuildwheel.windows]
 # Run a script that's inside your project
-before-build = "powershell scripts/prepare_for_build_windows.bat"
+before-all = "powershell scripts/prepare_for_build_windows.bat"
 
 # Need to replace the python version in the DEFS file before each build.
 [[tool.cibuildwheel.overrides]]
@@ -38,16 +40,15 @@ before-build = "sed -i 's/3.6/3.9/' /opt/labgraph/third-party/python/DEFS"
 select = "cp310-*"
 before-build = "sed -i 's/3.6/3.10/' /opt/labgraph/third-party/python/DEFS"
 # Do the same for windows.
-[[tool.cibuildwheel.windows.overrides]]
-select = "cp37-*"
-before-build = "get-content \".\\third-party\\python\\DEFS\" | %{$_ -replace \"3.6\",\"3.7\"}"
-[[tool.cibuildwheel.windows.overrides]]
-select = "cp38-*"
-before-build = "get-content \".\\third-party\\python\\DEFS\" | %{$_ -replace \"3.6\",\"3.8\"}"
-[[tool.cibuildwheel.windows.overrides]]
-select = "cp39-*"
-before-build = "get-content \".\\third-party\\python\\DEFS\" | %{$_ -replace \"3.6\",\"3.9\"}"
-[[tool.cibuildwheel.windows.overrides]]
-select = "cp310-*"
-before-build = "get-content \".\\third-party\\python\\DEFS\" | %{$_ -replace \"3.6\",\"3.10\"}"
-
+# [[tool.cibuildwheel.windows.overrides]]
+# select = "cp37-*"
+# before-build = "get-content \".\\third-party\\python\\DEFS\" | %{$_ -replace \"3.6\",\"3.7\"}"
+# [[tool.cibuildwheel.windows.overrides]]
+# select = "cp38-*"
+# before-build = "get-content \".\\third-party\\python\\DEFS\" | %{$_ -replace \"3.6\",\"3.8\"}"
+# [[tool.cibuildwheel.windows.overrides]]
+# select = "cp39-*"
+# before-build = "get-content \".\\third-party\\python\\DEFS\" | %{$_ -replace \"3.6\",\"3.9\"}"
+# [[tool.cibuildwheel.windows.overrides]]
+# select = "cp310-*"
+# before-build = "get-content \".\\third-party\\python\\DEFS\" | %{$_ -replace \"3.6\",\"3.10\"}"

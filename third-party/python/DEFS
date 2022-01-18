@@ -30,11 +30,13 @@ def config_var(key):
 PYTHON_SHARED_LIB_DIR = (
     config_var("BINDIR") if platform.system() == "Windows" else config_var("LIBDIR")
 )
-PYTHON_SHARED_LIB_FILENAME = (
-    "python" + PYTHON_VERSION.replace(".", "") + ".dll"
-    if platform.system() == "Windows"
-    else config_var("LDLIBRARY")
-)
+
+PYTHON_SHARED_LIB_FILENAME = {
+    "Windows": "python" + PYTHON_VERSION.replace(".", "") + ".dll",
+    "Darwin": "libpython" + PYTHON_VERSION + ".dylib",
+    "Linux": config_var("LDLIBRARY")
+}[platform.system()]
+
 PYTHON_SHARED_LIB_PATH = PYTHON_SHARED_LIB_DIR + os.sep + PYTHON_SHARED_LIB_FILENAME
 
 PYTHON_STATIC_LIB_DIR = {
@@ -47,3 +49,4 @@ PYTHON_STATIC_LIB_FILENAME = "python" + PYTHON_VERSION.replace(".", "") + ".lib"
 PYTHON_STATIC_LIB_PATH = PYTHON_STATIC_LIB_DIR + os.sep + PYTHON_STATIC_LIB_FILENAME
 
 PYTHON_INCLUDE_DIR = config_var("INCLUDEPY")
+
