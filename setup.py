@@ -21,7 +21,7 @@ LIBRARY_EXTENSIONS = [
 
 setup(
     name="labgraph",
-    version="2.0.0",
+    version="2.0.1",
     description="Research-friendly framework for in-lab experiments",
     long_description="LabGraph is a Python framework for rapidly prototyping experimental " +
                 "systems for real-time streaming applications. " +
