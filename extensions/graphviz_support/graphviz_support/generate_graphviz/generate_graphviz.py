@@ -112,4 +112,3 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
             graph_viz.edge(node.name, adj_node.name)
 
     graph_viz.render()
-    graph.__streams__.values()
