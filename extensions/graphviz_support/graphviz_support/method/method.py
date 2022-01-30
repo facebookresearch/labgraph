@@ -11,7 +11,7 @@ class Method:
 
     def __init__(self, name: str) -> None:
         self.__name = name
-        self.__in_edges: List[str] = []
+        self.__in_edge: str = ''
         self.__out_edges: List[str] = []
         self.__in_adjacents: List['Method'] = []
         self.__out_adjacents: List['Method'] = []
@@ -21,17 +21,21 @@ class Method:
         return self.__name
 
     @property
-    def in_edges(self) -> List[str]:
-        return self.__in_edges
+    def in_edge(self) -> str:
+        return self.__in_edge
+
+    @in_edge.setter
+    def in_edge(self, value) -> None:
+        self.__in_edge = value
 
     @property
     def out_edges(self) -> List[str]:
         return self.__out_edges
 
     @property
-    def in_adjacent(self) -> List['Method']:
+    def in_adjacents(self) -> List['Method']:
         return self.__in_adjacents
 
     @property
-    def out_adjacent(self) -> List['Method']:
+    def out_adjacents(self) -> List['Method']:
         return self.__out_adjacents
