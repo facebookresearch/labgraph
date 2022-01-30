@@ -51,6 +51,14 @@ def find_connections(nodes: List[Method], streams: Stream) -> List[Method]:
         for node_2 in nodes:
             if node_1 != node_2:
                 for stream in streams:
+                    # Check in_adjacents
+                    intersection = set((node_1.in_edge, )).union(
+                        set(node_2.out_edges)
+                        ).intersection(stream.topic_paths)
+
+                    if len(intersection) == 2:
+                        node_1.in_adjacents.append(node_2)
+
                     # Check out_adjacents
                     intersection = out_edge.union(
                         set((node_2.in_edge, ))
@@ -70,11 +78,6 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
         output_file: Filename for saving the source
     """
     # Check args
-    if graph is None:
-        raise GenerateGraphiz(
-            "Value cannot be null. Parameter name: graph"
-        )
-
     if not isinstance(graph, lg.Graph):
         raise GenerateGraphiz(
             "Parameter 'graph' should be of type labgraph.Graph"
@@ -108,5 +111,5 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
         for adj_node in node.out_adjacents:
             graph_viz.edge(node.name, adj_node.name)
 
-    graph_viz.view()
+    graph_viz.render()
     graph.__streams__.values()
