@@ -11,6 +11,7 @@ jobs:
           python-version: 3.6
       - name: install graphviz_support dependencies
         run: |
+          sudo apt install graphviz
           pip install extensions/graphviz_support
       - name: run graphviz_support tests
         run: |
