@@ -6,7 +6,7 @@ import os
 import pathlib
 import labgraph as lg
 from labgraph.examples.simple_viz import Demo
-from ..errors.errors import GenerateGraphiz
+from ..errors.errors import GenerateGraphvizError
 from ..generate_graphviz.generate_graphviz import (
     identify_graph_nodes,
     find_connections,
@@ -21,11 +21,11 @@ class TestLabgraphGraphvizAPI(unittest.TestCase):
         self.graph: lg.Graph = Demo()
 
     def test_generate_graphviz_invalid_graph_instance(self) -> None:
-        with self.assertRaises(GenerateGraphiz):
+        with self.assertRaises(GenerateGraphvizError):
             generate_graphviz(None, 'test.svg')
 
     def test_generate_graphviz_invalid_output_file(self) -> None:
-        with self.assertRaises(GenerateGraphiz):
+        with self.assertRaises(GenerateGraphvizError):
             generate_graphviz(None, '')
 
     def test_identify_graph_nodes(self) -> None:

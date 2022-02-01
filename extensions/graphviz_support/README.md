@@ -1,13 +1,16 @@
 # Graphviz for LabGraph graphs
 
-Graphviz provide an API to generate a graphviz visualization of the LabGraph topology. 
+This extension provides an API to generate a graphviz visualization of the LabGraph topology. 
 
 ## Quick Start
 
 ### Method 1 - building from source code
 
 **Prerequisites**:
-
+* Python3\
+Supported python version(s)
+    * [Python3.6](https://www.python.org/downloads/)
+    * [Python3.8](https://www.python.org/downloads/) (**RECOMMENDED**)
 * Make sure to install [labgraph](https://github.com/facebookresearch/labgraph) before proceeding
 * Make sure to install [graphviz](https://graphviz.org/download/) on your main OS before proceeding
 

@@ -6,7 +6,7 @@ from labgraph.graphs.stream import Stream
 from graphviz import Digraph
 from typing import List
 from ..method.method import Method
-from ..errors.errors import GenerateGraphiz
+from ..errors.errors import GenerateGraphvizError
 
 
 def identify_graph_nodes(graph: lg.Graph) -> List[Method]:
@@ -79,12 +79,12 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
     """
     # Check args
     if not isinstance(graph, lg.Graph):
-        raise GenerateGraphiz(
+        raise GenerateGraphvizError(
             "Parameter 'graph' should be of type labgraph.Graph"
         )
 
     if not output_file:
-        raise GenerateGraphiz(
+        raise GenerateGraphvizError(
             "Value cannot be null or empty string. Parameter name: output_file"
         )
 
