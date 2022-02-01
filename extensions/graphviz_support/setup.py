@@ -10,9 +10,7 @@ setup(
     packages=find_packages(),
     python_requires=">=3.6",
     install_requires=[
-        "labgraph==1.0.2",
-        "numpy==1.16.4",
+        "labgraph>=1.0.2",
         "graphviz==0.19.1",
-        "matplotlib==3.1.1",
     ],
 )

@@ -2,17 +2,19 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.8]
     steps:
-      - name: checkout repo content
-        uses: actions/checkout@v2 
-      - name: setup python
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6
-      - name: install graphviz_support dependencies
+          python-version: ${{ matrix.python-version }}
+      - name: Install graphviz_support dependencies
         run: |
           sudo apt install graphviz
           pip install extensions/graphviz_support
-      - name: run graphviz_support tests
+      - name: Run graphviz_support tests
         run: |
           python -m extensions.graphviz_support.graphviz_support.tests.test_lg_graphviz_api
