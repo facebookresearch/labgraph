@@ -7,14 +7,26 @@ from typing import List
 class GraphVizNode:
     """
     Represents a node in the graph.
-    """
 
+    @attributes:
+        name: A string that represents the name of the node.
+
+        in_edge: A string that represents
+                 a path to the topic to which the node is subscribed
+
+        out_edges: A list of strings.
+                   It represents the paths of the different topics
+                   on which the node publishes data
+
+        downstream_nodes: A list of GraphVizNode.
+                          It represents the adjacent node to which
+                          the node is streaming data
+    """
     def __init__(self, name: str) -> None:
         self.__name = name
         self.__in_edge: str = ''
         self.__out_edges: List[str] = []
-        self.__in_adjacents: List['GraphVizNode '] = []
-        self.__out_adjacents: List['GraphVizNode '] = []
+        self.__downstream_nodes: List['GraphVizNode '] = []
 
     @property
     def name(self) -> str:
@@ -33,9 +45,5 @@ class GraphVizNode:
         return self.__out_edges
 
     @property
-    def in_adjacents(self) -> List['GraphVizNode ']:
-        return self.__in_adjacents
-
-    @property
-    def out_adjacents(self) -> List['GraphVizNode ']:
-        return self.__out_adjacents
+    def downstream_nodes(self) -> List['GraphVizNode ']:
+        return self.__downstream_nodes

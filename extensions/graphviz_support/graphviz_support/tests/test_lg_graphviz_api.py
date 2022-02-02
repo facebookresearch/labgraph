@@ -37,12 +37,9 @@ class TestLabgraphGraphvizAPI(unittest.TestCase):
         nodes = identify_graph_nodes(self.graph)
         streams = self.graph.__streams__.values()
         nodes = find_connections(nodes, streams)
-        self.assertEqual(1, len(nodes[0].in_adjacents))
-        self.assertEqual(0, len(nodes[0].out_adjacents))
-        self.assertEqual(0, len(nodes[1].in_adjacents))
-        self.assertEqual(1, len(nodes[1].out_adjacents))
-        self.assertEqual(1, len(nodes[2].in_adjacents))
-        self.assertEqual(1, len(nodes[2].out_adjacents))
+        self.assertEqual(0, len(nodes[0].downstream_nodes))
+        self.assertEqual(1, len(nodes[1].downstream_nodes))
+        self.assertEqual(1, len(nodes[2].downstream_nodes))
 
     def test_generate_graphviz(self) -> None:
         output_dir = f"{self.test_dir}/output"

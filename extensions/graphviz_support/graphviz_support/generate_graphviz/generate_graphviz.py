@@ -17,20 +17,21 @@ def identify_graph_nodes(graph: lg.Graph) -> List[GraphVizNode]:
     @params:
         graph: instance of the running computational graph
 
-    @return: List of nodes(methods)
+    @return: List of nodes
     """
     nodes: List[GraphVizNode] = []
 
     for method in graph.__methods__.values():
         node: GraphVizNode = GraphVizNode(method.name)
+
         if hasattr(method, 'subscribed_topic_path'):
             node.in_edge = method.subscribed_topic_path
 
         if hasattr(method, 'published_topic_paths'):
-            for published_path in method.published_topic_paths:
-                node.out_edges.append(published_path)
+            for published_topic_path in method.published_topic_paths:
+                node.out_edges.append(published_topic_path)
 
-        if bool(len(node.in_edge) or len(node.out_edges)):
+        if len(node.in_edge) or len(node.out_edges):
             nodes.append(node)
 
     return nodes
@@ -41,11 +42,11 @@ def find_connections(
     streams: Stream
 ) -> List[GraphVizNode]:
     """
-    Function the find the node that are connected
+    Function that finds the node that are connected
 
     @params:
         nodes: The list of nodes of the graph
-        stream: sequence of messages that is accessible in real-time
+        stream: sequence of messages that are accessible in real-time
 
     @return: The new list of nodes after update
     """
@@ -54,21 +55,13 @@ def find_connections(
         for node_2 in nodes:
             if node_1 != node_2:
                 for stream in streams:
-                    # Check in_adjacents
-                    intersection = set((node_1.in_edge, )).union(
-                        set(node_2.out_edges)
-                        ).intersection(stream.topic_paths)
-
-                    if len(intersection) == 2:
-                        node_1.in_adjacents.append(node_2)
-
-                    # Check out_adjacents
+                    # Check downstream nodes
                     intersection = out_edge.union(
                         set((node_2.in_edge, ))
                         ).intersection(stream.topic_paths)
 
                     if len(intersection) == 2:
-                        node_1.out_adjacents.append(node_2)
+                        node_1.downstream_nodes.append(node_2)
 
     return nodes
 
@@ -88,7 +81,7 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
 
     if not output_file:
         raise GenerateGraphvizError(
-            "Value cannot be null or empty string. Parameter name: output_file"
+            "Parameter 'output_file' cannot be null or empty string."
         )
 
     filename, format = output_file.split('.')
@@ -111,7 +104,7 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
         graph_viz.node(node.name)
 
     for node in nodes:
-        for adj_node in node.out_adjacents:
-            graph_viz.edge(node.name, adj_node.name)
+        for downstream_node in node.downstream_nodes:
+            graph_viz.edge(node.name, downstream_node.name)
 
     graph_viz.render()
