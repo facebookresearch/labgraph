@@ -14,6 +14,10 @@ LabGraph is a streaming framework built by the Facebook Reality Labs Research te
 ```
 pip install labgraph
 ```
+For Mac (supported version as of 02/02/2022):
+```
+pip install labgraph==2.0.0
+```
 
 ### Method 2 - building from source code
 
