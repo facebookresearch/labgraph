@@ -21,12 +21,19 @@ python setup.py install
 
 ### Testing:
 
-To make sure things are working you can run any of the following examples
+To make sure things are working:
 
+1- Move to the root of the LabGraph directory:
+```
+labgraph\extensions\graphviz_support> cd ../..
+labgraph>
+```
+2- Run the following test
 ```
 python -m extensions.graphviz_support.graphviz_support.tests.test_lg_graphviz_api
 ```
-
+**The output of the file for this test can be found at:**\
+extensions\graphviz_support\graphviz_support\tests\output
 ### Generating a graphviz file
 
 To generate a graph visualization just call 'generate_graphviz' function and pass the appropriate parameters

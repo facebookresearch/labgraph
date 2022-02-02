@@ -5,11 +5,11 @@ import labgraph as lg
 from labgraph.graphs.stream import Stream
 from graphviz import Digraph
 from typing import List
-from ..method.method import Method
+from ..graphviz_node.graphviz_node import GraphVizNode
 from ..errors.errors import GenerateGraphvizError
 
 
-def identify_graph_nodes(graph: lg.Graph) -> List[Method]:
+def identify_graph_nodes(graph: lg.Graph) -> List[GraphVizNode]:
     """
     Function that identifies the graph methods
     and return them as individual nodes
@@ -19,16 +19,16 @@ def identify_graph_nodes(graph: lg.Graph) -> List[Method]:
 
     @return: List of nodes(methods)
     """
-    nodes: List[Method] = []
+    nodes: List[GraphVizNode] = []
 
     for method in graph.__methods__.values():
-        node: Method = Method(method.name)
+        node: GraphVizNode = GraphVizNode(method.name)
         if hasattr(method, 'subscribed_topic_path'):
             node.in_edge = method.subscribed_topic_path
 
         if hasattr(method, 'published_topic_paths'):
-            for publishe_path in method.published_topic_paths:
-                node.out_edges.append(publishe_path)
+            for published_path in method.published_topic_paths:
+                node.out_edges.append(published_path)
 
         if bool(len(node.in_edge) or len(node.out_edges)):
             nodes.append(node)
@@ -36,7 +36,10 @@ def identify_graph_nodes(graph: lg.Graph) -> List[Method]:
     return nodes
 
 
-def find_connections(nodes: List[Method], streams: Stream) -> List[Method]:
+def find_connections(
+    nodes: List[GraphVizNode],
+    streams: Stream
+) -> List[GraphVizNode]:
     """
     Function the find the node that are connected
 
@@ -91,7 +94,7 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
     filename, format = output_file.split('.')
 
     # Local variables
-    nodes: List[Method] = []
+    nodes: List[GraphVizNode] = []
     graph_viz: Digraph = Digraph('graph', filename=filename, format=format)
 
     # Identify graph nodes

@@ -4,7 +4,7 @@
 from typing import List
 
 
-class Method:
+class GraphVizNode:
     """
     Represents a node in the graph.
     """
@@ -13,8 +13,8 @@ class Method:
         self.__name = name
         self.__in_edge: str = ''
         self.__out_edges: List[str] = []
-        self.__in_adjacents: List['Method'] = []
-        self.__out_adjacents: List['Method'] = []
+        self.__in_adjacents: List['GraphVizNode '] = []
+        self.__out_adjacents: List['GraphVizNode '] = []
 
     @property
     def name(self) -> str:
@@ -33,9 +33,9 @@ class Method:
         return self.__out_edges
 
     @property
-    def in_adjacents(self) -> List['Method']:
+    def in_adjacents(self) -> List['GraphVizNode ']:
         return self.__in_adjacents
 
     @property
-    def out_adjacents(self) -> List['Method']:
+    def out_adjacents(self) -> List['GraphVizNode ']:
         return self.__out_adjacents
