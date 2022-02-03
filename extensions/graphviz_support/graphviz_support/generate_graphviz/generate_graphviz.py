@@ -4,25 +4,29 @@
 import labgraph as lg
 from labgraph.graphs.stream import Stream
 from graphviz import Digraph
-from typing import List
+from typing import List, Dict
 from ..graphviz_node.graphviz_node import GraphVizNode
 from ..errors.errors import GenerateGraphvizError
 
 
 def identify_graph_nodes(graph: lg.Graph) -> List[GraphVizNode]:
     """
-    Function that identifies the graph methods
+    A function that identifies the graph methods
     and return them as individual nodes
 
     @params:
-        graph: instance of the running computational graph
+        graph: Instance of the running computational graph
 
     @return: List of nodes
     """
     nodes: List[GraphVizNode] = []
 
-    for method in graph.__methods__.values():
+    for key, method in graph.__methods__.items():
         node: GraphVizNode = GraphVizNode(method.name)
+
+        # Find grouping name
+        group_path = '/'.join(key.split('/')[:-1])
+        node.grouping = type(graph.__descendants__[group_path]).__name__
 
         if hasattr(method, 'subscribed_topic_path'):
             node.in_edge = method.subscribed_topic_path
@@ -37,38 +41,113 @@ def identify_graph_nodes(graph: lg.Graph) -> List[GraphVizNode]:
     return nodes
 
 
-def find_connections(
+def out_edge_node_mapper(
+    nodes: List[GraphVizNode]
+) -> Dict[str, List[GraphVizNode]]:
+    """
+    A function that maps a published topic to the publisher node
+
+    @params:
+        nodes: The list of nodes of the graph
+
+    @return: A dictionary where the key is the published topic path
+             and the value is the publisher node
+    """
+    out_edge_node_map: Dict[str, List[GraphVizNode]] = {}
+
+    for node in nodes:
+        for out_edge in node.out_edges:
+            out_edge_node_map[out_edge] = node
+
+    return out_edge_node_map
+
+
+def in_out_edge_mapper(streams: Stream) -> Dict[str, str]:
+    """
+    A function that maps the in_edge of a downstream node
+             with the out_edge of the appropriate upstream node
+
+    @params:
+        streams: sequence of messages that are accessible in real-time
+
+    @return: A dictionary where the key is the subscribed topic path
+             and the value is the published topic path
+    """
+    in_out_edge_map: Dict[str, str] = {}
+
+    for stream in streams:
+        if len(stream.topic_paths) >= 2:
+            in_edge = stream.topic_paths[-1]
+            out_edge = stream.topic_paths[-2]
+            in_out_edge_map[in_edge] = out_edge
+
+    return in_out_edge_map
+
+
+def connect_to_upstream(
     nodes: List[GraphVizNode],
     streams: Stream
 ) -> List[GraphVizNode]:
     """
-    Function that finds the node that are connected
+    A function that connect a node to its upstream node
 
     @params:
         nodes: The list of nodes of the graph
-        stream: sequence of messages that are accessible in real-time
+        streams: sequence of messages that are accessible in real-time
 
     @return: The new list of nodes after update
     """
-    for node_1 in nodes:
-        out_edge = set(node_1.out_edges)
-        for node_2 in nodes:
-            if node_1 != node_2:
-                for stream in streams:
-                    # Check downstream nodes
-                    intersection = out_edge.union(
-                        set((node_2.in_edge, ))
-                        ).intersection(stream.topic_paths)
+    out_edge_node_map = out_edge_node_mapper(nodes)
+    in_out_edge_map = in_out_edge_mapper(streams)
 
-                    if len(intersection) == 2:
-                        node_1.downstream_nodes.append(node_2)
+    for node in nodes:
+        if node.in_edge and (node.in_edge in in_out_edge_map):
+            node.upstream_node = out_edge_node_map[
+                in_out_edge_map[node.in_edge]
+            ]
 
     return nodes
 
 
+def build_graph(nodes: List[GraphVizNode], filename: str, format: str) -> None:
+    """
+    A function that generates a graphviz visualization
+
+    @params:
+        nodes: The list of nodes of the graph
+        filename: name of the output file
+        format: Format of the output file
+    """
+    graph_viz: Digraph = Digraph(
+        'Labgraph Topology',
+        filename=filename,
+        format=format
+    )
+    graph_viz.attr(rankdir='LR', center="true")
+    graph_viz.attr(
+        'node',
+        shape='circle',
+        fontsize="12",
+        width="1.5",
+        height="1.5"
+    )
+
+    for node in nodes:
+        graph_viz.node(node.grouping)
+
+    for node in nodes:
+        if node.upstream_node:
+            graph_viz.edge(
+                node.upstream_node.grouping,
+                node.grouping
+            )
+
+    graph_viz.render()
+
+
 def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
     """
-    Generates a graphviz visualization of the LabGraph topology
+    A function that generates a graphviz visualization of the LabGraph topology
     @params:
         graph: An instance of the computational graph
         output_file: Filename for saving the source
@@ -83,28 +162,16 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
         raise GenerateGraphvizError(
             "Parameter 'output_file' cannot be null or empty string."
         )
-
     filename, format = output_file.split('.')
 
     # Local variables
     nodes: List[GraphVizNode] = []
-    graph_viz: Digraph = Digraph('graph', filename=filename, format=format)
 
     # Identify graph nodes
     nodes = identify_graph_nodes(graph)
 
     # Connect graph edges
-    nodes = find_connections(nodes, graph.__streams__.values())
+    nodes = connect_to_upstream(nodes, graph.__streams__.values())
 
     # Build graph visualization
-    graph_viz.attr(rankdir='LR')
-    graph_viz.attr('node', shape='circle')
-
-    for node in nodes:
-        graph_viz.node(node.name)
-
-    for node in nodes:
-        for downstream_node in node.downstream_nodes:
-            graph_viz.edge(node.name, downstream_node.name)
-
-    graph_viz.render()
+    build_graph(nodes, filename, format)

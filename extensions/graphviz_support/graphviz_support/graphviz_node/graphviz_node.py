@@ -11,6 +11,9 @@ class GraphVizNode:
     @attributes:
         name: A string that represents the name of the node.
 
+        grouping: logical grouping of methods
+                  which always share the same process
+
         in_edge: A string that represents
                  a path to the topic to which the node is subscribed
 
@@ -18,19 +21,28 @@ class GraphVizNode:
                    It represents the paths of the different topics
                    on which the node publishes data
 
-        downstream_nodes: A list of GraphVizNode.
-                          It represents the adjacent node to which
-                          the node is streaming data
+        upstream_node: A GraphVizNode.
+                       It represents the adjacent node
+                       from where the data is received
     """
     def __init__(self, name: str) -> None:
         self.__name = name
+        self.__grouping: str = ''
         self.__in_edge: str = ''
         self.__out_edges: List[str] = []
-        self.__downstream_nodes: List['GraphVizNode '] = []
+        self.__upstream_node: 'GraphVizNode ' = None
 
     @property
     def name(self) -> str:
         return self.__name
+
+    @property
+    def grouping(self) -> str:
+        return self.__grouping
+
+    @grouping.setter
+    def grouping(self, value) -> None:
+        self.__grouping = value
 
     @property
     def in_edge(self) -> str:
@@ -45,5 +57,9 @@ class GraphVizNode:
         return self.__out_edges
 
     @property
-    def downstream_nodes(self) -> List['GraphVizNode ']:
-        return self.__downstream_nodes
+    def upstream_node(self) -> 'GraphVizNode':
+        return self.__upstream_node
+
+    @upstream_node.setter
+    def upstream_node(self, value) -> None:
+        self.__upstream_node = value
