@@ -5,7 +5,7 @@ import unittest
 import os
 import pathlib
 import labgraph as lg
-from labgraph.examples.simple_viz import Demo
+from .demo_graph.demo import Demo
 from ..errors.errors import GenerateGraphvizError
 from ..generate_graphviz.generate_graphviz import (
     identify_graph_nodes,
@@ -20,55 +20,78 @@ from ..generate_graphviz.generate_graphviz import (
 class TestLabgraphGraphvizAPI(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.test_dir: str = pathlib.Path(__file__).parent.absolute()
         self.graph: lg.Graph = Demo()
 
     def test_identify_graph_nodes(self) -> None:
         nodes = identify_graph_nodes(self.graph)
-        expected_node_count = 3
+        expected_node_count = 7
         self.assertEqual(expected_node_count, len(nodes))
 
     def test_out_edge_node_mapper(self) -> None:
         nodes = identify_graph_nodes(self.graph)
         out_edge_node_map = out_edge_node_mapper(nodes)
-        self.assertEqual(2, len(out_edge_node_map))
+        self.assertEqual(4, len(out_edge_node_map))
         self.assertEqual(
             'generate_noise',
-            out_edge_node_map['AVERAGED_NOISE/GENERATOR/OUTPUT'].name
+            out_edge_node_map['NOISE_GENERATOR/OUTPUT'].name
         )
         self.assertEqual(
             'average',
-            out_edge_node_map['AVERAGED_NOISE/ROLLING_AVERAGER/OUTPUT'].name
+            out_edge_node_map['ROLLING_AVERAGER/OUTPUT'].name
+        )
+        self.assertEqual(
+            'amplify',
+            out_edge_node_map['AMPLIFIER/OUTPUT'].name
+        )
+        self.assertEqual(
+            'attenuate',
+            out_edge_node_map['ATTENUATOR/OUTPUT'].name
         )
 
     def test_in_out_edge_mapper(self) -> None:
         in_out_edge_map = in_out_edge_mapper(self.graph.__streams__.values())
-        self.assertEqual(2, len(in_out_edge_map))
+        self.assertEqual(6, len(in_out_edge_map))
         self.assertEqual(
-            'AVERAGED_NOISE/GENERATOR/OUTPUT',
-            in_out_edge_map['AVERAGED_NOISE/ROLLING_AVERAGER/INPUT']
+            'NOISE_GENERATOR/OUTPUT',
+            in_out_edge_map['ROLLING_AVERAGER/INPUT']
         )
         self.assertEqual(
-            'AVERAGED_NOISE/ROLLING_AVERAGER/OUTPUT',
-            in_out_edge_map['PLOT/INPUT']
+            'NOISE_GENERATOR/OUTPUT',
+            in_out_edge_map['AMPLIFIER/INPUT']
+        )
+        self.assertEqual(
+            'NOISE_GENERATOR/OUTPUT',
+            in_out_edge_map['ATTENUATOR/INPUT']
+        )
+        self.assertEqual(
+            'ROLLING_AVERAGER/OUTPUT',
+            in_out_edge_map['SINK/INPUT_1']
+        )
+        self.assertEqual(
+            'AMPLIFIER/OUTPUT',
+            in_out_edge_map['SINK/INPUT_2']
+        )
+        self.assertEqual(
+            'ATTENUATOR/OUTPUT',
+            in_out_edge_map['SINK/INPUT_3']
         )
 
     def test_connect_to_upstream(self) -> None:
         nodes = identify_graph_nodes(self.graph)
         streams = self.graph.__streams__.values()
         nodes = connect_to_upstream(nodes, streams)
-        self.assertEqual('average', nodes[0].upstream_node.name)
-        self.assertIsNone(nodes[1].upstream_node)
-        self.assertEqual('generate_noise', nodes[2].upstream_node.name)
+        expected_node_count = 7
+        self.assertEqual(expected_node_count, len(nodes))
 
     def test_build_graph(self) -> None:
+        self.test_dir: str = pathlib.Path(__file__).parent.absolute()
         nodes = identify_graph_nodes(self.graph)
         nodes = connect_to_upstream(nodes, self.graph.__streams__.values())
         output_dir = f"{self.test_dir}/output"
         output_file_name = f"{output_dir}/test"
         output_file_format = "svg"
 
-        build_graph(nodes, output_file_name, output_file_format)
+        build_graph("Demo", nodes, output_file_name, output_file_format)
         self.assertTrue(
             os.path.exists(f"{output_file_name}.{output_file_format}")
         )

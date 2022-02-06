@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
-from typing import List
+from typing import List, Set
 
 
 class GraphVizNode:
@@ -14,6 +14,8 @@ class GraphVizNode:
         grouping: logical grouping of methods
                   which always share the same process
 
+        in_edges: A set of in_edge.
+
         in_edge: A string that represents
                  a path to the topic to which the node is subscribed
 
@@ -25,6 +27,9 @@ class GraphVizNode:
                        It represents the adjacent node
                        from where the data is received
     """
+
+    in_edges: Set[str] = set()
+
     def __init__(self, name: str) -> None:
         self.__name = name
         self.__grouping: str = ''
@@ -51,6 +56,7 @@ class GraphVizNode:
     @in_edge.setter
     def in_edge(self, value) -> None:
         self.__in_edge = value
+        self.in_edges.add(value)
 
     @property
     def out_edges(self) -> List[str]:

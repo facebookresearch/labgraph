@@ -76,10 +76,13 @@ def in_out_edge_mapper(streams: Stream) -> Dict[str, str]:
     in_out_edge_map: Dict[str, str] = {}
 
     for stream in streams:
-        if len(stream.topic_paths) >= 2:
-            in_edge = stream.topic_paths[-1]
-            out_edge = stream.topic_paths[-2]
-            in_out_edge_map[in_edge] = out_edge
+        difference = set(stream.topic_paths).difference(GraphVizNode.in_edges)
+
+        if difference:
+            upstream_edge = difference.pop()
+            for edge in stream.topic_paths:
+                if edge != upstream_edge:
+                    in_out_edge_map[edge] = upstream_edge
 
     return in_out_edge_map
 
@@ -101,7 +104,7 @@ def connect_to_upstream(
     in_out_edge_map = in_out_edge_mapper(streams)
 
     for node in nodes:
-        if node.in_edge and (node.in_edge in in_out_edge_map):
+        if node.in_edge:
             node.upstream_node = out_edge_node_map[
                 in_out_edge_map[node.in_edge]
             ]
@@ -109,17 +112,23 @@ def connect_to_upstream(
     return nodes
 
 
-def build_graph(nodes: List[GraphVizNode], filename: str, format: str) -> None:
+def build_graph(
+    name: str,
+    nodes: List[GraphVizNode],
+    filename: str,
+    format: str
+) -> None:
     """
     A function that generates a graphviz visualization
 
     @params:
+        name: The name of the graph
         nodes: The list of nodes of the graph
-        filename: name of the output file
-        format: Format of the output file
+        filename: The name of the output file
+        format: The format of the output file
     """
     graph_viz: Digraph = Digraph(
-        'Labgraph Topology',
+        name,
         filename=filename,
         format=format
     )
@@ -174,4 +183,9 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
     nodes = connect_to_upstream(nodes, graph.__streams__.values())
 
     # Build graph visualization
-    build_graph(nodes, filename, format)
+    build_graph(
+        type(graph).__name__,
+        nodes,
+        filename,
+        format
+    )
