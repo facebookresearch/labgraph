@@ -2,8 +2,6 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 import unittest
-import os
-import pathlib
 import labgraph as lg
 from extensions.graphviz_support.graphviz_support.tests.demo_graph.demo import Demo
 from ..generate_lg_monitor.generate_lg_monitor import (
@@ -15,11 +13,11 @@ from ..generate_lg_monitor.generate_lg_monitor import (
     serialize_graph,
 )
 
-class TestLabgraphGraphvizAPI(unittest.TestCase):
+
+class TestLabgraphMonitorAPI(unittest.TestCase):
 
     def setUp(self) -> None:
         self.graph: lg.Graph = Demo()
-
 
     def test_identify_upstream_message(self) -> None:
         upstream_message = identify_upstream_message(
@@ -29,7 +27,6 @@ class TestLabgraphGraphvizAPI(unittest.TestCase):
 
         self.assertEqual('INPUT', upstream_message.name)
         self.assertEqual('RandomMessage', upstream_message.type.__name__)
-        
 
     def test_identify_graph_nodes(self) -> None:
         nodes = identify_graph_nodes(self.graph)
@@ -96,7 +93,7 @@ class TestLabgraphGraphvizAPI(unittest.TestCase):
         nodes = identify_graph_nodes(self.graph)
         nodes = connect_to_upstream(nodes, self.graph.__streams__.values())
         serialized_graph = serialize_graph("Demo", nodes)
-        
+
         self.assertEqual('Demo', serialized_graph["name"])
         self.assertEqual(5, len(serialized_graph["nodes"]))
 

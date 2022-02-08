@@ -1,0 +1,20 @@
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.8]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install yaml_support dependencies
+        run: |
+          pip install extensions/yaml_support
+      - name: Run yaml_support tests
+        run: |
+          python -m extensions.yaml_support.labgraph_monitor.tests.test_lg_monitor_api
+          python -m extensions.yaml_support.labgraph_yaml_parser.tests.test_lg_yaml_api
