@@ -23,7 +23,7 @@ SAMPLE_RATE = 5
 def run_server(data: SerializedGraph) -> None:
     """
     A function that creates a Websocket server graph.
-    The server graph streams data to the Labgraph Monitor Front-End
+    The server graph streams the lagraph topology to the clients
     """
     class WSSenderNode(lg.Graph):
         SERIALIZER: Serializer
