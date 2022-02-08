@@ -79,7 +79,7 @@ def in_out_edge_mapper(streams: Stream) -> Dict[str, str]:
         difference = set(stream.topic_paths).difference(GraphVizNode.in_edges)
 
         if difference:
-            upstream_edge = difference.pop()
+            upstream_edge = max(difference, key=len)
             for edge in stream.topic_paths:
                 if edge != upstream_edge:
                     in_out_edge_map[edge] = upstream_edge

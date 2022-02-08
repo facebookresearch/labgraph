@@ -1,4 +1,4 @@
-# Graphviz for LabGraph graphs
+# Graphviz for LabGraph Graphs
 
 This extension provides an API to generate a graphviz visualization of the LabGraph topology. 
 
@@ -38,7 +38,28 @@ extensions\graphviz_support\graphviz_support\tests\output
 
 To generate a graph visualization just call 'generate_graphviz' function and pass the appropriate parameters
 ```
-from extensions/graphviz_support/graphviz_support/generate_graphviz/generate_graphviz.py import generate_graphviz.py
+from extensions.graphviz_support.graphviz_support.generate_graphviz.generate_graphviz import(
+    generate_graphviz
+) 
 
 generate_graphviz(graph, output_file)
 ```
+
+### Examples:
+To get a better understanding of Graphviz API, please check the following examples
+
+```
+python -m extensions.graphviz_support.graphviz_support.examples.simple_viz
+```
+```
+python -m extensions.graphviz_support.graphviz_support.examples.simulation
+```
+```
+python -m extensions.graphviz_support.graphviz_support.examples.simple_viz_fixed_rate
+```
+```
+python -m extensions.graphviz_support.graphviz_support.examples.simple_viz_zmq  
+```
+
+**(!) The outputs of the above examples can be found under the following folder**
+extensions\graphviz_support\graphviz_support\examples\output
