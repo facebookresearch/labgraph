@@ -28,7 +28,7 @@ class LabgraphMonitorNode:
                        It represents the adjacent node
                        from where the data is received
 
-        upstream_message: Represents the Labgraph message
+        upstream_message: A Labgraph message
                           that is received from the upstream
     """
 
@@ -78,3 +78,7 @@ class LabgraphMonitorNode:
     @property
     def upstream_message(self) -> LabgraphMonitorMessage:
         return self.__upstream_message
+
+    @upstream_message.setter
+    def upstream_message(self, value) -> None:
+        self.__upstream_message = value
