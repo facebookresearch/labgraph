@@ -3,10 +3,11 @@
 
 from setuptools import find_packages, setup
 
+
 setup(
     name="graphviz_support",
     version="1.0.0",
-    description="LabGraph Monitor Improvement - Graphviz for LabGraph graphs",
+    description="Graphviz Extension For LabGraph",
     packages=find_packages(),
     python_requires=">=3.6",
     install_requires=[

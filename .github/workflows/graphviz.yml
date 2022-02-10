@@ -18,3 +18,5 @@ jobs:
       - name: Run graphviz_support tests
         run: |
           python -m extensions.graphviz_support.graphviz_support.tests.test_lg_graphviz_api
+          python -m extensions.graphviz_support.graphviz_support.examples.simple_viz
+          python -m extensions.graphviz_support.graphviz_support.examples.graph_w_logging
