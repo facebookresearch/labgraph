@@ -3,6 +3,9 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@emotion/react": "^11.7.1",
+        "@emotion/styled": "^11.6.0",
+        "@mui/material": "^5.4.1",
         "@testing-library/jest-dom": "^5.14.1",
         "@testing-library/react": "^12.0.0",
         "@testing-library/user-event": "^13.2.1",
@@ -25,7 +28,7 @@
         "eject": "react-scripts eject",
         "format": "prettier --write .",
         "lint": "eslint ./src --ext .ts --ext .tsx --max-warnings=0",
-        "check-code": "yarn run format && yarn run lint",
+        "check-code": "yarn run lint && yarn run format",
         "prepare": "cd ../../.. && husky install extensions/prototypes/labgraph_monitor/.husky"
     },
     "eslintConfig": {
