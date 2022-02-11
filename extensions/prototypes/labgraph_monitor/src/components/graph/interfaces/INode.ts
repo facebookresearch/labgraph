@@ -7,6 +7,9 @@ interface INode {
         x: number;
         y: number;
     };
+
+    sourcePosition: 'right' | 'bottom';
+    targetPosition: 'left' | 'top';
 }
 
 export default INode;

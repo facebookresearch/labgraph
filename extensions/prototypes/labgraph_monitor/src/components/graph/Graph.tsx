@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import ReactFlow, { Controls, Background } from 'react-flow-renderer';
-import { TGraphElement } from './types/GraphElement';
+import { TGraphElement } from './types/TGraphElement';
 import { useGraphContext } from '../../contexts';
+import { layoutGraph } from './util/layoutGraph';
 
-const Graph: React.FC = () => {
+const Graph: React.FC = (): JSX.Element => {
     const { graph: serializedGraph } = useGraphContext();
     const [graph, setGraph] = useState<Array<TGraphElement>>(
         [] as Array<TGraphElement>
@@ -20,10 +21,9 @@ const Graph: React.FC = () => {
                 data: {
                     label: name,
                 },
-                position: {
-                    x: Math.floor(Math.random() * 1000),
-                    y: Math.floor(Math.random() * 1000),
-                },
+                position: { x: 0, y: 0 },
+                targetPosition: 'left',
+                sourcePosition: 'right',
             });
 
             data.upstreams.forEach((upstream) => {
@@ -36,18 +36,17 @@ const Graph: React.FC = () => {
             });
         }
 
-        setGraph(deserializedGraph);
+        setGraph(layoutGraph(deserializedGraph));
     }, [serializedGraph]);
 
     return (
         <ReactFlow
-            elements={graph}
+            elements={graph as any}
             snapToGrid={true}
-            snapGrid={[15, 15]}
             style={{ width: '100%', height: '100%' }}
         >
             <Controls />
-            <Background color="#aaa" gap={16} />
+            <Background color="#2a2a2a" />
         </ReactFlow>
     );
 };

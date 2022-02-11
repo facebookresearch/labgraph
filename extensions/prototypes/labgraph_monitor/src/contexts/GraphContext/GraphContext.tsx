@@ -12,7 +12,9 @@ import demo from '../../mocks/demo.json';
 const GraphContext = createContext<IGraphContext>({} as IGraphContext);
 export const useGraphContext = (): IGraphContext => useContext(GraphContext);
 
-const GraphContextProvider: React.FC<ReactNode> = ({ children }) => {
+const GraphContextProvider: React.FC<ReactNode> = ({
+    children,
+}): JSX.Element => {
     const [graph, setGraph] = useState<IGraph>({} as IGraph);
 
     useEffect(() => {
