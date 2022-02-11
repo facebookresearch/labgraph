@@ -3,7 +3,7 @@
 
 # For usage see examples/heat_map_example.py
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Union, Optional, Tuple
 
 import labgraph as lg
 import numpy as np
@@ -37,7 +37,7 @@ class HeatMapConfig(lg.Config):
     """
     data: str = None
     channel_map: str = None
-    style: Dict[str, Any] = None
+    style: Union[str, Any] = None
     shape: Tuple[int, int] = None
     color_map: str = "jet"
     external_timer: bool = False
@@ -113,4 +113,5 @@ class HeatMap(lg.Node):
         return self.state.plot
 
     def stop(self) -> None:
-        self.state.timer.stop()
+        if not self.config.external_timer:
+            self.state.timer.stop()

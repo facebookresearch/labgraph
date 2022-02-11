@@ -12,10 +12,10 @@ from setuptools.command.build_ext import build_ext
 
 CONFIG_FILE = {
     "Windows": "win.buckconfig",
-}.get(platform.system(), "unix.buckconfig")
+    "Darwin" : "unix.buckconfig",
+    "Linux" : "manylinux.buckconfig",
+}[platform.system()]
 
-if platform.system() == 'Linux' and platform.linux_distribution()[0] == 'CentOS Linux':
-    CONFIG_FILE = "manylinux.buckconfig"
 
 class BuckExtension(Extension):
     def __init__(self, name: str, target: str) -> None:

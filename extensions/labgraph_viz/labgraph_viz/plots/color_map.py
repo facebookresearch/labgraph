@@ -123,4 +123,5 @@ class ColorMap(lg.Node):
         return self.state.plot
 
     def stop(self) -> None:
-        self.state.timer.stop()
+        if not self.config.external_timer:
+            self.state.timer.stop()

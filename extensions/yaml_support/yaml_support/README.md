@@ -14,7 +14,7 @@ Make sure to install labgraph before proceeding
 
 ```
 cd labgraph/extensions/yaml_support
-python setup.py install
+python -m pip install .
 ```
 
 ### Testing:
@@ -22,6 +22,6 @@ python setup.py install
 To make sure things are working you can run
 
 ```
-python -m extensions.yaml_support.yaml_support.tests.test_lg_yaml_api
+python -m yaml_support.tests.test_lg_yaml_api
 ```
 

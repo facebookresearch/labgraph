@@ -12,7 +12,7 @@ Make sure to install labgraph before proceeding
 
 ```
 cd labgraph/extensions/labgraph_viz
-python setup.py install
+python -m pip install .
 ```
 
 ### Testing:
@@ -20,12 +20,12 @@ python setup.py install
 To make sure things are working you can run any of the following examples
 
 ```
-python -m extensions.labgraph_viz.labgraph_viz.application_example
-python -m extensions.labgraph_viz.labgraph_viz.bar_plot_example
-python -m extensions.labgraph_viz.labgraph_viz.heat_map_example
-python -m extensions.labgraph_viz.labgraph_viz.line_plot_example
-python -m extensions.labgraph_viz.labgraph_viz.scatter_plot_example
-python -m extensions.labgraph_viz.labgraph_viz.spatial_plot_example
+python -m labgraph_viz.examples.application_example
+python -m labgraph_viz.examples.bar_plot_example
+python -m labgraph_viz.examples.heat_map_example
+python -m labgraph_viz.examples.line_plot_example
+python -m labgraph_viz.examples.scatter_plot_example
+python -m labgraph_viz.examples.spatial_plot_example
 ```
 
 ### Contributers:

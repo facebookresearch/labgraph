@@ -12,7 +12,7 @@ Make sure to install labgraph before proceeding
 
 ```
 cd extensions/psychopy_example
-python setup.py install
+python -m pip install .
 ```
 
 #### Install-time issues
@@ -26,7 +26,7 @@ python setup.py install
 
 To make sure things are working you can run the following example from the labgraph dir:
 ```
-python -m extensions.psychopy_example.psychopy_example
+python -m psychopy_example
 ```
 
 ### Contributers:

@@ -12,7 +12,7 @@ SHELL ["/bin/bash", "--login", "-c"]
 RUN g++ --version
 
 # Install Python, Java, wget, vim
-RUN yum install -y python2 python36 python36-devel wget java-1.8.0-openjdk \
+RUN yum install -y python2 python3 python3-devel wget java-1.8.0-openjdk \
     java-1.8.0-openjdk-devel vim
 
 # Install Ant
@@ -32,7 +32,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk"
 # Build Buck
 WORKDIR "/opt/buck"
 RUN ant
-Run ln -s /opt/buck/bin/buck /usr/bin/buck
+RUN ln -s /opt/buck/bin/buck /usr/bin/buck
 
 # Install Watchman
 WORKDIR "/opt/watchman"
@@ -45,25 +45,117 @@ RUN cp lib/* /usr/local/lib
 RUN chmod 755 /usr/local/bin/watchman
 RUN chmod 2777 /usr/local/var/run/watchman
 
+# Unpack the static python libraries from the manylinux image.
+WORKDIR "/opt/_internal/"
+RUN XZ_OPT=-9e tar -xf static-libs-for-embedding-only.tar.xz cpython-*/lib/libpython*.a
+
 # Copy LabGraph files
-WORKDIR "/opt/labgraph"
+WORKDIR "/opt/labgraph/"
+
+# Copy labgraph into the container
 COPY . .
 
-# Build LabGraph Wheel
-RUN python3.6 setup_py36.py install --user
-RUN python3.6 setup_py36.py sdist bdist_wheel
-RUN python3.6 -m pip install auditwheel
-RUN auditwheel repair dist/*whl -w dist/
+# Create a user to act as the builder.
+# This is done to prevent root installs with pip.
+RUN useradd -m -r builder && \
+    chown -R builder /opt/labgraph
+USER builder
 
-# Test LabGraph
-RUN python3.6 -m pytest --pyargs -v labgraph._cthulhu
-RUN python3.6 -m pytest --pyargs -v labgraph.events
-RUN python3.6 -m pytest --pyargs -v labgraph.graphs
-RUN python3.6 -m pytest --pyargs -v labgraph.loggers
-RUN python3.6 -m pytest --pyargs -v labgraph.messages
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_aligner
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_cpp
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_exception
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_launch
-RUN python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+# Build LabGraph Wheel
+RUN python3.6 -m pip install build && \
+ python3.6 -m build --sdist --wheel 
+# Build LabGraph Wheel
+RUN sed -i 's/3.6/3.7/' /opt/labgraph/third-party/python/DEFS && \
+ python3.7 -m pip install build && \
+ python3.7 -m build --sdist --wheel 
+# Build LabGraph Wheel
+RUN sed -i 's/3.7/3.8/' /opt/labgraph/third-party/python/DEFS && \
+ python3.8 -m pip install build && \
+ python3.8 -m build --sdist --wheel
+# Build LabGraph Wheel
+RUN sed -i 's/3.8/3.9/' /opt/labgraph/third-party/python/DEFS && \
+ python3.9 -m pip install build && \
+ python3.9 -m build --sdist --wheel
+# Build LabGraph Wheel
+RUN sed -i 's/3.9/3.10/' /opt/labgraph/third-party/python/DEFS && \
+ python3.10 -m pip install build && \
+ python3.10 -m build --sdist --wheel --no-isolation
+
+# Build wheels for each python version
+RUN find dist/*whl -exec auditwheel repair {} -w dist/ \;
+
+# Test LabGraph for python3.6
+RUN python3.6 -m pip install \
+ dist/labgraph-2.0.0-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl && \
+ python3.6 -m pytest --pyargs -v labgraph._cthulhu && \
+ python3.6 -m pytest --pyargs -v labgraph.events && \
+ python3.6 -m pytest --pyargs -v labgraph.graphs && \
+ python3.6 -m pytest --pyargs -v labgraph.loggers && \
+ python3.6 -m pytest --pyargs -v labgraph.messages && \
+ python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager && \
+ python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_aligner && \
+ python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_cpp && \
+ python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_exception && \
+ python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_launch && \
+ python3.6 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+
+# Test LabGraph for python3.7
+RUN python3.7 -m pip install \
+ dist/labgraph-2.0.0-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl && \
+ python3.7 -m pytest --pyargs -v labgraph._cthulhu && \
+ python3.7 -m pytest --pyargs -v labgraph.events && \
+ python3.7 -m pytest --pyargs -v labgraph.graphs && \
+ python3.7 -m pytest --pyargs -v labgraph.loggers && \
+ python3.7 -m pytest --pyargs -v labgraph.messages && \
+ python3.7 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager && \
+ python3.7 -m pytest --pyargs -v labgraph.runners.tests.test_aligner && \
+ python3.7 -m pytest --pyargs -v labgraph.runners.tests.test_cpp && \
+ python3.7 -m pytest --pyargs -v labgraph.runners.tests.test_exception && \
+ python3.7 -m pytest --pyargs -v labgraph.runners.tests.test_launch && \
+ python3.7 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+
+# Test LabGraph for python3.8
+RUN python3.8 -m pip install \
+ dist/labgraph-2.0.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl && \
+ python3.8 -m pytest --pyargs -v labgraph._cthulhu && \
+ python3.8 -m pytest --pyargs -v labgraph.events && \
+ python3.8 -m pytest --pyargs -v labgraph.graphs && \
+ python3.8 -m pytest --pyargs -v labgraph.loggers && \
+ python3.8 -m pytest --pyargs -v labgraph.messages && \
+ python3.8 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager && \
+ python3.8 -m pytest --pyargs -v labgraph.runners.tests.test_aligner && \
+ python3.8 -m pytest --pyargs -v labgraph.runners.tests.test_cpp && \
+ python3.8 -m pytest --pyargs -v labgraph.runners.tests.test_exception && \
+ python3.8 -m pytest --pyargs -v labgraph.runners.tests.test_launch && \
+ python3.8 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+
+# Test LabGraph for python3.9
+RUN python3.9 -m pip install \
+ dist/labgraph-2.0.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl && \
+ python3.9 -m pytest --pyargs -v labgraph._cthulhu && \
+ python3.9 -m pytest --pyargs -v labgraph.events && \
+ python3.9 -m pytest --pyargs -v labgraph.graphs && \
+ python3.9 -m pytest --pyargs -v labgraph.loggers && \
+ python3.9 -m pytest --pyargs -v labgraph.messages && \
+ python3.9 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager && \
+ python3.9 -m pytest --pyargs -v labgraph.runners.tests.test_aligner && \
+ python3.9 -m pytest --pyargs -v labgraph.runners.tests.test_cpp && \
+ python3.9 -m pytest --pyargs -v labgraph.runners.tests.test_exception && \
+ python3.9 -m pytest --pyargs -v labgraph.runners.tests.test_launch && \
+ python3.9 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+
+# Test LabGraph for python3.10
+RUN python3.10 -m pip install \
+ dist/labgraph-2.0.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl && \
+ python3.10 -m pytest --pyargs -v labgraph._cthulhu && \
+ python3.10 -m pytest --pyargs -v labgraph.events && \
+ python3.10 -m pytest --pyargs -v labgraph.graphs && \
+ python3.10 -m pytest --pyargs -v labgraph.loggers && \
+ python3.10 -m pytest --pyargs -v labgraph.messages && \
+ python3.10 -m pytest --pyargs -v labgraph.runners.tests.test_process_manager && \
+ python3.10 -m pytest --pyargs -v labgraph.runners.tests.test_aligner && \
+ python3.10 -m pytest --pyargs -v labgraph.runners.tests.test_cpp && \
+ python3.10 -m pytest --pyargs -v labgraph.runners.tests.test_exception && \
+ python3.10 -m pytest --pyargs -v labgraph.runners.tests.test_launch && \
+ python3.10 -m pytest --pyargs -v labgraph.runners.tests.test_runner
+

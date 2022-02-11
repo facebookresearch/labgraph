@@ -2,6 +2,12 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 import asyncio
+# asyncio.Task.all_tasks deprecated in python3.7
+try:
+    asyncio.all_tasks
+except AttributeError as e:
+    asyncio.all_tasks = asyncio.Task.all_tasks
+
 import dataclasses
 
 import pytest
@@ -133,7 +139,7 @@ def test_run_with_harness_max_num_results() -> None:
     with pytest.raises(TypeError):
         run_with_harness(MyNode, _not_a_generator, max_num_results=1)  # type: ignore
     loop = get_event_loop()
-    for task in asyncio.Task.all_tasks(loop=loop):
+    for task in asyncio.all_tasks(loop=loop):
         task.cancel()
     loop.run_until_complete(loop.shutdown_asyncgens())
 
@@ -153,7 +159,7 @@ def test_run_async_max_num_results() -> None:
     with pytest.raises(TypeError):
         run_async(_not_a_generator, max_num_results=1)  # type: ignore
     loop = get_event_loop()
-    for task in asyncio.Task.all_tasks(loop=loop):
+    for task in asyncio.all_tasks(loop=loop):
         task.cancel()
     loop.run_until_complete(loop.shutdown_asyncgens())
 

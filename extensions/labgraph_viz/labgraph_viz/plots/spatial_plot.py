@@ -56,7 +56,7 @@ class SpatialPlot(lg.Node):
         color_lut = color_map._lut.view(np.ndarray)
         colors = (color_lut * 255).astype(int)
         self._color_map = pg.ColorMap(np.linspace(0.0, 1.0, colors.shape[0]), colors)
-        self._np_mkBrush = np.vectorize(pg.fn.mkBrush)
+        self._np_mkBrush = np.vectorize(pg.mkBrush)
 
     def update(self) -> None:
         for name, subplot in self.state.subplots.items():

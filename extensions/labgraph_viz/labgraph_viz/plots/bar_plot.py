@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import labgraph as lg
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
-from typing import Any, Dict, Optional
+from typing import Any, Union, Optional
 
 from .common import TIMER_INTERVAL
 
@@ -51,7 +51,7 @@ class BarPlotConfig(lg.Config):
     """
     x_field: str
     y_field: str
-    style: Dict[str, Any] = None
+    style: Union[str, Any] = None
     external_timer: bool = False
 
 
