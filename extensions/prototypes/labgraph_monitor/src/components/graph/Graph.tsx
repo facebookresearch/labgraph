@@ -24,14 +24,26 @@ const Graph: React.FC = (): JSX.Element => {
                 position: { x: 0, y: 0 },
                 targetPosition: 'left',
                 sourcePosition: 'right',
+                style: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100px',
+                    height: '100px',
+                    borderRadius: '50%',
+                    textAlign: 'center',
+                },
             });
 
             data.upstreams.forEach((upstream) => {
                 deserializedGraph.push({
                     id: `e${upstream}-${name}`,
+                    label: `MName(MType)`,
                     source: upstream,
                     target: name,
-                    label: `MName(MType)`,
+                    arrowHeadType: 'arrow',
+                    type: 'default',
+                    animated: nodes[upstream].upstreams.length ? false : true,
                 });
             });
         }
@@ -46,7 +58,7 @@ const Graph: React.FC = (): JSX.Element => {
             style={{ width: '100%', height: '100%' }}
         >
             <Controls />
-            <Background color="#2a2a2a" />
+            <Background />
         </ReactFlow>
     );
 };
