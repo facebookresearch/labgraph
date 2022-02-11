@@ -1,9 +1,10 @@
 import React from 'react';
-import { Graph } from '../../components';
+import { Graph, SettingPanel } from '../../components';
 
 const Home: React.FC = (): JSX.Element => {
     return (
         <React.Fragment>
+            <SettingPanel />
             <Graph />
         </React.Fragment>
     );

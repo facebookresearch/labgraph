@@ -57,8 +57,20 @@ const Graph: React.FC = (): JSX.Element => {
             snapToGrid={true}
             style={{ width: '100%', height: '100%' }}
         >
-            <Controls />
-            <Background />
+            <Controls
+                showZoom={false}
+                showInteractive={false}
+                showFitView={true}
+                style={{
+                    position: 'absolute',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    bottom: '40px',
+                    left: '40px',
+                }}
+            />
+            <Background size={0} />
         </ReactFlow>
     );
 };
