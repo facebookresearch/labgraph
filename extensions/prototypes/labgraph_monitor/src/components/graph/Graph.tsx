@@ -28,10 +28,10 @@ const Graph: React.FC = (): JSX.Element => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: '100px',
-                    height: '100px',
+                    width: '120px',
+                    height: '120px',
                     borderRadius: '50%',
-                    textAlign: 'center',
+                    fontWeight: '500',
                 },
             });
 
