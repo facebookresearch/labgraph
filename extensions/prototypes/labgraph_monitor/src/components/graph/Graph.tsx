@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
-import ReactFlow, { Controls, Background } from 'react-flow-renderer';
+import ReactFlow, {
+    ReactFlowProvider,
+    Controls,
+    Background,
+} from 'react-flow-renderer';
 import { TGraphElement } from './types/TGraphElement';
-import { useGraphContext } from '../../contexts';
+import { useGraphContext, useUIContext } from '../../contexts';
 import { layoutGraph } from './util/layoutGraph';
 
 const Graph: React.FC = (): JSX.Element => {
+    const { layout } = useUIContext();
     const { graph: serializedGraph } = useGraphContext();
     const [graph, setGraph] = useState<Array<TGraphElement>>(
         [] as Array<TGraphElement>
@@ -13,7 +18,6 @@ const Graph: React.FC = (): JSX.Element => {
     useEffect(() => {
         const { nodes } = serializedGraph;
         const deserializedGraph = [] as Array<TGraphElement>;
-
         if (!nodes) return;
         for (const [name, data] of Object.entries(nodes)) {
             deserializedGraph.push({
@@ -22,8 +26,8 @@ const Graph: React.FC = (): JSX.Element => {
                     label: name,
                 },
                 position: { x: 0, y: 0 },
-                targetPosition: 'left',
-                sourcePosition: 'right',
+                targetPosition: layout === 'horizontal' ? 'left' : 'top',
+                sourcePosition: layout === 'horizontal' ? 'right' : 'bottom',
                 style: {
                     display: 'flex',
                     justifyContent: 'center',
@@ -32,6 +36,7 @@ const Graph: React.FC = (): JSX.Element => {
                     height: '120px',
                     borderRadius: '50%',
                     fontWeight: '500',
+                    fill: 'currentColor',
                 },
             });
 
@@ -44,34 +49,38 @@ const Graph: React.FC = (): JSX.Element => {
                     arrowHeadType: 'arrow',
                     type: 'default',
                     animated: nodes[upstream].upstreams.length ? false : true,
+                    style: {
+                        stroke: 'currentColor',
+                    },
                 });
             });
         }
-
-        setGraph(layoutGraph(deserializedGraph));
-    }, [serializedGraph]);
+        setGraph(layoutGraph(deserializedGraph, layout));
+    }, [serializedGraph, layout]);
 
     return (
-        <ReactFlow
-            elements={graph as any}
-            snapToGrid={true}
-            style={{ width: '100%', height: '100%' }}
-        >
-            <Controls
-                showZoom={false}
-                showInteractive={false}
-                showFitView={true}
-                style={{
-                    position: 'absolute',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    bottom: '40px',
-                    left: '40px',
-                }}
-            />
-            <Background size={0} />
-        </ReactFlow>
+        <ReactFlowProvider>
+            <ReactFlow
+                elements={graph as any}
+                snapToGrid={true}
+                style={{ width: '100%', height: '100%' }}
+            >
+                <Controls
+                    showZoom={false}
+                    showInteractive={false}
+                    showFitView={true}
+                    style={{
+                        position: 'absolute',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        bottom: '40px',
+                        left: '40px',
+                    }}
+                />
+                <Background size={0} />
+            </ReactFlow>
+        </ReactFlowProvider>
     );
 };
 

@@ -8,6 +8,7 @@ import AlignHorizontalLeftOutlinedIcon from '@mui/icons-material/AlignHorizontal
 import AlignVerticalTopOutlinedIcon from '@mui/icons-material/AlignVerticalTopOutlined';
 import SettingTabs from './SettingTabs';
 import { makeStyles } from '@mui/styles';
+import { useUIContext } from '../../contexts';
 
 const PANEL_WIDTH = 280;
 
@@ -40,7 +41,6 @@ const useStyles = makeStyles({
     themeBar: {
         display: 'flex',
         width: '100%',
-        backgroundColor: '#f7f7f7',
         justifyContent: 'space-around',
         alignItem: 'center',
         padding: '2px 4px 2px 4px',
@@ -48,9 +48,8 @@ const useStyles = makeStyles({
 });
 
 const SettingPanel: React.FC = (): JSX.Element => {
+    const { mode, layout, toggleMode, toggleLayout } = useUIContext();
     const [open, setOpen] = useState<boolean>(false);
-    const [isDark, setIsDark] = useState<boolean>(false);
-    const [isVertical, setIsVertical] = useState<boolean>(false);
     const classes = useStyles();
 
     const handleDrawerOpen = () => {
@@ -59,14 +58,6 @@ const SettingPanel: React.FC = (): JSX.Element => {
 
     const handleDrawerClose = () => {
         setOpen(false);
-    };
-
-    const handleThemeIconClick = () => {
-        setIsDark((isDark) => !isDark);
-    };
-
-    const handleLayoutIconClick = () => {
-        setIsVertical((isVertical) => !isVertical);
     };
 
     return (
@@ -104,14 +95,18 @@ const SettingPanel: React.FC = (): JSX.Element => {
                 </Box>
                 <Divider />
                 <Box className={classes.themeBar}>
-                    <IconButton onClick={handleThemeIconClick}>
-                        {isDark ? <Brightness7Icon /> : <DarkModeIcon />}
-                    </IconButton>
-                    <IconButton onClick={handleLayoutIconClick}>
-                        {isVertical ? (
-                            <AlignHorizontalLeftOutlinedIcon />
+                    <IconButton onClick={toggleMode}>
+                        {mode === 'light' ? (
+                            <DarkModeIcon />
                         ) : (
+                            <Brightness7Icon />
+                        )}
+                    </IconButton>
+                    <IconButton onClick={toggleLayout}>
+                        {layout === 'horizontal' ? (
                             <AlignVerticalTopOutlinedIcon />
+                        ) : (
+                            <AlignHorizontalLeftOutlinedIcon />
                         )}
                     </IconButton>
                 </Box>

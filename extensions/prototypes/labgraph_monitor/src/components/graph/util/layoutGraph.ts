@@ -7,10 +7,9 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 export const layoutGraph = (
     elements: Array<TGraphElement>,
-    direction: string = 'LR'
+    layout: string
 ): Array<TGraphElement> => {
-    dagreGraph.setGraph({ rankdir: direction });
-
+    dagreGraph.setGraph({ rankdir: layout === 'horizontal' ? 'LR' : 'TB' });
     elements.forEach((el: any) => {
         if (isNode(el)) {
             dagreGraph.setNode(el.id, { width: 250, height: 150 });

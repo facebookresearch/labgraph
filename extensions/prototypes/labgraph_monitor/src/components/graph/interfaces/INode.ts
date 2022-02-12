@@ -9,7 +9,7 @@ interface INode {
     };
     sourcePosition: 'left' | 'top' | 'right' | 'bottom';
     targetPosition: 'left' | 'top' | 'right' | 'bottom';
-    style: { [property: string]: string };
+    style?: { [property: string]: string };
 }
 
 export default INode;

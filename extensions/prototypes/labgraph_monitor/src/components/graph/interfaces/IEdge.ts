@@ -6,6 +6,7 @@ interface IEdge {
     arrowHeadType?: 'arrow' | 'arrowclosed';
     type?: 'default' | 'straight' | 'step' | 'smoothstep';
     animated?: boolean;
+    style?: { [property: string]: string };
 }
 
 export default IEdge;

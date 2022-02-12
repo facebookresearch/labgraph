@@ -6,12 +6,10 @@ import { makeStyles } from '@mui/styles';
 const useStyles = makeStyles({
     root: {
         width: '100%',
-        typography: 'body1',
-        bgColor: '#2a2a2a',
     },
 });
 
-const SettingTabs = () => {
+const SettingTabs: React.FC = (): JSX.Element => {
     const classes = useStyles();
     const [value, setValue] = useState<string>('1');
 
