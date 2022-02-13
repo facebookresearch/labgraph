@@ -163,19 +163,28 @@ def serialize_graph(
     for node in nodes:
         if node.grouping not in serialized_graph["nodes"]:
             serialized_graph["nodes"][node.grouping] = {
-                "inputs": [],
-                "upstreams": []
+                "upstreams": {}
             }
 
         if node.upstream_node:
-            serialized_graph["nodes"][node.grouping]["inputs"].append({
-                "name": node.upstream_message.name,
-                "type": node.upstream_message.type.__name__
-            })
 
-            serialized_graph["nodes"][node.grouping]["upstreams"].append(
-                node.upstream_node.grouping
-            )
+            if node.upstream_node.grouping not in \
+             serialized_graph["nodes"][node.grouping]["upstreams"]:
+                (serialized_graph["nodes"]
+                    [node.grouping]
+                    ["upstreams"]
+                    [node.upstream_node.grouping]) = [{
+                        "name": node.upstream_message.name,
+                        "type": node.upstream_message.type.__name__
+                    }]
+            else:
+                (serialized_graph["nodes"]
+                    [node.grouping]
+                    ["upstreams"]
+                    [node.upstream_node.grouping]).append({
+                            "name": node.upstream_message.name,
+                            "type": node.upstream_message.type.__name__
+                    })
 
     return serialized_graph
 

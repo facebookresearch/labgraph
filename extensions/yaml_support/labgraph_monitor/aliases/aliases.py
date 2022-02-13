@@ -3,15 +3,34 @@
 
 from typing import Dict, List, Union
 
+
+"""
+{
+    name: "graph_name",
+    nodes: {
+        "node_name":{
+            upstreams:{
+                "upstream_name":[
+                    {
+                        name: "message_name",
+                        type: "message_type",
+                    }
+                ]
+            }
+        }
+    }
+}
+"""
 SerializedGraph = Dict[
     str,
     Union[
         str,
-        List[
+        Dict[
+            str,
             Dict[
                 str,
-                Union[
-                    List[str],
+                Dict[
+                    str,
                     List[Dict[str, str]]
                 ]
             ]
