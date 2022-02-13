@@ -1,6 +1,15 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Box, Tab, MenuItem, InputLabel, FormControl } from '@mui/material';
+import {
+    Box,
+    Tab,
+    MenuItem,
+    InputLabel,
+    FormControl,
+    TextField,
+    Button,
+    Stack,
+} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { MOCK } from '../../mocks';
@@ -19,23 +28,45 @@ const useStyles = makeStyles({
         fontWeight: 400,
     },
 
-    selectInputLabel: {
-        fontSize: '0.8rem',
+    textFieldLabel: {
+        fontSize: '.85rem',
     },
 });
 
 const GraphSettings: React.FC = (): JSX.Element => {
     const classes = useStyles();
-    const { mock, setMock } = useWSContext();
+    const { mock, setMock, setEndPoint } = useWSContext();
     const [value, setValue] = useState<string>('1');
+    const [textField, setTextField] = useState<string>('');
+    const [isConnected, setIsConnected] = useState<boolean>(false);
 
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    const handleChange = (_: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
 
     const handleMockChange = (event: SelectChangeEvent) => {
-        console.log(event.target.value);
         setMock(event.target.value);
+    };
+
+    const handleEndPointChange = (
+        event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    ) => {
+        setTextField(event?.target.value);
+    };
+    const handleConnect = useCallback(
+        (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            if (!textField) return;
+            setEndPoint(textField);
+            setIsConnected(true);
+        },
+        [textField, setEndPoint]
+    );
+
+    const handleDiconnect = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setEndPoint('');
+        setIsConnected(false);
     };
 
     return (
@@ -66,7 +97,63 @@ const GraphSettings: React.FC = (): JSX.Element => {
                         />
                     </TabList>
                 </Box>
-                <TabPanel value="1">realtime</TabPanel>
+                <TabPanel value="1">
+                    <Box>
+                        <form
+                            onSubmit={
+                                isConnected ? handleDiconnect : handleConnect
+                            }
+                        >
+                            <FormControl sx={{ width: '100%' }}>
+                                <TextField
+                                    required
+                                    id="outlined-basic"
+                                    label="ENDPOINT"
+                                    variant="outlined"
+                                    placeholder="ws://127.0.0.1:9000"
+                                    value={textField}
+                                    size="small"
+                                    inputProps={{
+                                        pattern:
+                                            'ws://127.0.0.1:[1-9][0-9]{3,4}',
+                                    }}
+                                    InputLabelProps={{
+                                        style: { fontSize: '.8rem' },
+                                    }}
+                                    InputProps={{
+                                        style: {
+                                            padding: '2px',
+                                            fontSize: '.85rem',
+                                            letterSpacing: '1px',
+                                        },
+                                    }}
+                                    onChange={handleEndPointChange}
+                                />
+                                <Stack
+                                    style={{
+                                        marginTop: 10,
+                                    }}
+                                >
+                                    {isConnected ? (
+                                        <Button
+                                            type="submit"
+                                            variant="outlined"
+                                        >
+                                            disconnect
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            type="submit"
+                                            variant="outlined"
+                                        >
+                                            connect
+                                        </Button>
+                                    )}
+                                </Stack>
+                            </FormControl>
+                        </form>
+                    </Box>
+                </TabPanel>
                 <TabPanel value="2">
                     <Box>
                         <FormControl sx={{ width: '100%' }}>
@@ -81,22 +168,20 @@ const GraphSettings: React.FC = (): JSX.Element => {
                                 labelId="mock-selection-bar"
                                 id="mock-selectio"
                                 value={mock}
-                                onChange={handleMockChange}
                                 label="Mock"
+                                onChange={handleMockChange}
                             >
-                                {Object.entries(MOCK).map(
-                                    ([key, value], index) => {
-                                        return (
-                                            <MenuItem
-                                                key={key}
-                                                style={{ fontSize: '.8rem' }}
-                                                value={value}
-                                            >
-                                                {value}
-                                            </MenuItem>
-                                        );
-                                    }
-                                )}
+                                {Object.entries(MOCK).map(([key, value]) => {
+                                    return (
+                                        <MenuItem
+                                            key={key}
+                                            style={{ fontSize: '.8rem' }}
+                                            value={value}
+                                        >
+                                            {value}
+                                        </MenuItem>
+                                    );
+                                })}
                             </Select>
                         </FormControl>
                     </Box>

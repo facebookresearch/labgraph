@@ -66,7 +66,6 @@ const Graph: React.FC = (): JSX.Element => {
         <ReactFlowProvider>
             <ReactFlow
                 elements={graph as any}
-                snapToGrid={true}
                 style={{ width: '100%', height: '100%' }}
             >
                 <Controls
