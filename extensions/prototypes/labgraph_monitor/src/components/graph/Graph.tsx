@@ -32,26 +32,30 @@ const Graph: React.FC = (): JSX.Element => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: '120px',
-                    height: '120px',
+                    width: '150px',
+                    height: '150px',
                     borderRadius: '50%',
                     fontWeight: '500',
                     fill: 'currentColor',
                 },
             });
 
-            data.upstreams.forEach((upstream) => {
-                deserializedGraph.push({
-                    id: `e${upstream}-${name}`,
-                    label: `MName(MType)`,
-                    source: upstream,
-                    target: name,
-                    arrowHeadType: 'arrow',
-                    type: 'default',
-                    animated: nodes[upstream].upstreams.length ? false : true,
-                    style: {
-                        stroke: 'currentColor',
-                    },
+            Object.entries(data.upstreams).forEach(([upstream, messages]) => {
+                messages.forEach((message) => {
+                    deserializedGraph.push({
+                        id: `e${upstream}-${name}`,
+                        label: `${message.name}(${message.type})`,
+                        source: upstream,
+                        target: name,
+                        arrowHeadType: 'arrow',
+                        type: 'default',
+                        animated: Object.keys(nodes[upstream].upstreams).length
+                            ? false
+                            : true,
+                        style: {
+                            stroke: 'currentColor',
+                        },
+                    });
                 });
             });
         }

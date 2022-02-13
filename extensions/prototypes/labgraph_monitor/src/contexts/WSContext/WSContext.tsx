@@ -8,14 +8,14 @@ import {
 } from 'react';
 import IGraph from './interfaces/IGraph';
 import IWSContext from './interfaces/IWSContext';
-import { selectMock } from '../../mocks';
+import { MOCK, selectMock } from '../../mocks';
 
 const GraphContext = createContext<IWSContext>({} as IWSContext);
 export const useWSContext = (): IWSContext => useContext(GraphContext);
 
 const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     const [graph, setGraph] = useState<IGraph>({} as IGraph);
-    const [mock, setMock] = useState<string>('demo');
+    const [mock, setMock] = useState<string>(MOCK.DEMO);
 
     const demo_graph = useMemo(() => selectMock(mock), [mock]);
 
@@ -25,7 +25,6 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
                 'labgraph.monitor': { samples },
             },
         } = demo_graph;
-
         setGraph(samples[0]['data']);
     }, [demo_graph]);
 
@@ -33,6 +32,7 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
         <GraphContext.Provider
             value={{
                 graph,
+                mock,
                 setMock,
             }}
         >

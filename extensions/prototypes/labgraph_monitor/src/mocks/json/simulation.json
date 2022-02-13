@@ -1,0 +1,32 @@
+{
+    "stream_batch": {
+        "stream_id": "LABGRAPH.MONITOR",
+        "labgraph.monitor": {
+            "samples": [
+                {
+                    "data": {
+                        "name": "Demo",
+                        "nodes": {
+                            "SimulationGenerator": {
+                                "upstreams": {}
+                            },
+                            "Plot": {
+                                "upstreams": {
+                                    "SimulationGenerator": [
+                                        {
+                                            "name": "INPUT",
+                                            "type": "SimulationMessage"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "produced_timestamp_s": 1644762154.2937894,
+                    "timestamp_s": 1644762154.2937894
+                }
+            ],
+            "batch_num": 154
+        }
+    }
+}

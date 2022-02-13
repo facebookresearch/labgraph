@@ -1,0 +1,74 @@
+{
+    "stream_batch": {
+        "stream_id": "LABGRAPH.MONITOR",
+        "labgraph.monitor": {
+            "samples": [
+                {
+                    "data": {
+                        "name": "Demo",
+                        "nodes": {
+                            "NoiseGenerator": {
+                                "upstreams": {}
+                            },
+                            "RollingAverager": {
+                                "upstreams": {
+                                    "NoiseGenerator": [
+                                        {
+                                            "name": "INPUT",
+                                            "type": "RandomMessage"
+                                        }
+                                    ]
+                                }
+                            },
+                            "Amplifier": {
+                                "upstreams": {
+                                    "NoiseGenerator": [
+                                        {
+                                            "name": "INPUT",
+                                            "type": "RandomMessage"
+                                        }
+                                    ]
+                                }
+                            },
+                            "Attenuator": {
+                                "upstreams": {
+                                    "NoiseGenerator": [
+                                        {
+                                            "name": "INPUT",
+                                            "type": "RandomMessage"
+                                        }
+                                    ]
+                                }
+                            },
+                            "Sink": {
+                                "upstreams": {
+                                    "RollingAverager": [
+                                        {
+                                            "name": "INPUT_1",
+                                            "type": "RandomMessage"
+                                        }
+                                    ],
+                                    "Amplifier": [
+                                        {
+                                            "name": "INPUT_2",
+                                            "type": "RandomMessage"
+                                        }
+                                    ],
+                                    "Attenuator": [
+                                        {
+                                            "name": "INPUT_3",
+                                            "type": "RandomMessage"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "produced_timestamp_s": 1644761497.0970812,
+                    "timestamp_s": 1644761497.0970812
+                }
+            ],
+            "batch_num": 96
+        }
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "stream_batch": {
+        "stream_id": "LABGRAPH.MONITOR",
+        "labgraph.monitor": {
+            "samples": [
+                {
+                    "data": {
+                        "name": "Demo",
+                        "nodes": {
+                            "Plot": {
+                                "upstreams": {
+                                    "RollingAverager": [
+                                        {
+                                            "name": "INPUT",
+                                            "type": "RandomMessage"
+                                        }
+                                    ]
+                                }
+                            },
+                            "NoiseGenerator": {
+                                "upstreams": {}
+                            },
+                            "RollingAverager": {
+                                "upstreams": {
+                                    "NoiseGenerator": [
+                                        {
+                                            "name": "INPUT",
+                                            "type": "RandomMessage"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "produced_timestamp_s": 1644761828.648661,
+                    "timestamp_s": 1644761828.648661
+                }
+            ],
+            "batch_num": 92
+        }
+    }
+}

@@ -4,6 +4,7 @@ import { Box, Tab, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { MOCK } from '../../mocks';
+import { useWSContext } from '../../contexts';
 
 const useStyles = makeStyles({
     root: {
@@ -25,15 +26,15 @@ const useStyles = makeStyles({
 
 const GraphSettings: React.FC = (): JSX.Element => {
     const classes = useStyles();
+    const { mock, setMock } = useWSContext();
     const [value, setValue] = useState<string>('1');
 
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
 
-    const [mock, setMock] = useState('');
-
     const handleMockChange = (event: SelectChangeEvent) => {
+        console.log(event.target.value);
         setMock(event.target.value);
     };
 
@@ -87,9 +88,9 @@ const GraphSettings: React.FC = (): JSX.Element => {
                                     ([key, value], index) => {
                                         return (
                                             <MenuItem
-                                                key={index}
+                                                key={key}
                                                 style={{ fontSize: '.8rem' }}
-                                                value={key}
+                                                value={value}
                                             >
                                                 {value}
                                             </MenuItem>

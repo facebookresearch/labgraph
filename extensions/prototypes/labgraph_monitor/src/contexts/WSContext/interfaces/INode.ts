@@ -1,10 +1,11 @@
 interface INode {
     [name: string]: {
-        inputs: Array<{
-            name: string;
-            type: string;
-        }>;
-        upstreams: Array<string>;
+        upstreams: {
+            [upstream: string]: Array<{
+                name: string;
+                type: string;
+            }>;
+        };
     };
 }
 

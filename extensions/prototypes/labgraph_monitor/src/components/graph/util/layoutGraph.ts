@@ -12,7 +12,7 @@ export const layoutGraph = (
     dagreGraph.setGraph({ rankdir: layout === 'horizontal' ? 'LR' : 'TB' });
     elements.forEach((el: any) => {
         if (isNode(el)) {
-            dagreGraph.setNode(el.id, { width: 250, height: 150 });
+            dagreGraph.setNode(el.id, { width: 400, height: 200 });
         } else if (isEdge(el)) {
             dagreGraph.setEdge(el.source, el.target);
         }
