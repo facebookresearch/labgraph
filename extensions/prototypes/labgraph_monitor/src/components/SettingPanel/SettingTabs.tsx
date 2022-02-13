@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Tab } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import NodeSettings from './NodeSettings';
+import EdgeSettings from './EdgeSettings';
+import GraphSettings from './GraphSettings';
 
 const useStyles = makeStyles({
     root: {
@@ -32,9 +35,15 @@ const SettingTabs: React.FC = (): JSX.Element => {
                         <Tab label="edge" value="3" />
                     </TabList>
                 </Box>
-                <TabPanel value="1">Graph</TabPanel>
-                <TabPanel value="2">Node</TabPanel>
-                <TabPanel value="3">Edge</TabPanel>
+                <TabPanel style={{ padding: 0 }} value="1">
+                    <GraphSettings />
+                </TabPanel>
+                <TabPanel style={{ padding: 0 }} value="2">
+                    <NodeSettings />
+                </TabPanel>
+                <TabPanel style={{ padding: 0 }} value="3">
+                    <EdgeSettings />
+                </TabPanel>
             </TabContext>
         </Box>
     );

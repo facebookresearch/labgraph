@@ -5,12 +5,12 @@ import ReactFlow, {
     Background,
 } from 'react-flow-renderer';
 import { TGraphElement } from './types/TGraphElement';
-import { useGraphContext, useUIContext } from '../../contexts';
+import { useWSContext, useUIContext } from '../../contexts';
 import { layoutGraph } from './util/layoutGraph';
 
 const Graph: React.FC = (): JSX.Element => {
     const { layout } = useUIContext();
-    const { graph: serializedGraph } = useGraphContext();
+    const { graph: serializedGraph } = useWSContext();
     const [graph, setGraph] = useState<Array<TGraphElement>>(
         [] as Array<TGraphElement>
     );
@@ -76,6 +76,7 @@ const Graph: React.FC = (): JSX.Element => {
                         alignItems: 'center',
                         bottom: '40px',
                         left: '40px',
+                        cursor: 'pointer',
                     }}
                 />
                 <Background size={0} />
