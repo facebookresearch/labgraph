@@ -1,0 +1,10 @@
+{
+    "api_version": "0.1",
+    "api_request": {
+        "request_id": 1,
+        "end_stream_request": {
+            "stream_id": "LABGRAPH.MONITOR",
+            "labgraph.monitor": {}
+        }
+    }
+}

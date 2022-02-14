@@ -35,10 +35,10 @@ const useStyles = makeStyles({
 
 const GraphSettings: React.FC = (): JSX.Element => {
     const classes = useStyles();
-    const { mock, setMock, setEndPoint } = useWSContext();
+    const { mock, endPoint, setMock, setEndPoint } = useWSContext();
     const [value, setValue] = useState<string>('1');
     const [textField, setTextField] = useState<string>('');
-    const [isConnected, setIsConnected] = useState<boolean>(false);
+    // const [isConnected, setIsConnected] = useState<boolean>(false);
 
     const handleChange = (_: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
@@ -58,7 +58,6 @@ const GraphSettings: React.FC = (): JSX.Element => {
             event.preventDefault();
             if (!textField) return;
             setEndPoint(textField);
-            setIsConnected(true);
         },
         [textField, setEndPoint]
     );
@@ -66,7 +65,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
     const handleDiconnect = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setEndPoint('');
-        setIsConnected(false);
+        // setIsConnected(false);
     };
 
     return (
@@ -101,7 +100,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
                     <Box>
                         <form
                             onSubmit={
-                                isConnected ? handleDiconnect : handleConnect
+                                endPoint ? handleDiconnect : handleConnect
                             }
                         >
                             <FormControl sx={{ width: '100%' }}>
@@ -134,7 +133,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
                                         marginTop: 10,
                                     }}
                                 >
-                                    {isConnected ? (
+                                    {endPoint ? (
                                         <Button
                                             type="submit"
                                             variant="outlined"
