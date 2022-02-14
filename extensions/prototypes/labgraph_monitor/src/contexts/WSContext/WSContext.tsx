@@ -12,6 +12,7 @@ import { MOCK, selectMock } from '../../mocks';
 import startStreamRequest from './json/startStreamRequest.json';
 import endStreamRequest from './json/endStreamRequest.json';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import _ from 'lodash';
 
 const GraphContext = createContext<IWSContext>({} as IWSContext);
 export const useWSContext = (): IWSContext => useContext(GraphContext);
@@ -42,18 +43,22 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
         };
         client.onmessage = (message) => {
             const parsedData = JSON.parse(message.data as any);
+
             const {
                 stream_batch: {
                     'labgraph.monitor': { samples },
                 },
             } = parsedData;
-            setGraph(samples[0]['data']);
+
+            if (!_.isEqual(samples[0]['data'], graph)) {
+                setGraph(samples[0]['data']);
+            }
         };
         return () => {
             client.send(endStreamRequest);
             client.close();
         };
-    }, [endPoint]);
+    }, [endPoint, graph]);
 
     return (
         <GraphContext.Provider
