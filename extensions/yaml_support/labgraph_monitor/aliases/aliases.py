@@ -3,6 +3,24 @@
 
 from typing import Dict, List, Union
 
+"""
+{
+    name: "message_name",
+    fields: {
+            "field_name": "field_type",
+            ...
+    }
+}
+"""
+
+SerializedMessage = Dict[
+    str,
+    Union[
+        str,
+        Dict[str, str]
+    ]
+]
+
 
 """
 {
@@ -11,11 +29,9 @@ from typing import Dict, List, Union
         "node_name":{
             upstreams:{
                 "upstream_name":[
-                    {
-                        name: "message_name",
-                        type: "message_type",
-                    }
-                ]
+                    SerializedMessage,
+                ],
+                ...
             }
         }
     }
@@ -31,7 +47,7 @@ SerializedGraph = Dict[
                 str,
                 Dict[
                     str,
-                    List[Dict[str, str]]
+                    List[SerializedMessage]
                 ]
             ]
         ]

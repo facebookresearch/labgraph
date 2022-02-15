@@ -116,8 +116,11 @@ E.g:
                                 "upstreams": {
                                     "NoiseGenerator": [
                                         {
-                                            "name": "INPUT",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ]
                                 }
@@ -126,8 +129,11 @@ E.g:
                                 "upstreams": {
                                     "NoiseGenerator": [
                                         {
-                                            "name": "INPUT",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ]
                                 }
@@ -136,8 +142,11 @@ E.g:
                                 "upstreams": {
                                     "NoiseGenerator": [
                                         {
-                                            "name": "INPUT",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ]
                                 }
@@ -146,31 +155,40 @@ E.g:
                                 "upstreams": {
                                     "RollingAverager": [
                                         {
-                                            "name": "INPUT_1",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ],
                                     "Amplifier": [
                                         {
-                                            "name": "INPUT_2",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ],
                                     "Attenuator": [
                                         {
-                                            "name": "INPUT_3",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ]
                                 }
                             }
                         }
                     },
-                    "produced_timestamp_s": 1644761497.0970812,
-                    "timestamp_s": 1644761497.0970812
+                    "produced_timestamp_s": 1644931422.141309,
+                    "timestamp_s": 1644931422.141309
                 }
             ],
-            "batch_num": 96
+            "batch_num": 54
         }
     }
 }

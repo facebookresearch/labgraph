@@ -2,6 +2,7 @@
 # Copyright 2004-present Facebook. All Rights Reserved.
 
 import labgraph as lg
+from ..aliases.aliases import SerializedMessage
 
 
 class LabgraphMonitorMessage:
@@ -11,19 +12,28 @@ class LabgraphMonitorMessage:
     between nodes via topics.
 
     @attributes:
-        name: A string that represents the name of the message.
-
-        type: A class that inherent from lg.Message,
+        message: A class that inherent from lg.Message,
               The class name represents the type of the message.
     """
-    def __init__(self, name: str, type: lg.Message) -> None:
-        self.__name: str = name
-        self.__type: lg.Message = type
+    def __init__(self, value: lg.Message) -> None:
+        self.___value: str = value
 
-    @property
     def name(self) -> str:
-        return self.__name
+        return self.___value.__name__
 
-    @property
-    def type(self) -> str:
-        return self.__type
+    def serialize(self) -> SerializedMessage:
+        """
+        A function that returns a serialized version of the labgraph message.
+        """
+        serialized_message: SerializedMessage = {
+            "name": self.name(),
+            "fields": {}
+        }
+
+        for annotation in self.___value.__annotations__.items():
+            name = annotation[0]
+            type = (annotation[1]).__name__
+
+            serialized_message['fields'][name] = type
+
+        return serialized_message

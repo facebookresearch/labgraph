@@ -25,7 +25,6 @@ def identify_upstream_message(
         topics:  References to streams
     """
     return LabgraphMonitorMessage(
-        topics[in_edge]._name,
         topics[in_edge].message_type
     )
 
@@ -173,18 +172,16 @@ def serialize_graph(
                 (serialized_graph["nodes"]
                     [node.grouping]
                     ["upstreams"]
-                    [node.upstream_node.grouping]) = [{
-                        "name": node.upstream_message.name,
-                        "type": node.upstream_message.type.__name__
-                    }]
+                    [node.upstream_node.grouping]) = [
+                        node.upstream_message.serialize()
+                    ]
             else:
                 (serialized_graph["nodes"]
                     [node.grouping]
                     ["upstreams"]
-                    [node.upstream_node.grouping]).append({
-                            "name": node.upstream_message.name,
-                            "type": node.upstream_message.type.__name__
-                    })
+                    [node.upstream_node.grouping]).append(
+                        node.upstream_message.serialize()
+                    )
 
     return serialized_graph
 

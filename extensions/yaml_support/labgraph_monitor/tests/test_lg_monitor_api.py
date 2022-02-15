@@ -25,8 +25,7 @@ class TestLabgraphMonitorAPI(unittest.TestCase):
             self.graph.__topics__
         )
 
-        self.assertEqual('INPUT', upstream_message.name)
-        self.assertEqual('RandomMessage', upstream_message.type.__name__)
+        self.assertEqual('RandomMessage', upstream_message.name())
 
     def test_identify_graph_nodes(self) -> None:
         nodes = identify_graph_nodes(self.graph)
