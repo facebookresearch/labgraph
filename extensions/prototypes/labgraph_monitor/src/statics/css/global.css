@@ -3,3 +3,7 @@
 * {
     font-family: 'Poppins', sans-serif !important;
 }
+
+.react-flow__edge {
+    cursor: pointer !important;
+}

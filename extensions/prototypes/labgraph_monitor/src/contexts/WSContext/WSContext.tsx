@@ -31,7 +31,6 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
                 'labgraph.monitor': { samples },
             },
         } = demo_graph;
-
         setGraph(samples[0]['data']);
     }, [demo_graph, setGraph, endPoint]);
 

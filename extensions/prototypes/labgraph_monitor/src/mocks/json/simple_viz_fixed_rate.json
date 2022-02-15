@@ -11,8 +11,11 @@
                                 "upstreams": {
                                     "RollingAverager": [
                                         {
-                                            "name": "INPUT",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ]
                                 }
@@ -24,19 +27,22 @@
                                 "upstreams": {
                                     "NoiseGenerator": [
                                         {
-                                            "name": "INPUT",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ]
                                 }
                             }
                         }
                     },
-                    "produced_timestamp_s": 1644761922.247352,
-                    "timestamp_s": 1644761922.247352
+                    "produced_timestamp_s": 1644930955.5364213,
+                    "timestamp_s": 1644930955.5364213
                 }
             ],
-            "batch_num": 134
+            "batch_num": 94
         }
     }
 }

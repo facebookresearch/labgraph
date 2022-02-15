@@ -1,6 +1,6 @@
 interface INode {
     id: string;
-    data: {
+    data?: {
         label: string;
     };
     position: {

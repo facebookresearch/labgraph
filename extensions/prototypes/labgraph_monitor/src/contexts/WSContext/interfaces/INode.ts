@@ -3,7 +3,9 @@ interface INode {
         upstreams: {
             [upstream: string]: Array<{
                 name: string;
-                type: string;
+                fields: {
+                    [fieldName: string]: string;
+                };
             }>;
         };
     };

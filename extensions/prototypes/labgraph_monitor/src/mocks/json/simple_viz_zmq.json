@@ -11,8 +11,11 @@
                                 "upstreams": {
                                     "RollingAverager": [
                                         {
-                                            "name": "INPUT",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ]
                                 }
@@ -24,8 +27,10 @@
                                 "upstreams": {
                                     "ZMQPollerNode": [
                                         {
-                                            "name": "INPUT",
-                                            "type": "ZMQMessage"
+                                            "name": "ZMQMessage",
+                                            "fields": {
+                                                "data": "bytes"
+                                            }
                                         }
                                     ]
                                 }
@@ -34,19 +39,22 @@
                                 "upstreams": {
                                     "ZMQDeserializer": [
                                         {
-                                            "name": "INPUT",
-                                            "type": "RandomMessage"
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
                                         }
                                     ]
                                 }
                             }
                         }
                     },
-                    "produced_timestamp_s": 1644762008.0223997,
-                    "timestamp_s": 1644762008.0223997
+                    "produced_timestamp_s": 1644931059.3961816,
+                    "timestamp_s": 1644931059.3961816
                 }
             ],
-            "batch_num": 63
+            "batch_num": 132
         }
     }
 }

@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Tab } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import NodeSettings from './NodeSettings';
 import EdgeSettings from './EdgeSettings';
 import GraphSettings from './GraphSettings';
+import { useConfigContext } from '../../contexts';
 
 const useStyles = makeStyles({
     root: {
@@ -14,15 +14,20 @@ const useStyles = makeStyles({
 
 const SettingTabs: React.FC = (): JSX.Element => {
     const classes = useStyles();
-    const [value, setValue] = useState<string>('1');
-
+    const {
+        panel: { panelIndex },
+        setPanel,
+    } = useConfigContext();
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-        setValue(newValue);
+        setPanel({
+            isOpen: true,
+            panelIndex: newValue,
+        });
     };
 
     return (
         <Box className={classes.root}>
-            <TabContext value={value}>
+            <TabContext value={panelIndex}>
                 <Box
                     sx={{
                         borderBottom: 1,

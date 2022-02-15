@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Box, Drawer, CssBaseline, IconButton, Divider } from '@mui/material';
 import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -8,7 +7,7 @@ import AlignHorizontalLeftOutlinedIcon from '@mui/icons-material/AlignHorizontal
 import AlignVerticalTopOutlinedIcon from '@mui/icons-material/AlignVerticalTopOutlined';
 import SettingTabs from './SettingTabs';
 import { makeStyles } from '@mui/styles';
-import { useUIContext } from '../../contexts';
+import { useUIContext, useConfigContext } from '../../contexts';
 
 const PANEL_WIDTH = 280;
 
@@ -49,15 +48,24 @@ const useStyles = makeStyles({
 
 const SettingPanel: React.FC = (): JSX.Element => {
     const { mode, layout, toggleMode, toggleLayout } = useUIContext();
-    const [open, setOpen] = useState<boolean>(false);
+    const {
+        panel: { isOpen, panelIndex },
+        setPanel,
+    } = useConfigContext();
     const classes = useStyles();
 
     const handleDrawerOpen = () => {
-        setOpen(true);
+        setPanel({
+            isOpen: true,
+            panelIndex,
+        });
     };
 
     const handleDrawerClose = () => {
-        setOpen(false);
+        setPanel({
+            isOpen: false,
+            panelIndex,
+        });
     };
 
     return (
@@ -67,7 +75,7 @@ const SettingPanel: React.FC = (): JSX.Element => {
                 onClick={handleDrawerOpen}
                 className={classes.settingButton}
                 sx={{
-                    display: open ? 'none' : 'block',
+                    display: isOpen ? 'none' : 'block',
                     position: 'absolute',
                     '&:hover, &.Mui-focusVisible': {
                         backgroundColor: 'transparent',
@@ -86,7 +94,7 @@ const SettingPanel: React.FC = (): JSX.Element => {
                 className={classes.settingPanel}
                 variant="persistent"
                 anchor="right"
-                open={open}
+                open={isOpen}
             >
                 <Box>
                     <IconButton onClick={handleDrawerClose}>
