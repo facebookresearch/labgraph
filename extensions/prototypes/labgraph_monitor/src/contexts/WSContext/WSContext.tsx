@@ -20,8 +20,8 @@ export const useWSContext = (): IWSContext => useContext(GraphContext);
 const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     const [graph, setGraph] = useState<IGraph>({} as IGraph);
     const [endPoint, setEndPoint] = useState<string>('');
+    const [isConnected, setIsConnected] = useState<boolean>(false);
     const [mock, setMock] = useState<string>(MOCK.DEMO);
-
     const demo_graph = useMemo(() => selectMock(mock), [mock]);
 
     useEffect(() => {
@@ -39,6 +39,7 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
         const client = new W3CWebSocket(endPoint);
         client.onopen = () => {
             client.send(JSON.stringify(startStreamRequest));
+            setIsConnected(true);
         };
         client.onmessage = (message) => {
             const parsedData = JSON.parse(message.data as any);
@@ -67,6 +68,8 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
                 setMock,
                 endPoint,
                 setEndPoint,
+                isConnected,
+                setIsConnected,
             }}
         >
             {children}

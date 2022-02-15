@@ -35,9 +35,16 @@ const useStyles = makeStyles({
 
 const GraphSettings: React.FC = (): JSX.Element => {
     const classes = useStyles();
-    const { mock, endPoint, setMock, setEndPoint } = useWSContext();
+    const {
+        mock,
+        endPoint,
+        isConnected,
+        setMock,
+        setEndPoint,
+        setIsConnected,
+    } = useWSContext();
     const [value, setValue] = useState<string>('1');
-    const [textField, setTextField] = useState<string>('');
+    const [textField, setTextField] = useState<string>(endPoint);
     // const [isConnected, setIsConnected] = useState<boolean>(false);
 
     const handleChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -65,7 +72,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
     const handleDiconnect = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setEndPoint('');
-        // setIsConnected(false);
+        setIsConnected(false);
     };
 
     return (
@@ -100,7 +107,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
                     <Box>
                         <form
                             onSubmit={
-                                endPoint ? handleDiconnect : handleConnect
+                                isConnected ? handleDiconnect : handleConnect
                             }
                         >
                             <FormControl sx={{ width: '100%' }}>
@@ -133,7 +140,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
                                         marginTop: 10,
                                     }}
                                 >
-                                    {endPoint ? (
+                                    {isConnected ? (
                                         <Button
                                             type="submit"
                                             variant="outlined"

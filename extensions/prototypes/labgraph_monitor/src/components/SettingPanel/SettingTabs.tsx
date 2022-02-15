@@ -46,7 +46,7 @@ const SettingTabs: React.FC = (): JSX.Element => {
                 <TabPanel style={{ padding: 0 }} value="2">
                     <NodeSettings />
                 </TabPanel>
-                <TabPanel style={{ padding: 0 }} value="3">
+                <TabPanel style={{ padding: 8 }} value="3">
                     <EdgeSettings />
                 </TabPanel>
             </TabContext>

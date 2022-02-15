@@ -7,6 +7,8 @@ interface IWSContext {
     setMock: Dispatch<SetStateAction<string>>;
     endPoint: string;
     setEndPoint: Dispatch<SetStateAction<string>>;
+    isConnected: boolean;
+    setIsConnected: Dispatch<SetStateAction<boolean>>;
 }
 
 export default IWSContext;

@@ -1,3 +1,12 @@
+import {
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from '@mui/material';
 import React from 'react';
 import { useConfigContext, useWSContext } from '../../contexts';
 
@@ -7,30 +16,36 @@ const Edge: React.FC = (): JSX.Element => {
     const { graph } = useWSContext();
 
     const messages =
-        graph['nodes'][selectedEdge.target]['upstreams'][selectedEdge.source];
+        graph && selectedEdge.target
+            ? graph['nodes'][selectedEdge.target]['upstreams'][
+                  selectedEdge.source
+              ]
+            : [];
     return (
         <React.Fragment>
             {messages.map((message, index) => {
                 return (
-                    <div
-                        key={index}
-                        style={{
-                            background: '#fff',
-                            padding: '2px 4px 2px 4px',
-                            color: 'inhrent',
-                        }}
-                    >
-                        <h6>{message['name']}</h6>
-                        {Object.entries(message['fields']).map(
-                            ([name, type]) => {
-                                return (
-                                    <div key={name}>
-                                        {name}:{type}
-                                    </div>
-                                );
-                            }
-                        )}
-                    </div>
+                    <TableContainer key={index} component={Paper}>
+                        <Table sx={{ width: '100%' }} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>{message['name']}</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {Object.entries(message['fields']).map(
+                                    ([name, type]) => {
+                                        return (
+                                            <TableRow key={name}>
+                                                <TableCell>{name}</TableCell>
+                                                <TableCell>{type}</TableCell>
+                                            </TableRow>
+                                        );
+                                    }
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 );
             })}
         </React.Fragment>
