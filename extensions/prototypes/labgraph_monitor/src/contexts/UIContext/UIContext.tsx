@@ -1,4 +1,11 @@
-import { ReactNode, useState, createContext, useContext, useMemo } from 'react';
+import {
+    ReactNode,
+    useState,
+    useEffect,
+    createContext,
+    useContext,
+    useMemo,
+} from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import IUIContext from './interfaces/IUIContext';
 
@@ -6,10 +13,26 @@ const UIContext = createContext<IUIContext>({} as IUIContext);
 export const useUIContext = (): IUIContext => useContext(UIContext);
 
 const UIContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
-    const [mode, setMode] = useState<'light' | 'dark'>('dark');
+    const localMode = localStorage.getItem('labgraph_monitor_mode') as
+        | 'dark'
+        | 'light';
+
+    const [mode, setMode] = useState<'light' | 'dark'>(() => {
+        return localMode ? localMode : 'dark';
+    });
     const [layout, setLayout] = useState<'horizontal' | 'vertical'>(
         'horizontal'
     );
+
+    useEffect(() => {
+        return () => {
+            localStorage.setItem(
+                'labgraph_monitor_mode',
+                mode === 'dark' ? 'light' : 'dark'
+            );
+        };
+    }, [mode]);
+
     const themeObject = useMemo(
         () => ({
             toggleMode: () => {

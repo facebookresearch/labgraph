@@ -9,19 +9,29 @@ import ReactFlow, {
     isEdge,
 } from 'react-flow-renderer';
 import { TGraphElement } from './types/TGraphElement';
-import { useWSContext, useUIContext } from '../../contexts';
+import { useUIContext } from '../../contexts';
 import { layoutGraph } from './util/layoutGraph';
-import { useDispatch } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { useSelector, useDispatch } from 'react-redux';
 import {
     setPanel,
     setTabIndex,
     setSelectedNode,
     setSelectedEdge,
 } from '../../redux/reducers/config/configReducer';
+import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
 
 const Graph: React.FC = (): JSX.Element => {
     const { layout } = useUIContext();
-    const { graph: serializedGraph } = useWSContext();
+    const { mockGraph } = useSelector((state: RootState) => state.mock);
+
+    const { connection, graph: realtimeGraph } = useSelector(
+        (state: RootState) => state.ws
+    );
+
+    const serializedGraph =
+        connection === WS_STATE.CONNECTED ? realtimeGraph : mockGraph;
+
     const [graph, setGraph] = useState<Array<TGraphElement>>(
         [] as Array<TGraphElement>
     );

@@ -8,13 +8,18 @@ import {
     TableRow,
 } from '@mui/material';
 import React from 'react';
-import { useWSContext } from '../../contexts';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
+import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
 
 const Edge: React.FC = (): JSX.Element => {
     const { selectedEdge } = useSelector((state: RootState) => state.config);
-    const { graph } = useWSContext();
+    const { connection, graph: realtimeGraph } = useSelector(
+        (state: RootState) => state.ws
+    );
+    const { mockGraph } = useSelector((state: RootState) => state.mock);
+
+    const graph = connection === WS_STATE.CONNECTED ? realtimeGraph : mockGraph;
 
     const messages =
         graph && selectedEdge.target

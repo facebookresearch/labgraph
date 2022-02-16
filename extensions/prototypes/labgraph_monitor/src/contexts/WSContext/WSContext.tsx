@@ -1,80 +1,59 @@
-import {
-    ReactNode,
-    createContext,
-    useContext,
-    useState,
-    useEffect,
-    useMemo,
-} from 'react';
-import IGraph from './interfaces/IGraph';
-import IWSContext from './interfaces/IWSContext';
-import { MOCK, selectMock } from '../../mocks';
+import { ReactNode, useRef, createContext, useEffect } from 'react';
+import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import { RootState } from '../../redux/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { setConnection, setGraph } from '../../redux/reducers/ws/WSReducer';
+import { copyRealtimeGraph } from '../../redux/reducers/mock/mockReducer';
+import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
 import startStreamRequest from './json/startStreamRequest.json';
 import endStreamRequest from './json/endStreamRequest.json';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import _ from 'lodash';
 
-const GraphContext = createContext<IWSContext>({} as IWSContext);
-export const useWSContext = (): IWSContext => useContext(GraphContext);
+const GraphContext = createContext<{}>({});
 
 const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
-    const [graph, setGraph] = useState<IGraph>({} as IGraph);
-    const [endPoint, setEndPoint] = useState<string>('');
-    const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [mock, setMock] = useState<string>(MOCK.DEMO);
-    const demo_graph = useMemo(() => selectMock(mock), [mock]);
+    const { connection, graph } = useSelector((state: RootState) => state.ws);
+
+    const clientRef = useRef<any>(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        if (endPoint) return;
-        const {
-            stream_batch: {
-                'labgraph.monitor': { samples },
-            },
-        } = demo_graph;
-        setGraph(samples[0]['data']);
-    }, [demo_graph, setGraph, endPoint]);
+        switch (connection) {
+            case WS_STATE.IS_CONNECTING:
+                clientRef.current = new W3CWebSocket(
+                    process.env.REACT_APP_WS_API as string
+                );
+                clientRef.current.onopen = () => {
+                    clientRef.current.send(JSON.stringify(startStreamRequest));
+                    dispatch(setConnection(WS_STATE.CONNECTED));
+                };
+                break;
 
-    useEffect(() => {
-        if (!endPoint) return;
-        const client = new W3CWebSocket(endPoint);
-        client.onopen = () => {
-            client.send(JSON.stringify(startStreamRequest));
-            setIsConnected(true);
-        };
-        client.onmessage = (message) => {
-            const parsedData = JSON.parse(message.data as any);
+            case WS_STATE.CONNECTED:
+                clientRef.current.onmessage = (message: any) => {
+                    const data = JSON.parse(message.data);
+                    if (!data['stream_batch']) return;
+                    const {
+                        stream_batch: {
+                            'labgraph.monitor': { samples },
+                        },
+                    } = data;
+                    if (!_.isEqual(samples[0]['data'], graph)) {
+                        dispatch(setGraph(samples[0]['data']));
+                    }
+                };
 
-            const {
-                stream_batch: {
-                    'labgraph.monitor': { samples },
-                },
-            } = parsedData;
+                break;
 
-            if (!_.isEqual(samples[0]['data'], graph)) {
-                setGraph(samples[0]['data']);
-            }
-        };
-        return () => {
-            client.send(endStreamRequest);
-            client.close();
-        };
-    }, [endPoint, graph]);
+            case WS_STATE.IS_DISCONNECTING:
+                clientRef.current.send(JSON.stringify(endStreamRequest));
+                clientRef.current.close();
+                dispatch(setConnection(WS_STATE.DISCONNECTED));
+                dispatch(copyRealtimeGraph(graph));
+        }
+    }, [connection, graph, dispatch]);
 
-    return (
-        <GraphContext.Provider
-            value={{
-                graph,
-                mock,
-                setMock,
-                endPoint,
-                setEndPoint,
-                isConnected,
-                setIsConnected,
-            }}
-        >
-            {children}
-        </GraphContext.Provider>
-    );
+    return <GraphContext.Provider value={{}}>{children}</GraphContext.Provider>;
 };
 
 export default WSContextProvider;

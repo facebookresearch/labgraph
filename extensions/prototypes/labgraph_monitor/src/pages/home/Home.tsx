@@ -1,11 +1,14 @@
 import React from 'react';
 import { Graph, SettingPanel } from '../../components';
+import { WSContextProvider } from '../../contexts';
 
 const Home: React.FC = (): JSX.Element => {
     return (
         <React.Fragment>
             <SettingPanel />
-            <Graph />
+            <WSContextProvider>
+                <Graph />
+            </WSContextProvider>
         </React.Fragment>
     );
 };

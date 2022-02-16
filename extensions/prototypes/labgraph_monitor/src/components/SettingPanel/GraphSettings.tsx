@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
     Box,
@@ -6,14 +6,17 @@ import {
     MenuItem,
     InputLabel,
     FormControl,
-    TextField,
     Button,
     Stack,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { MOCK } from '../../mocks';
-import { useWSContext } from '../../contexts';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { setMockGraph } from '../../redux/reducers/mock/mockReducer';
+import { setConnection } from '../../redux/reducers/ws/WSReducer';
+import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
 
 const useStyles = makeStyles({
     root: {
@@ -35,44 +38,28 @@ const useStyles = makeStyles({
 
 const GraphSettings: React.FC = (): JSX.Element => {
     const classes = useStyles();
-    const {
-        mock,
-        endPoint,
-        isConnected,
-        setMock,
-        setEndPoint,
-        setIsConnected,
-    } = useWSContext();
+    const { connection } = useSelector((state: RootState) => state.ws);
     const [value, setValue] = useState<string>('1');
-    const [textField, setTextField] = useState<string>(endPoint);
-    // const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [mock, setMock] = useState<string>('');
+    const dispatch = useDispatch();
 
     const handleChange = (_: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
 
     const handleMockChange = (event: SelectChangeEvent) => {
+        dispatch(setMockGraph(event.target.value));
         setMock(event.target.value);
     };
 
-    const handleEndPointChange = (
-        event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-    ) => {
-        setTextField(event?.target.value);
+    const handleConnect = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        dispatch(setConnection(WS_STATE.IS_CONNECTING));
     };
-    const handleConnect = useCallback(
-        (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            if (!textField) return;
-            setEndPoint(textField);
-        },
-        [textField, setEndPoint]
-    );
 
     const handleDiconnect = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setEndPoint('');
-        setIsConnected(false);
+        dispatch(setConnection(WS_STATE.IS_DISCONNECTING));
     };
 
     return (
@@ -107,40 +94,18 @@ const GraphSettings: React.FC = (): JSX.Element => {
                     <Box>
                         <form
                             onSubmit={
-                                isConnected ? handleDiconnect : handleConnect
+                                connection === WS_STATE.CONNECTED
+                                    ? handleDiconnect
+                                    : handleConnect
                             }
                         >
                             <FormControl sx={{ width: '100%' }}>
-                                <TextField
-                                    required
-                                    id="outlined-basic"
-                                    label="ENDPOINT"
-                                    variant="outlined"
-                                    placeholder="ws://127.0.0.1:9000"
-                                    value={textField}
-                                    size="small"
-                                    inputProps={{
-                                        pattern:
-                                            'ws://127.0.0.1:[1-9][0-9]{3,4}',
-                                    }}
-                                    InputLabelProps={{
-                                        style: { fontSize: '.8rem' },
-                                    }}
-                                    InputProps={{
-                                        style: {
-                                            padding: '2px',
-                                            fontSize: '.85rem',
-                                            letterSpacing: '1px',
-                                        },
-                                    }}
-                                    onChange={handleEndPointChange}
-                                />
                                 <Stack
                                     style={{
                                         marginTop: 10,
                                     }}
                                 >
-                                    {isConnected ? (
+                                    {connection === WS_STATE.CONNECTED ? (
                                         <Button
                                             type="submit"
                                             variant="outlined"
@@ -172,11 +137,14 @@ const GraphSettings: React.FC = (): JSX.Element => {
                             <Select
                                 style={{ fontSize: '.8rem' }}
                                 labelId="mock-selection-bar"
-                                id="mock-selectio"
-                                value={mock}
+                                id="mock-selection"
                                 label="Mock"
+                                value={mock}
                                 onChange={handleMockChange}
                             >
+                                <MenuItem value="">
+                                    <em>Mock</em>
+                                </MenuItem>
                                 {Object.entries(MOCK).map(([key, value]) => {
                                     return (
                                         <MenuItem
