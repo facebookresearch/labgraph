@@ -6,6 +6,12 @@ import { setConnection, setGraph } from '../../redux/reducers/ws/WSReducer';
 import { copyRealtimeGraph } from '../../redux/reducers/mock/mockReducer';
 import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
 import startStreamRequest from './json/startStreamRequest.json';
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import endStreamRequest from './json/endStreamRequest.json';
 import _ from 'lodash';
 

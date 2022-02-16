@@ -1,4 +1,4 @@
-#!/bin/sh
+ #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 cd ./extensions/prototypes/labgraph_monitor
 yarn check-code
