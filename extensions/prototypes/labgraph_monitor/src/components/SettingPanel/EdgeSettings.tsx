@@ -8,11 +8,12 @@ import {
     TableRow,
 } from '@mui/material';
 import React from 'react';
-import { useConfigContext, useWSContext } from '../../contexts';
+import { useWSContext } from '../../contexts';
+import { RootState } from '../../redux/store';
+import { useSelector } from 'react-redux';
 
 const Edge: React.FC = (): JSX.Element => {
-    const { selectedEdge } = useConfigContext();
-
+    const { selectedEdge } = useSelector((state: RootState) => state.config);
     const { graph } = useWSContext();
 
     const messages =

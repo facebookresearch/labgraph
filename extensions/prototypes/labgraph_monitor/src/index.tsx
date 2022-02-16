@@ -1,21 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import {
-    WSContextProvider,
-    UIContextProvider,
-    ConfigContextProvider,
-} from './contexts';
+import { WSContextProvider, UIContextProvider } from './contexts';
 import reportWebVitals from './reportWebVitals';
 import './statics/css/global.css';
+import { store } from './redux/store';
+import { Provider } from 'react-redux';
 
 ReactDOM.render(
     <React.StrictMode>
         <UIContextProvider>
             <WSContextProvider>
-                <ConfigContextProvider>
+                <Provider store={store}>
                     <App />
-                </ConfigContextProvider>
+                </Provider>
             </WSContextProvider>
         </UIContextProvider>
     </React.StrictMode>,

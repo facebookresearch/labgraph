@@ -1,13 +1,18 @@
 import { Box, Drawer, CssBaseline, IconButton, Divider } from '@mui/material';
-import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import AlignHorizontalLeftOutlinedIcon from '@mui/icons-material/AlignHorizontalLeftOutlined';
-import AlignVerticalTopOutlinedIcon from '@mui/icons-material/AlignVerticalTopOutlined';
+import {
+    ChevronRight,
+    Brightness7,
+    DarkMode,
+    SettingsApplicationsRounded,
+    AlignHorizontalLeftOutlined,
+    AlignVerticalTopOutlined,
+} from '@mui/icons-material';
 import SettingTabs from './SettingTabs';
 import { makeStyles } from '@mui/styles';
-import { useUIContext, useConfigContext } from '../../contexts';
+import { useUIContext } from '../../contexts';
+import { RootState } from '../../redux/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { setPanel } from '../../redux/reducers/config/configReducer';
 
 const PANEL_WIDTH = 280;
 
@@ -47,42 +52,26 @@ const useStyles = makeStyles({
 });
 
 const SettingPanel: React.FC = (): JSX.Element => {
-    const { mode, layout, toggleMode, toggleLayout } = useUIContext();
-    const {
-        panel: { isOpen, panelIndex },
-        setPanel,
-    } = useConfigContext();
     const classes = useStyles();
-
-    const handleDrawerOpen = () => {
-        setPanel({
-            isOpen: true,
-            panelIndex,
-        });
-    };
-
-    const handleDrawerClose = () => {
-        setPanel({
-            isOpen: false,
-            panelIndex,
-        });
-    };
+    const { mode, layout, toggleMode, toggleLayout } = useUIContext();
+    const { panelOpen } = useSelector((state: RootState) => state.config);
+    const dispatch = useDispatch();
 
     return (
         <Box className={classes.root}>
             <CssBaseline />
             <IconButton
-                onClick={handleDrawerOpen}
+                onClick={() => dispatch(setPanel(true))}
                 className={classes.settingButton}
                 sx={{
-                    display: isOpen ? 'none' : 'block',
+                    display: panelOpen ? 'none' : 'block',
                     position: 'absolute',
                     '&:hover, &.Mui-focusVisible': {
                         backgroundColor: 'transparent',
                     },
                 }}
             >
-                <SettingsApplicationsRoundedIcon
+                <SettingsApplicationsRounded
                     className={classes.settingIcon}
                     sx={{
                         width: 40,
@@ -94,27 +83,23 @@ const SettingPanel: React.FC = (): JSX.Element => {
                 className={classes.settingPanel}
                 variant="persistent"
                 anchor="right"
-                open={isOpen}
+                open={panelOpen}
             >
                 <Box>
-                    <IconButton onClick={handleDrawerClose}>
-                        <ChevronRightIcon />
+                    <IconButton onClick={() => dispatch(setPanel(false))}>
+                        <ChevronRight />
                     </IconButton>
                 </Box>
                 <Divider />
                 <Box className={classes.themeBar}>
                     <IconButton onClick={toggleMode}>
-                        {mode === 'light' ? (
-                            <DarkModeIcon />
-                        ) : (
-                            <Brightness7Icon />
-                        )}
+                        {mode === 'light' ? <DarkMode /> : <Brightness7 />}
                     </IconButton>
                     <IconButton onClick={toggleLayout}>
                         {layout === 'horizontal' ? (
-                            <AlignVerticalTopOutlinedIcon />
+                            <AlignVerticalTopOutlined />
                         ) : (
-                            <AlignHorizontalLeftOutlinedIcon />
+                            <AlignHorizontalLeftOutlined />
                         )}
                     </IconButton>
                 </Box>

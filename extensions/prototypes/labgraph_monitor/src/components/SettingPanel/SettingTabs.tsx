@@ -4,7 +4,9 @@ import { makeStyles } from '@mui/styles';
 import NodeSettings from './NodeSettings';
 import EdgeSettings from './EdgeSettings';
 import GraphSettings from './GraphSettings';
-import { useConfigContext } from '../../contexts';
+import { RootState } from '../../redux/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { setTabIndex } from '../../redux/reducers/config/configReducer';
 
 const useStyles = makeStyles({
     root: {
@@ -14,27 +16,22 @@ const useStyles = makeStyles({
 
 const SettingTabs: React.FC = (): JSX.Element => {
     const classes = useStyles();
-    const {
-        panel: { panelIndex },
-        setPanel,
-    } = useConfigContext();
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-        setPanel({
-            isOpen: true,
-            panelIndex: newValue,
-        });
-    };
-
+    const { tabIndex } = useSelector((state: RootState) => state.config);
+    const dispatch = useDispatch();
     return (
         <Box className={classes.root}>
-            <TabContext value={panelIndex}>
+            <TabContext value={tabIndex}>
                 <Box
                     sx={{
                         borderBottom: 1,
                         borderColor: 'divider',
                     }}
                 >
-                    <TabList onChange={handleChange}>
+                    <TabList
+                        onChange={(event, newValue) =>
+                            dispatch(setTabIndex(newValue))
+                        }
+                    >
                         <Tab label="graph" value="1" />
                         <Tab label="node" value="2" />
                         <Tab label="edge" value="3" />

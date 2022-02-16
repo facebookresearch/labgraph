@@ -9,16 +9,24 @@ import ReactFlow, {
     isEdge,
 } from 'react-flow-renderer';
 import { TGraphElement } from './types/TGraphElement';
-import { useWSContext, useUIContext, useConfigContext } from '../../contexts';
+import { useWSContext, useUIContext } from '../../contexts';
 import { layoutGraph } from './util/layoutGraph';
+import { useDispatch } from 'react-redux';
+import {
+    setPanel,
+    setTabIndex,
+    setSelectedNode,
+    setSelectedEdge,
+} from '../../redux/reducers/config/configReducer';
 
 const Graph: React.FC = (): JSX.Element => {
     const { layout } = useUIContext();
-    const { setPanel, setSelectedNode, setSelectedEdge } = useConfigContext();
     const { graph: serializedGraph } = useWSContext();
     const [graph, setGraph] = useState<Array<TGraphElement>>(
         [] as Array<TGraphElement>
     );
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const { nodes } = serializedGraph;
@@ -72,19 +80,13 @@ const Graph: React.FC = (): JSX.Element => {
         element: Node | Edge
     ) => {
         if (isNode(element)) {
-            setPanel({
-                isOpen: true,
-                panelIndex: '2',
-            });
-
-            setSelectedNode(element);
+            dispatch(setPanel(true));
+            dispatch(setTabIndex('2'));
+            dispatch(setSelectedNode(element));
         } else if (isEdge(element)) {
-            setPanel({
-                isOpen: true,
-                panelIndex: '3',
-            });
-
-            setSelectedEdge(element);
+            dispatch(setPanel(true));
+            dispatch(setTabIndex('3'));
+            dispatch(setSelectedEdge(element));
         }
     };
 

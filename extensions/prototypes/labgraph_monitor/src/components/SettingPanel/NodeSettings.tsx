@@ -1,7 +1,8 @@
 import React from 'react';
-import { useConfigContext } from '../../contexts';
+import { RootState } from '../../redux/store';
+import { useSelector } from 'react-redux';
 const Node: React.FC = (): JSX.Element => {
-    const { selectedNode } = useConfigContext();
+    const { selectedNode } = useSelector((state: RootState) => state.config);
 
     return (
         <React.Fragment>
