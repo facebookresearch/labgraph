@@ -64,7 +64,7 @@ const SettingPanel: React.FC = (): JSX.Element => {
     const dispatch = useDispatch();
 
     return (
-        <Box className={classes.root}>
+        <Box className={classes.root} data-testid="setting-panel">
             <CssBaseline />
             <IconButton
                 onClick={() => dispatch(setPanel(true))}

@@ -26,6 +26,7 @@ import {
     setSelectedEdge,
 } from '../../redux/reducers/config/configReducer';
 import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
+import { Box } from '@mui/material';
 
 const Graph: React.FC = (): JSX.Element => {
     const { layout } = useUIContext();
@@ -107,29 +108,31 @@ const Graph: React.FC = (): JSX.Element => {
     };
 
     return (
-        <ReactFlowProvider>
-            <ReactFlow
-                elements={graph as any}
-                style={{ width: '100%', height: '100%' }}
-                onElementClick={handleElementClick}
-            >
-                <Controls
-                    showZoom={false}
-                    showInteractive={false}
-                    showFitView={true}
-                    style={{
-                        position: 'absolute',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        bottom: '40px',
-                        left: '40px',
-                        cursor: 'pointer',
-                    }}
-                />
-                <Background size={0} />
-            </ReactFlow>
-        </ReactFlowProvider>
+        <Box data-testid="graph">
+            <ReactFlowProvider>
+                <ReactFlow
+                    elements={graph as any}
+                    style={{ width: '100%', height: '100vh' }}
+                    onElementClick={handleElementClick}
+                >
+                    <Controls
+                        showZoom={false}
+                        showInteractive={false}
+                        showFitView={true}
+                        style={{
+                            position: 'absolute',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            bottom: '40px',
+                            left: '40px',
+                            cursor: 'pointer',
+                        }}
+                    />
+                    <Background size={0} />
+                </ReactFlow>
+            </ReactFlowProvider>
+        </Box>
     );
 };
 

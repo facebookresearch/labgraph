@@ -12,6 +12,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    Typography,
 } from '@mui/material';
 import React from 'react';
 import { RootState } from '../../redux/store';
@@ -60,6 +61,12 @@ const Edge: React.FC = (): JSX.Element => {
                     </TableContainer>
                 );
             })}
+
+            {!messages.length && (
+                <Typography style={{ fontSize: '.8rem', fontWeight: 400 }}>
+                    Click on an edge to see the message information
+                </Typography>
+            )}
         </React.Fragment>
     );
 };

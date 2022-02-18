@@ -7,12 +7,18 @@
 import React from 'react';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
+import { Typography } from '@mui/material';
 const Node: React.FC = (): JSX.Element => {
     const { selectedNode } = useSelector((state: RootState) => state.config);
 
     return (
         <React.Fragment>
-            <p style={{ padding: 10 }}>{selectedNode.id}</p>
+            {selectedNode.id && <Typography>{selectedNode.id}</Typography>}
+            {!selectedNode.id && (
+                <Typography style={{ fontSize: '.8rem', fontWeight: 400 }}>
+                    Click on a node to see its information
+                </Typography>
+            )}
         </React.Fragment>
     );
 };
