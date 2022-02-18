@@ -42,6 +42,11 @@ const useStyles = makeStyles({
     },
 });
 
+/**
+ * A component that manages the settings of a graph.
+ *
+ * @returns {JSX.Element}
+ */
 const GraphSettings: React.FC = (): JSX.Element => {
     const classes = useStyles();
     const { connection } = useSelector((state: RootState) => state.ws);

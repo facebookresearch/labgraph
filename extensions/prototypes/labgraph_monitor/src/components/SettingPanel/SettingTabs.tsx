@@ -20,6 +20,11 @@ const useStyles = makeStyles({
     },
 });
 
+/**
+ * A component that categorizes settings within the settings panel
+ *
+ * @returns {JSX.Element}
+ */
 const SettingTabs: React.FC = (): JSX.Element => {
     const classes = useStyles();
     const { tabIndex } = useSelector((state: RootState) => state.config);

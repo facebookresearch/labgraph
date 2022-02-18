@@ -20,6 +20,12 @@ import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
 import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
 
+/**
+ * A component that manages the settings of an edge.
+ * All components related to edge settings should be children of this component.
+ *
+ * @returns {JSX.Element}
+ */
 const Edge: React.FC = (): JSX.Element => {
     const { selectedEdge } = useSelector((state: RootState) => state.config);
     const { connection, graph: realtimeGraph } = useSelector(

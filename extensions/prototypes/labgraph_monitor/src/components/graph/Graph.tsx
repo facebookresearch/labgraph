@@ -28,6 +28,11 @@ import {
 import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
 import { Box } from '@mui/material';
 
+/**
+ * A component that represents the computational graph.
+ *
+ * @returns {JSX.Element}
+ */
 const Graph: React.FC = (): JSX.Element => {
     const { layout } = useUIContext();
     const { mockGraph } = useSelector((state: RootState) => state.mock);

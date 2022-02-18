@@ -18,6 +18,12 @@ import IUIContext from './interfaces/IUIContext';
 const UIContext = createContext<IUIContext>({} as IUIContext);
 export const useUIContext = (): IUIContext => useContext(UIContext);
 
+/**
+ * A context component used to share UI related information with different component
+ *
+ * @param {ReactNode} props represents the react components wrapped by this context
+ * @returns {JSX.Element}
+ */
 const UIContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     const localMode = localStorage.getItem('labgraph_monitor_mode') as
         | 'dark'

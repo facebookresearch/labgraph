@@ -8,6 +8,13 @@ import React from 'react';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
 import { Box, Typography } from '@mui/material';
+
+/**
+ * A component that manages the settings of a node.
+ * All components related to node settings should be children of this component.
+ *
+ * @returns {JSX.Element}
+ */
 const Node: React.FC = (): JSX.Element => {
     const { selectedNode } = useSelector((state: RootState) => state.config);
 

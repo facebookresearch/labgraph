@@ -6,6 +6,10 @@
  */
 import { Home } from './pages';
 
+/**
+ * The main component of the application
+ * @returns {JSX.Element}
+ */
 const App: React.FC = (): JSX.Element => {
     return (
         <div className="App" style={{ height: '100vh' }}>

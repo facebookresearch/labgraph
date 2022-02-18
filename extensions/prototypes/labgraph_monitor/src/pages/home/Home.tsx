@@ -8,6 +8,11 @@ import React from 'react';
 import { Graph, SettingPanel } from '../../components';
 import { WSContextProvider } from '../../contexts';
 
+/**
+ * A component that represents the Home page of the application
+ *
+ * @returns {JSX.Element}
+ */
 const Home: React.FC = (): JSX.Element => {
     return (
         <React.Fragment>

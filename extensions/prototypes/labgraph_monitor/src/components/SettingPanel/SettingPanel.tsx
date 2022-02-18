@@ -57,6 +57,12 @@ const useStyles = makeStyles({
     },
 });
 
+/**
+ * A component that represents the setting panel of the application.
+ * All components related to UI or Graph settings should be children of this component.
+ *
+ * @returns {JSX.Element}
+ */
 const SettingPanel: React.FC = (): JSX.Element => {
     const classes = useStyles();
     const { mode, layout, toggleMode, toggleLayout } = useUIContext();

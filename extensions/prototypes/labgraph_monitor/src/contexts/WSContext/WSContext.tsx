@@ -17,6 +17,13 @@ import _ from 'lodash';
 
 const GraphContext = createContext<{}>({});
 
+/**
+ * A context component used to share WebSocket related information with different component.
+ * All interactions with the LabGraph WebSockets API are happening inside this context.
+ *
+ * @param {ReactNode} props represents the react components wrapped by this context
+ * @returns {JSX.Element}
+ */
 const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     const { connection, graph } = useSelector((state: RootState) => state.ws);
 

@@ -11,6 +11,12 @@ import simpleVizFixedRate from '../json/simple_viz_fixed_rate.json';
 import simulation from '../json/simulation.json';
 import MOCK from '../enums/MOCK';
 
+/**
+ * A function that picks a mock example based on the argument passed
+ *
+ * @param {string} mock the name of the mock example
+ * @returns a parsed version of the JSON file containing the mock sample.
+ */
 export const selectMock = (mock: string) => {
     switch (mock) {
         case MOCK.SIMPLE_VIZ:

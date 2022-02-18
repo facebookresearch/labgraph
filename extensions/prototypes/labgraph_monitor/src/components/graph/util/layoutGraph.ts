@@ -11,6 +11,14 @@ import { TGraphElement } from '../types/TGraphElement';
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
+/**
+ * A function used to update the graph layout
+ *
+ * @param {Array<TGraphElement} elements: Nodes and Edges of the computational graph
+ * @param {string} layout: The direction of the nodes and edges.
+ *                         It can be either 'horizontal' or 'vertical'
+ * @returns {Array<TGraphElement} The new array of nodes and edges
+ */
 export const layoutGraph = (
     elements: Array<TGraphElement>,
     layout: string
