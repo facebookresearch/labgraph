@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import {
+    Box,
     Paper,
     Table,
     TableBody,
@@ -36,37 +37,46 @@ const Edge: React.FC = (): JSX.Element => {
             : [];
     return (
         <React.Fragment>
-            {messages.map((message, index) => {
-                return (
-                    <TableContainer key={index} component={Paper}>
-                        <Table sx={{ width: '100%' }} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>{message['name']}</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {Object.entries(message['fields']).map(
-                                    ([name, type]) => {
-                                        return (
-                                            <TableRow key={name}>
-                                                <TableCell>{name}</TableCell>
-                                                <TableCell>{type}</TableCell>
-                                            </TableRow>
-                                        );
-                                    }
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                );
-            })}
+            <Box data-testid="edge-settings">
+                {messages.map((message, index) => {
+                    return (
+                        <TableContainer key={index} component={Paper}>
+                            <Table
+                                sx={{ width: '100%' }}
+                                aria-label="simple table"
+                            >
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>{message['name']}</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {Object.entries(message['fields']).map(
+                                        ([name, type]) => {
+                                            return (
+                                                <TableRow key={name}>
+                                                    <TableCell>
+                                                        {name}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {type}
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        }
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    );
+                })}
 
-            {!messages.length && (
-                <Typography style={{ fontSize: '.8rem', fontWeight: 400 }}>
-                    Click on an edge to see the message information
-                </Typography>
-            )}
+                {!messages.length && (
+                    <Typography style={{ fontSize: '.8rem', fontWeight: 400 }}>
+                        Click on an edge to see the message information
+                    </Typography>
+                )}
+            </Box>
         </React.Fragment>
     );
 };

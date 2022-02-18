@@ -7,22 +7,20 @@
 import { render, screen } from '@testing-library/react';
 import { store } from '../../../redux/store';
 import { Provider } from 'react-redux';
-import Home from '../Home';
+import EdgeSettings from '../EdgeSettings';
 
-const MockHome = () => {
+const MockEdgeSettings = () => {
     return (
         <Provider store={store}>
-            <Home />
+            <EdgeSettings />
         </Provider>
     );
 };
 
-describe('Home', () => {
-    it('should render Home component', async () => {
-        render(<MockHome />);
-        const settingPanel = screen.getByTestId('setting-panel');
-        const graph = screen.getByTestId('graph');
-        expect(settingPanel).toBeInTheDocument();
-        expect(graph).toBeInTheDocument();
+describe('EdgeSettings', () => {
+    it('should render EdgeSettings component', async () => {
+        render(<MockEdgeSettings />);
+        const edgeSettings = screen.getByTestId('edge-settings');
+        expect(edgeSettings).toBeInTheDocument();
     });
 });

@@ -69,7 +69,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
     };
 
     return (
-        <Box className={classes.root}>
+        <Box className={classes.root} data-testid="graph-settings">
             <TabContext value={value}>
                 <Box
                     sx={{

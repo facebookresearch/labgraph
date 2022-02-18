@@ -69,6 +69,7 @@ const SettingPanel: React.FC = (): JSX.Element => {
             <IconButton
                 onClick={() => dispatch(setPanel(true))}
                 className={classes.settingButton}
+                data-testid="open-setting-btn"
                 sx={{
                     display: panelOpen ? 'none' : 'block',
                     position: 'absolute',
@@ -92,20 +93,33 @@ const SettingPanel: React.FC = (): JSX.Element => {
                 open={panelOpen}
             >
                 <Box>
-                    <IconButton onClick={() => dispatch(setPanel(false))}>
+                    <IconButton
+                        onClick={() => dispatch(setPanel(false))}
+                        data-testid="close-setting-btn"
+                    >
                         <ChevronRight />
                     </IconButton>
                 </Box>
                 <Divider />
                 <Box className={classes.themeBar}>
-                    <IconButton onClick={toggleMode}>
-                        {mode === 'light' ? <DarkMode /> : <Brightness7 />}
-                    </IconButton>
-                    <IconButton onClick={toggleLayout}>
-                        {layout === 'horizontal' ? (
-                            <AlignVerticalTopOutlined />
+                    <IconButton
+                        onClick={toggleMode}
+                        data-testid="toggle-mode-btn"
+                    >
+                        {mode === 'light' ? (
+                            <DarkMode data-testid="dark-mode-icon" />
                         ) : (
-                            <AlignHorizontalLeftOutlined />
+                            <Brightness7 data-testid="light-mode-icon" />
+                        )}
+                    </IconButton>
+                    <IconButton
+                        onClick={toggleLayout}
+                        data-testid="toggle-layout-btn"
+                    >
+                        {layout === 'horizontal' ? (
+                            <AlignVerticalTopOutlined data-testid="vertical-layout-icon" />
+                        ) : (
+                            <AlignHorizontalLeftOutlined data-testid="horizontal-layout-icon" />
                         )}
                     </IconButton>
                 </Box>

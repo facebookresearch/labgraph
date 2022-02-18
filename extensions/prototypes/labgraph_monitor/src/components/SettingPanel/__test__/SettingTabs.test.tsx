@@ -7,22 +7,20 @@
 import { render, screen } from '@testing-library/react';
 import { store } from '../../../redux/store';
 import { Provider } from 'react-redux';
-import Home from '../Home';
+import SettingTabs from '../SettingTabs';
 
-const MockHome = () => {
+const MockSettingTabs = () => {
     return (
         <Provider store={store}>
-            <Home />
+            <SettingTabs />
         </Provider>
     );
 };
 
-describe('Home', () => {
-    it('should render Home component', async () => {
-        render(<MockHome />);
-        const settingPanel = screen.getByTestId('setting-panel');
-        const graph = screen.getByTestId('graph');
+describe('SettingTabs', () => {
+    it('should render SettingTabs component', async () => {
+        render(<MockSettingTabs />);
+        const settingPanel = screen.getByTestId('setting-tabs');
         expect(settingPanel).toBeInTheDocument();
-        expect(graph).toBeInTheDocument();
     });
 });

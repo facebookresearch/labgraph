@@ -25,7 +25,7 @@ const SettingTabs: React.FC = (): JSX.Element => {
     const { tabIndex } = useSelector((state: RootState) => state.config);
     const dispatch = useDispatch();
     return (
-        <Box className={classes.root}>
+        <Box className={classes.root} data-testid="setting-tabs">
             <TabContext value={tabIndex}>
                 <Box
                     sx={{
@@ -37,6 +37,7 @@ const SettingTabs: React.FC = (): JSX.Element => {
                         onChange={(event, newValue) =>
                             dispatch(setTabIndex(newValue))
                         }
+                        data-testid="tab-list"
                     >
                         <Tab label="graph" value="1" />
                         <Tab label="node" value="2" />
