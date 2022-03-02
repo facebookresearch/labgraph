@@ -1,32 +1,35 @@
-#!/usr/bin/env python3
-# Copyright 2004-present Facebook. All Rights Reserved.
-
 import socket
+from labgraph.graphs import Config, Node
+from labgraph.graphs.method import background
 
-from socket_message import SOCKETMessage
-from labgraph.graphs import Node
+# client
 
 
-class SOCKETPollerNode():
+class SOCKETPollerConfig(Config):
+    read_addr: str
+    socket_topic: str
+
+
+class SOCKETPollerNode(Node):
     """
-    Represents a node in the graph which recieves data from SOCKET.
-    Data polled from SOCKET is subsequently pushed to rest of the graph
-    as as SOCKETMessage
+    Represents a node in a Labgraph graph that subscribes to messages in a
+    Labgraph topic and forwards them by writing to a SOCKET object.
     """
+    config: SOCKETPollerConfig
 
     def setup(self) -> None:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((socket.gethostname(), 1234))
-        self.socket.listen(5)
+        self.socket.connect((socket.gethostname(), self.config.read_addr))
 
-    def cleanup(self, clientsocket) -> None:
-        clientsocket.close()
+    def cleanup(self) -> None:
+        self.socket.close()
 
+    @background
     def socket_monitor(self) -> None:
+        data = ''
         while True:
-            clientsocket, address = self.socket.accept()
-            print(f"Connection from {address} has been established!")
-            # client socket is our local version of the client's socket,
-            # so we send information to the client
-            clientsocket.send(bytes("Welcome to the server!", "utf-8"))
-            self.cleanup(clientsocket)
+            msg = self.socket.recv(8)
+            if(len(msg) <= 0):
+                break
+            data += msg.decode("utf-8")
+        print(data)
