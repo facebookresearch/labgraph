@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
-
+import pickle
+import asyncio
 import socket
+from labgraph.graphs.method import subscriber
 from socket_message import SOCKETMessage
 from labgraph.graphs import Config, Node, Topic, background
 from labgraph.util.logger import get_logger
@@ -10,7 +12,7 @@ from labgraph.util.logger import get_logger
 # server
 
 # lookup what is a logger
-STARTUP_WAIT_TIME = 5
+STARTUP_WAIT_TIME = 0.1
 
 logger = get_logger(__name__)
 
@@ -40,6 +42,7 @@ class SOCKETSenderNode(Node):
         logger.debug(f"{self}:binding to {self.config.write_addr}")
         self.socket.bind((socket.gethostname(), self.config.write_addr))
         self.socket.listen(STARTUP_WAIT_TIME)
+        self.has_subscrivers = False
 
     def cleanup(self, clientsocket) -> None:
         clientsocket.close()
@@ -48,8 +51,13 @@ class SOCKETSenderNode(Node):
     async def socket_monitor(self) -> None:
         while True:
             clientsocket, address = self.socket.accept()
-            print(f"Connection from {address} has been established!")
+            logger.debug(f"Connection from {address} has been established!")
             # client socket is our local version of the client's socket,
             # so we send information to the client
             clientsocket.send(bytes(self.config.socket_topic, "utf-8"))
             self.cleanup(clientsocket)
+
+    @subscriber(topic)
+    async def socket_subscriber(self) -> None:
+        while not self.has_subscrivers:
+            await asyncio.sleep(STARTUP_WAIT_TIME)
