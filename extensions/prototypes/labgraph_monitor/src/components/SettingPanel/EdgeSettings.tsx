@@ -14,6 +14,10 @@ import {
     TableHead,
     TableRow,
     Typography,
+    Card,
+    Switch,
+    Button,
+    Backdrop,
 } from '@mui/material';
 import React from 'react';
 import { RootState } from '../../redux/store';
@@ -41,6 +45,13 @@ const Edge: React.FC = (): JSX.Element => {
                   selectedEdge.source
               ]
             : [];
+    const [open, setOpen] = React.useState(false);
+    const handleClose = () => {
+        setOpen(false);
+    };
+    const handleToggle = () => {
+        setOpen(!open);
+    };
     return (
         <React.Fragment>
             <Box data-testid="edge-settings">
@@ -49,7 +60,7 @@ const Edge: React.FC = (): JSX.Element => {
                         <TableContainer key={index} component={Paper}>
                             <Table
                                 sx={{ width: '100%' }}
-                                aria-label="simple table"
+                                aria-label="edge table contains the name, type of the edge"
                             >
                                 <TableHead>
                                     <TableRow>
@@ -57,6 +68,7 @@ const Edge: React.FC = (): JSX.Element => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
+                                    {/* ZMQMessage Edge */}
                                     {Object.entries(message['fields']).map(
                                         ([name, type]) => {
                                             return (
@@ -71,6 +83,33 @@ const Edge: React.FC = (): JSX.Element => {
                                             );
                                         }
                                     )}
+
+                                    <TableRow>
+                                        <Button onClick={handleToggle}>
+                                            Show Realtime Data
+                                        </Button>
+                                        <Backdrop
+                                            sx={{
+                                                color: '#fff',
+                                                zIndex: (theme) =>
+                                                    theme.zIndex.drawer + 1,
+                                            }}
+                                            open={open}
+                                            onClick={handleClose}
+                                        >
+                                            {/* Dummy data */}
+                                            <Card style={{ width: 400 }}>
+                                                "id": "0001", "type": "donut",
+                                                "name": "Cake", "ppu": 0.55,
+                                                "batters": ] "id": "0001",
+                                                "type": "donut", "name": "Cake",
+                                                "ppu": 0.55, "batters": ] "id":
+                                                "0001", "type": "donut", "name":
+                                                "Cake", "ppu": 0.55, "batters":
+                                                ]
+                                            </Card>
+                                        </Backdrop>
+                                    </TableRow>
                                 </TableBody>
                             </Table>
                         </TableContainer>
