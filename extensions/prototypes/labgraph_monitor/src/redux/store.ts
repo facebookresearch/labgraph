@@ -6,8 +6,8 @@
  */
 import { configureStore } from '@reduxjs/toolkit';
 import configReducer from './reducers/config/configReducer';
-import mockReducer from './reducers/mock/mockReducer';
-import WSReducer from './reducers/ws/WSReducer';
+import mockReducer from './reducers/graph/mock/mockReducer';
+import WSReducer from './reducers/graph/ws/WSReducer';
 
 export const store = configureStore({
     reducer: {

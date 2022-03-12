@@ -8,9 +8,12 @@ import { ReactNode, useRef, createContext, useEffect } from 'react';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { RootState } from '../../redux/store';
 import { useSelector, useDispatch } from 'react-redux';
-import { setConnection, setGraph } from '../../redux/reducers/ws/WSReducer';
-import { copyRealtimeGraph } from '../../redux/reducers/mock/mockReducer';
-import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
+import {
+    setConnection,
+    setGraph,
+} from '../../redux/reducers/graph/ws/WSReducer';
+import { copyRealtimeGraph } from '../../redux/reducers/graph/mock/mockReducer';
+import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
 import startStreamRequest from './json/startStreamRequest.json';
 import endStreamRequest from './json/endStreamRequest.json';
 import _ from 'lodash';

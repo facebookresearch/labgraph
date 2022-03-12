@@ -6,7 +6,7 @@
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import IWS from './interfaces/IWS';
-import IGraph from './interfaces/IGraph';
+import IGraph from '../common/interfaces/IGraph';
 import WS_STATE from './enums/WS_STATE';
 
 const initialState: IWS = {

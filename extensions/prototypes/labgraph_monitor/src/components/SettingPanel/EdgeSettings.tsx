@@ -18,7 +18,7 @@ import {
 import React from 'react';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
-import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
+import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
 
 /**
  * A component that manages the settings of an edge.

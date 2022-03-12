@@ -4,11 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import INode from './INode';
+import IGraph from '../../common/interfaces/IGraph';
 
-interface IGraph {
-    name: string;
-    nodes: INode;
+interface IMock {
+    mockGraph: IGraph;
 }
 
-export default IGraph;
+export default IMock;

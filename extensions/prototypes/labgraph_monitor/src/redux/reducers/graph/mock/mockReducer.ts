@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import IGraph from './interfaces/IGraph';
+import IGraph from '../common/interfaces/IGraph';
 import IMock from './interfaces/IMock';
-import { selectMock } from '../../../mocks';
+import { selectMock } from '../../../../mocks';
 
 const initialState: IMock = {
     mockGraph: {} as IGraph,

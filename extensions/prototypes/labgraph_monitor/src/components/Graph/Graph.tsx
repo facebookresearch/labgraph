@@ -25,7 +25,7 @@ import {
     setSelectedNode,
     setSelectedEdge,
 } from '../../redux/reducers/config/configReducer';
-import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
+import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
 import { Box } from '@mui/material';
 
 /**

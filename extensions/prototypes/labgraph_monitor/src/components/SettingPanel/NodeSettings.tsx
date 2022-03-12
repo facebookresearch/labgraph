@@ -21,8 +21,9 @@ const Node: React.FC = (): JSX.Element => {
     return (
         <React.Fragment>
             <Box data-testid="node-settings">
-                {selectedNode.id && <Typography>{selectedNode.id}</Typography>}
-                {!selectedNode.id && (
+                {selectedNode?.id ? (
+                    <Typography>{selectedNode.id}</Typography>
+                ) : (
                     <Typography style={{ fontSize: '.8rem', fontWeight: 400 }}>
                         Click on a node to see its information
                     </Typography>

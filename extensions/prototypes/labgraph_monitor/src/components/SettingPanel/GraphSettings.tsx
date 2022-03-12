@@ -20,9 +20,9 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { MOCK } from '../../mocks';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { setMockGraph } from '../../redux/reducers/mock/mockReducer';
-import { setConnection } from '../../redux/reducers/ws/WSReducer';
-import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
+import { setMockGraph } from '../../redux/reducers/graph/mock/mockReducer';
+import { setConnection } from '../../redux/reducers/graph/ws/WSReducer';
+import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
 
 const useStyles = makeStyles({
     root: {
@@ -50,12 +50,12 @@ const useStyles = makeStyles({
 const GraphSettings: React.FC = (): JSX.Element => {
     const classes = useStyles();
     const { connection } = useSelector((state: RootState) => state.ws);
-    const [value, setValue] = useState<string>('1');
+    const [tabIndex, setTabIndex] = useState<string>('1');
     const [mock, setMock] = useState<string>('');
     const dispatch = useDispatch();
 
-    const handleChange = (_: React.SyntheticEvent, newValue: string) => {
-        setValue(newValue);
+    const toggleTab = (_: React.SyntheticEvent, newValue: string) => {
+        setTabIndex(newValue);
     };
 
     const handleMockChange = (event: SelectChangeEvent) => {
@@ -68,21 +68,21 @@ const GraphSettings: React.FC = (): JSX.Element => {
         dispatch(setConnection(WS_STATE.IS_CONNECTING));
     };
 
-    const handleDiconnect = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleDisconnect = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         dispatch(setConnection(WS_STATE.IS_DISCONNECTING));
     };
 
     return (
         <Box className={classes.root} data-testid="graph-settings">
-            <TabContext value={value}>
+            <TabContext value={tabIndex}>
                 <Box
                     sx={{
                         borderBottom: 1,
                         borderColor: 'divider',
                     }}
                 >
-                    <TabList onChange={handleChange}>
+                    <TabList onChange={toggleTab}>
                         <Tab
                             className={classes.tab}
                             label={
@@ -106,7 +106,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
                         <form
                             onSubmit={
                                 connection === WS_STATE.CONNECTED
-                                    ? handleDiconnect
+                                    ? handleDisconnect
                                     : handleConnect
                             }
                         >
