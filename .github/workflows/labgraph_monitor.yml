@@ -19,3 +19,4 @@ jobs:
         run: |
           cd extensions/prototypes/labgraph_monitor
           yarn test --watchAll=false
+          yarn build
