@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
     Box,
@@ -13,7 +13,6 @@ import {
     InputLabel,
     FormControl,
     Button,
-    Stack,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -73,6 +72,35 @@ const GraphSettings: React.FC = (): JSX.Element => {
         dispatch(setConnection(WS_STATE.IS_DISCONNECTING));
     };
 
+    const renderConnectionButton = useCallback(() => {
+        switch (connection) {
+            case WS_STATE.IS_CONNECTING:
+                return (
+                    <Button type="submit" variant="outlined" disabled>
+                        is connecting
+                    </Button>
+                );
+            case WS_STATE.CONNECTED:
+                return (
+                    <Button type="submit" variant="outlined">
+                        disconnect
+                    </Button>
+                );
+            case WS_STATE.IS_DISCONNECTING:
+                return (
+                    <Button type="submit" variant="outlined" disabled>
+                        is disconnecting
+                    </Button>
+                );
+            case WS_STATE.DISCONNECTED:
+                return (
+                    <Button type="submit" variant="outlined">
+                        connect
+                    </Button>
+                );
+        }
+    }, [connection]);
+
     return (
         <Box className={classes.root} data-testid="graph-settings">
             <TabContext value={tabIndex}>
@@ -111,27 +139,7 @@ const GraphSettings: React.FC = (): JSX.Element => {
                             }
                         >
                             <FormControl sx={{ width: '100%' }}>
-                                <Stack
-                                    style={{
-                                        marginTop: 10,
-                                    }}
-                                >
-                                    {connection === WS_STATE.CONNECTED ? (
-                                        <Button
-                                            type="submit"
-                                            variant="outlined"
-                                        >
-                                            disconnect
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            type="submit"
-                                            variant="outlined"
-                                        >
-                                            connect
-                                        </Button>
-                                    )}
-                                </Stack>
+                                {renderConnectionButton()}
                             </FormControl>
                         </form>
                     </Box>

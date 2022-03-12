@@ -30,22 +30,30 @@ const GraphContext = createContext<{}>({});
 const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     const { connection, graph } = useSelector((state: RootState) => state.ws);
 
-    const clientRef = useRef<any>(null);
+    const clientRef = useRef<W3CWebSocket | null>(null);
     const dispatch = useDispatch();
 
     useEffect(() => {
+        if (!process.env.REACT_APP_WS_API) return;
         switch (connection) {
             case WS_STATE.IS_CONNECTING:
                 clientRef.current = new W3CWebSocket(
                     process.env.REACT_APP_WS_API as string
                 );
+
                 clientRef.current.onopen = () => {
-                    clientRef.current.send(JSON.stringify(startStreamRequest));
+                    clientRef.current?.send(JSON.stringify(startStreamRequest));
                     dispatch(setConnection(WS_STATE.CONNECTED));
                 };
+
+                clientRef.current.onerror = (err: any) => {
+                    dispatch(setConnection(WS_STATE.DISCONNECTED));
+                };
+
                 break;
 
             case WS_STATE.CONNECTED:
+                if (!clientRef.current) return;
                 clientRef.current.onmessage = (message: any) => {
                     const data = JSON.parse(message.data);
                     if (!data['stream_batch']) return;
@@ -62,8 +70,8 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
                 break;
 
             case WS_STATE.IS_DISCONNECTING:
-                clientRef.current.send(JSON.stringify(endStreamRequest));
-                clientRef.current.close();
+                clientRef.current?.send(JSON.stringify(endStreamRequest));
+                clientRef.current?.close();
                 dispatch(setConnection(WS_STATE.DISCONNECTED));
                 dispatch(copyRealtimeGraph(graph));
         }
