@@ -12,7 +12,7 @@ import Graph from '../Graph';
 const MockGraph = () => {
     return (
         <Provider store={store}>
-            <Graph />;
+            <Graph />
         </Provider>
     );
 };

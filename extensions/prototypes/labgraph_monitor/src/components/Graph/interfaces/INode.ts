@@ -16,6 +16,7 @@ interface INode {
     sourcePosition: 'left' | 'top' | 'right' | 'bottom';
     targetPosition: 'left' | 'top' | 'right' | 'bottom';
     style?: { [property: string]: string };
+    className?: string;
 }
 
 export default INode;

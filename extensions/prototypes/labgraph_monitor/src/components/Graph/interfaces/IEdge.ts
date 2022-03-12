@@ -13,6 +13,7 @@ interface IEdge {
     type?: 'default' | 'straight' | 'step' | 'smoothstep';
     animated?: boolean;
     style?: { [property: string]: string };
+    className?: string;
 }
 
 export default IEdge;

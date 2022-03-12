@@ -27,6 +27,34 @@ import {
 } from '../../redux/reducers/config/configReducer';
 import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
 import { Box } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles({
+    node: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '150px',
+        height: '150px',
+        borderRadius: '50%',
+        fontWeight: '500',
+        fill: 'currentColor',
+    },
+
+    edge: {
+        stroke: 'inherit',
+    },
+
+    controllers: {
+        position: 'absolute',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        bottom: '40px',
+        left: '40px',
+        cursor: 'pointer',
+    },
+});
 
 /**
  * A component that represents LabGraph computational graph.
@@ -34,6 +62,7 @@ import { Box } from '@mui/material';
  * @returns {JSX.Element}
  */
 const Graph: React.FC = (): JSX.Element => {
+    const styles = useStyles();
     const { layout } = useUIContext();
     const { mockGraph } = useSelector((state: RootState) => state.mock);
 
@@ -63,16 +92,7 @@ const Graph: React.FC = (): JSX.Element => {
                 position: { x: 0, y: 0 },
                 targetPosition: layout === 'horizontal' ? 'left' : 'top',
                 sourcePosition: layout === 'horizontal' ? 'right' : 'bottom',
-                style: {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '150px',
-                    height: '150px',
-                    borderRadius: '50%',
-                    fontWeight: '500',
-                    fill: 'currentColor',
-                },
+                className: styles.node,
             });
 
             Object.entries(data.upstreams).forEach(([upstream, messages]) => {
@@ -87,15 +107,13 @@ const Graph: React.FC = (): JSX.Element => {
                         animated: Object.keys(nodes[upstream].upstreams).length
                             ? false
                             : true,
-                        style: {
-                            stroke: 'currentColor',
-                        },
+                        className: styles.edge,
                     });
                 });
             });
         }
         setGraph(layoutGraph(deserializedGraph, layout));
-    }, [serializedGraph, layout]);
+    }, [serializedGraph, layout, styles]);
 
     const handleElementClick = (
         event: React.MouseEvent<Element, MouseEvent>,
@@ -124,15 +142,7 @@ const Graph: React.FC = (): JSX.Element => {
                         showZoom={false}
                         showInteractive={false}
                         showFitView={true}
-                        style={{
-                            position: 'absolute',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            bottom: '40px',
-                            left: '40px',
-                            cursor: 'pointer',
-                        }}
+                        className={styles.controllers}
                     />
                     <Background size={0} />
                 </ReactFlow>

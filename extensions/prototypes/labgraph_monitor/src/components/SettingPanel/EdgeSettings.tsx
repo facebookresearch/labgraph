@@ -20,6 +20,11 @@ import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
 import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
 
+interface IMessage {
+    name: string;
+    fields: { [fieldName: string]: string };
+}
+
 /**
  * A component that manages the settings of an edge.
  * All components related to edge settings should be children of this component.
@@ -35,7 +40,7 @@ const Edge: React.FC = (): JSX.Element => {
 
     const graph = connection === WS_STATE.CONNECTED ? realtimeGraph : mockGraph;
 
-    const messages =
+    const messages: IMessage[] =
         graph && selectedEdge.target
             ? graph['nodes'][selectedEdge.target]['upstreams'][
                   selectedEdge.source
@@ -44,7 +49,7 @@ const Edge: React.FC = (): JSX.Element => {
     return (
         <React.Fragment>
             <Box data-testid="edge-settings">
-                {messages.map((message, index) => {
+                {messages.map((message: IMessage, index) => {
                     return (
                         <TableContainer key={index} component={Paper}>
                             <Table
@@ -53,11 +58,11 @@ const Edge: React.FC = (): JSX.Element => {
                             >
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>{message['name']}</TableCell>
+                                        <TableCell>{message.name}</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {Object.entries(message['fields']).map(
+                                    {Object.entries(message.fields).map(
                                         ([name, type]) => {
                                             return (
                                                 <TableRow key={name}>

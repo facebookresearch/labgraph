@@ -37,10 +37,7 @@ export const layoutGraph = (
     return elements.map((el: any) => {
         if (isNode(el)) {
             const { x, y } = dagreGraph.node(el.id);
-            el.position = {
-                x: x,
-                y: y,
-            };
+            el.position = { x, y };
         }
 
         return el;
