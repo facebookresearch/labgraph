@@ -19,10 +19,11 @@ import {
     Button,
     Backdrop,
 } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RootState } from '../../redux/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import WS_STATE from '../../redux/reducers/ws/enums/WS_STATE';
+import { setMockRealtimeData } from '../../redux/reducers/mock/mockReducer';
 
 /**
  * A component that manages the settings of an edge.
@@ -35,7 +36,11 @@ const Edge: React.FC = (): JSX.Element => {
     const { connection, graph: realtimeGraph } = useSelector(
         (state: RootState) => state.ws
     );
-    const { mockGraph } = useSelector((state: RootState) => state.mock);
+    const { mockGraph, mockRealtimeData } = useSelector(
+        (state: RootState) => state.mock
+    );
+
+    const mockData = useSelector((s: RootState) => s.mock.mockRealtimeData);
 
     const graph = connection === WS_STATE.CONNECTED ? realtimeGraph : mockGraph;
 
@@ -52,6 +57,24 @@ const Edge: React.FC = (): JSX.Element => {
     const handleToggle = () => {
         setOpen(!open);
     };
+
+    // creating mock data, check mockReducer.ts, IMock.ts and EdgeSettings.tsx for future updates
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            const date = Date.now();
+
+            dispatch(
+                setMockRealtimeData([date, date % 10, date * 3, date / 4])
+            );
+        }, 1000);
+
+        return () => {
+            clearInterval(id);
+        };
+    }, []);
+
     return (
         <React.Fragment>
             <Box data-testid="edge-settings">
@@ -98,15 +121,13 @@ const Edge: React.FC = (): JSX.Element => {
                                             onClick={handleClose}
                                         >
                                             {/* Dummy data */}
-                                            <Card style={{ width: 400 }}>
-                                                "id": "0001", "type": "donut",
-                                                "name": "Cake", "ppu": 0.55,
-                                                "batters": ] "id": "0001",
-                                                "type": "donut", "name": "Cake",
-                                                "ppu": 0.55, "batters": ] "id":
-                                                "0001", "type": "donut", "name":
-                                                "Cake", "ppu": 0.55, "batters":
-                                                ]
+                                            <Card
+                                                style={{
+                                                    width: 500,
+                                                    padding: 20,
+                                                }}
+                                            >
+                                                [{mockData.join(', ')}]
                                             </Card>
                                         </Backdrop>
                                     </TableRow>

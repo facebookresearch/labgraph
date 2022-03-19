@@ -4,10 +4,11 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import IGraph from './IGraph';
+ import IGraph from './IGraph';
 
-interface IMock {
-    mockGraph: IGraph;
-}
-
-export default IMock;
+ interface IMock {
+     mockGraph: IGraph;
+     mockRealtimeData: any;
+ }
+ 
+ export default IMock;

@@ -11,6 +11,7 @@ import { selectMock } from '../../../mocks';
 
 const initialState: IMock = {
     mockGraph: {} as IGraph,
+    mockRealtimeData: [Date.now()],
 };
 
 export const mockSlice = createSlice({
@@ -30,9 +31,14 @@ export const mockSlice = createSlice({
         copyRealtimeGraph: (state, action: PayloadAction<IGraph>) => {
             state.mockGraph = action.payload;
         },
+
+        setMockRealtimeData: (state, action: PayloadAction<any>) => {
+            state.mockRealtimeData = action.payload;
+        },
     },
 });
 
-export const { copyRealtimeGraph, setMockGraph } = mockSlice.actions;
+export const { copyRealtimeGraph, setMockGraph, setMockRealtimeData } =
+    mockSlice.actions;
 
 export default mockSlice.reducer;
