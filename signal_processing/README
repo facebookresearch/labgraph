@@ -10,7 +10,6 @@ Files in this directory contain signal processing examples used with LabGraph
 - synthetic: Synthetic signal generator and nodes
 - synthetic_data: Synthetic data (currently only for continuous fNIRS signals)
 - utils: utility files used in signal processing
-- v0_nodes: These nodes used a deprecated version of LabGraph and are suitable for new LabGraph users who want to learn and convert them using the latest LabGraph.
 
 ## Example use
 - python3 -m pytest --pyargs signal_processing.filter
