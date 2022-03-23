@@ -43,7 +43,7 @@ setup(
         "pytest_mock==2.0.0",
         "pyzmq==18.1.0",
         "typeguard==2.5.1",
-        "typing_extensions>=3.7.4.3",
+        "typing_extensions==3.7.4.3",
         "websockets==8.1",
         "yappi==1.2.5",
     ],
