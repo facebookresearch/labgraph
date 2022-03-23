@@ -32,8 +32,10 @@ setup(
     install_requires=[
         "appdirs==1.4.3",
         "click==7.0",
+        "cppy==1.1.0"
         "dataclasses==0.6",
         "h5py==2.10.0",
+        "kiwisolver==1.3.2"
         "matplotlib==3.1.1",
         "mypy==0.782",
         "numpy==1.16.4",
