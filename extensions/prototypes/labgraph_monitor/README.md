@@ -86,3 +86,15 @@ To see the information related to a specific node or edge, just click on it, the
 **Nodes** : currently when a node is clicked its name will be displayed, However, this feature will be updated in the future to include more information.
 
 **Edges** : currently when an edge is clicked the "message_name", "message_fields" and "fields_datatypes" will be displayed, However, this feature will be updated in the future to include more information (E.g: the field value in realtime).
+
+## Architecture Overview
+
+This the birdview architecture of the Labgraph Monitor.
+
+<image src="https://i.ibb.co/chtfM5R/lg-Architecture.png" width="500px" alt="labgraph monitor's architecture overview"/>
+
+This web application is composed of multiple components (redux, pages, mocks, contextx, and components) below is the overview diagram for each:
+
+### Redux diagram:
+
+<image src="https://i.ibb.co/LznCmt7/redux-Diagram.png" width="500px"  alt=""/>
