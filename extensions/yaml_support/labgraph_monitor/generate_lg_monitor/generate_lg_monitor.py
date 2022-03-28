@@ -210,6 +210,5 @@ def generate_labgraph_monitor(graph: lg.Graph) -> None:
         nodes
     )
 
-    # Send the serialized graph to Front-End
-    # using LabGraph Websockets API
-    run_server(serialized_graph)
+    # Return the serialized topology of the graph 
+    return serialized_graph

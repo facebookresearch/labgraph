@@ -71,30 +71,32 @@ class Serializer(lg.Node):
     async def source(self) -> lg.AsyncPublisher:
         await asyncio.sleep(.1)
         while True:
-            output_data = {
-                key: value for key, value in self.config.data.items()
-            }
-            # Populate Serializer Node
-            output_data["nodes"]["Serializer"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_1["timestamp"]
-            output_data["nodes"]["Serializer"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_1["numpy"]
-            output_data["nodes"]["Serializer"]["upstreams"]["RollingAverager"][0]["fields"]["timestamp"]["content"] = self.state.data_2["timestamp"]
-            output_data["nodes"]["Serializer"]["upstreams"]["RollingAverager"][0]["fields"]["data"]["content"] = self.state.data_2["numpy"]
-            output_data["nodes"]["Serializer"]["upstreams"]["Amplifier"][0]["fields"]["timestamp"]["content"] = self.state.data_3["timestamp"]
-            output_data["nodes"]["Serializer"]["upstreams"]["Amplifier"][0]["fields"]["data"]["content"] = self.state.data_3["numpy"]
-            output_data["nodes"]["Serializer"]["upstreams"]["Attenuator"][0]["fields"]["timestamp"]["content"] = self.state.data_4["timestamp"]
-            output_data["nodes"]["Serializer"]["upstreams"]["Attenuator"][0]["fields"]["data"]["content"] = self.state.data_4["numpy"]
+            output_data = dict()
+            if hasattr(self.config, "data"):
+                output_data = {
+                    key: value for key, value in self.config.data.items()
+                }
+                # Populate Serializer Node
+                output_data["nodes"]["Serializer"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_1["timestamp"]
+                output_data["nodes"]["Serializer"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_1["numpy"]
+                output_data["nodes"]["Serializer"]["upstreams"]["RollingAverager"][0]["fields"]["timestamp"]["content"] = self.state.data_2["timestamp"]
+                output_data["nodes"]["Serializer"]["upstreams"]["RollingAverager"][0]["fields"]["data"]["content"] = self.state.data_2["numpy"]
+                output_data["nodes"]["Serializer"]["upstreams"]["Amplifier"][0]["fields"]["timestamp"]["content"] = self.state.data_3["timestamp"]
+                output_data["nodes"]["Serializer"]["upstreams"]["Amplifier"][0]["fields"]["data"]["content"] = self.state.data_3["numpy"]
+                output_data["nodes"]["Serializer"]["upstreams"]["Attenuator"][0]["fields"]["timestamp"]["content"] = self.state.data_4["timestamp"]
+                output_data["nodes"]["Serializer"]["upstreams"]["Attenuator"][0]["fields"]["data"]["content"] = self.state.data_4["numpy"]
 
-            # Populate RollingAverage Node
-            output_data["nodes"]["RollingAverager"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_1["timestamp"]
-            output_data["nodes"]["RollingAverager"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_1["numpy"]
-            
-            # Populate Amplifier Node
-            output_data["nodes"]["Amplifier"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_2["timestamp"]
-            output_data["nodes"]["Amplifier"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_2["numpy"]
+                # Populate RollingAverage Node
+                output_data["nodes"]["RollingAverager"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_1["timestamp"]
+                output_data["nodes"]["RollingAverager"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_1["numpy"]
+                
+                # Populate Amplifier Node
+                output_data["nodes"]["Amplifier"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_2["timestamp"]
+                output_data["nodes"]["Amplifier"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_2["numpy"]
 
-            # Populate Attenuator Node
-            output_data["nodes"]["Attenuator"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_3["timestamp"]
-            output_data["nodes"]["Attenuator"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_3["numpy"]
+                # Populate Attenuator Node
+                output_data["nodes"]["Attenuator"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_3["timestamp"]
+                output_data["nodes"]["Attenuator"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_3["numpy"]
             yield self.TOPIC, WSStreamMessage(
                 samples=output_data,
                 stream_name=self.config.stream_name,
