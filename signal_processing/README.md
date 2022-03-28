@@ -16,4 +16,4 @@ Files in this directory contain signal processing examples used with LabGraph
 - python3 -m pytest --pyargs signal_processing.nodes
 
 ## Main contributors
-Main contributors for this folder are currently snakagome and allenyin-fb.
+Main contributors for this folder are currently Sho Nakagome and Allen Yin.
