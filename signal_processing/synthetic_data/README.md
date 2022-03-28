@@ -2,7 +2,6 @@
 
 ## What this folder contains
 Files in this directory relate to generation and testing of synthetic data
-(e.g. synthetic betazoid output)
 
 ## Folder structure
 - dummy_generator.py: functions to generate dummy physiological signals
