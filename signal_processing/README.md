@@ -14,3 +14,6 @@ Files in this directory contain signal processing examples used with LabGraph
 ## Example use
 - python3 -m pytest --pyargs signal_processing.filter
 - python3 -m pytest --pyargs signal_processing.nodes
+
+## Main contributors
+Main contributors for this folder are currently snakagome and allenyin-fb.
