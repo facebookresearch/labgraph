@@ -15,7 +15,7 @@ from labgraph.websockets.ws_server.ws_api_node_server import (
 from extensions.yaml_support.labgraph_monitor.server.enums.enums import ENUMS
 from extensions.yaml_support.labgraph_monitor.aliases.aliases import SerializedGraph
 from extensions.yaml_support.labgraph_monitor.server.serializer_node import SerializerConfig, Serializer
-from extensions.yaml_support.labgraph_monitor.generate_lg_monitor.generate_lg_monitor import generate_labgraph_monitor
+from extensions.yaml_support.labgraph_monitor.generate_lg_monitor.generate_lg_monitor import generate_graph_topology
 
 # Graph Components
 from extensions.graphviz_support.graphviz_support.tests.demo_graph.noise_generator import NoiseGeneratorConfig, NoiseGenerator
@@ -122,7 +122,7 @@ class Demo(lg.Graph):
 
 if __name__ == "__main__":
     graph = Demo()
-    topology = generate_labgraph_monitor(graph=graph)
+    topology = generate_graph_topology(graph=graph)
     graph.set_topology(topology)
 
     runner = lg.ParallelRunner(graph=graph)
