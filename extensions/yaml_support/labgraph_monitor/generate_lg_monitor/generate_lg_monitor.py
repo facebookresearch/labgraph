@@ -7,8 +7,6 @@ from typing import List, Dict
 from ..lg_monitor_node.lg_monitor_node import LabgraphMonitorNode
 from ..lg_monitor_node.lg_monitor_message import LabgraphMonitorMessage
 from ..aliases.aliases import SerializedGraph
-from ..server.lg_monitor_server import run_server
-
 
 def identify_upstream_message(
     in_edge: str,
@@ -186,7 +184,7 @@ def serialize_graph(
     return serialized_graph
 
 
-def generate_labgraph_monitor(graph: lg.Graph) -> None:
+def generate_graph_topology(graph: lg.Graph) -> SerializedGraph:
     """
     A function that serialize the graph topology
     and send it using to LabGraphMonitor Front-End

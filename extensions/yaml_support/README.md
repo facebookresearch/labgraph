@@ -44,17 +44,32 @@ python -m extensions.yaml_support.labgraph_yaml_parser.tests.test_lg_yaml_api
 
 #### Labgraph Monitor:
 
-**generate_labgraph_monitor(graph: lg.Graph) -> None** : This function can be used to generate a serialized version of the passed graph instance. The serialized version of the graph will be streamed
-to the clients using LabGraph Websockets API.
+**generate_graph_topology(graph: lg.Graph) -> SerializedGraph** : This function can be used to generate a serialized version of the passed graph instance. 
+**run_topology(data: SerializedGraph) -> None**: This function can be used to send the generated serialized version of the graph instance via LabGraph Websockets API.
 
-1. Call **generate_labgraph_monitor(graph: lg.Graph) -> None** and pass an instance of the graph as a parameter
+The serialized version of the graph will be streamed to the clients using LabGraph Websockets API.
+
+1. Call **generate_graph_topology(graph: lg.Graph) -> SerializedGraph** and pass an instance of the graph as a parameter
 
 ```
+from extensions.graphviz_support.graphviz_support.tests.demo_graph.demo import Demo
+
 from extensions.yaml_support.labgraph_monitor.generate_lg_monitor.generate_lg_monitor import (
-    generate_labgraph_monitor
+    generate_graph_topology,
 )
 
-generate_labgraph_monitor(graph)
+from extensions.yaml_support.labgraph_monitor.server.lg_monitor_server import (
+    run_topology,
+)
+
+# Initialize a Demo graph
+graph = Demo()
+
+# Serialize its topology
+topology = generate_graph_topology(graph)
+
+# Run the WebSockets API to send the topology to Front-End
+run_topology(topology)
 ```
 
 This will start a websocket server on localhost port 9000 (127.0.0.1:9000)
@@ -118,8 +133,12 @@ E.g:
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type": "float"
+                                                },
+                                                "data": {
+                                                    "type": "ndarray"
+                                                }
                                             }
                                         }
                                     ]
@@ -131,8 +150,12 @@ E.g:
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type": "float"
+                                                },
+                                                "data": {
+                                                    "type": "ndarray"
+                                                }
                                             }
                                         }
                                     ]
@@ -144,8 +167,12 @@ E.g:
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type": "float"
+                                                },
+                                                "data": {
+                                                    "type": "ndarray"
+                                                }
                                             }
                                         }
                                     ]
@@ -157,8 +184,12 @@ E.g:
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type": "float"
+                                                },
+                                                "data": {
+                                                    "type": "ndarray"
+                                                }
                                             }
                                         }
                                     ],
@@ -166,8 +197,12 @@ E.g:
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type": "float"
+                                                },
+                                                "data": {
+                                                    "type": "ndarray"
+                                                }
                                             }
                                         }
                                     ],
@@ -175,8 +210,12 @@ E.g:
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type": "float"
+                                                },
+                                                "data": {
+                                                    "type": "ndarray"
+                                                }
                                             }
                                         }
                                     ]
@@ -184,11 +223,11 @@ E.g:
                             }
                         }
                     },
-                    "produced_timestamp_s": 1644931422.141309,
-                    "timestamp_s": 1644931422.141309
+                    "produced_timestamp_s": 1648581339.9652574,
+                    "timestamp_s": 1648581339.965258
                 }
             ],
-            "batch_num": 54
+            "batch_num": 31
         }
     }
 }
