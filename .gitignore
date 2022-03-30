@@ -40,3 +40,5 @@ ENV/
 env.bak/
 venv.bak/
 lab_env/
+
+.DS_Store
