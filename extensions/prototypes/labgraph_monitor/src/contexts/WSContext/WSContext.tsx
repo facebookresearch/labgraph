@@ -41,7 +41,7 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
                     dispatch(setConnection(WS_STATE.CONNECTED));
                 };
                 break;
-
+            // if you get a new graph update the graph
             case WS_STATE.CONNECTED:
                 clientRef.current.onmessage = (message: any) => {
                     const data = JSON.parse(message.data);
@@ -54,6 +54,7 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
                     if (!_.isEqual(samples[0]['data'], graph)) {
                         dispatch(setGraph(samples[0]['data']));
                     }
+                    // will need to do something similar for real time data
                 };
 
                 break;

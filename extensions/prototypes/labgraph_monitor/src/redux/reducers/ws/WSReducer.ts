@@ -25,6 +25,8 @@ const WSSlice = createSlice({
         setGraph: (state, action: PayloadAction<IGraph>) => {
             state.graph = action.payload;
         },
+        // will need to create a new reducer
+        // setRealTimeData:
     },
 });
 
