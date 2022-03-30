@@ -98,3 +98,7 @@ This web application is composed of multiple components (redux, pages, mocks, co
 ### Redux diagram:
 
 <image src="https://i.ibb.co/LznCmt7/redux-Diagram.png" width="500px"  alt=""/>
+
+### Redux & Edge Settings
+
+<image src="https://i.ibb.co/0qGRLr0/edge-redux.png" width="500px"  alt=""/>
