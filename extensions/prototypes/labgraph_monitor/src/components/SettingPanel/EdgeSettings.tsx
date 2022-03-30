@@ -36,14 +36,16 @@ const Edge: React.FC = (): JSX.Element => {
     const { connection, graph: realtimeGraph } = useSelector(
         (state: RootState) => state.ws
     );
-    const { mockGraph, mockRealtimeData } = useSelector(
-        (state: RootState) => state.mock
+    const { mockGraph } = useSelector((state: RootState) => state.mock);
+
+    const mockData = useSelector(
+        (state: RootState) => state.mock.mockRealtimeData
     );
 
-    const mockData = useSelector((s: RootState) => s.mock.mockRealtimeData);
-
+    // Choose between realtimeGraph or mockGraph
     const graph = connection === WS_STATE.CONNECTED ? realtimeGraph : mockGraph;
 
+    // FZ - what's this
     const messages =
         graph && selectedEdge.target
             ? graph['nodes'][selectedEdge.target]['upstreams'][
