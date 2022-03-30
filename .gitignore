@@ -39,3 +39,4 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+lab_env/
