@@ -42,7 +42,6 @@ const Edge: React.FC = (): JSX.Element => {
     // Choose between realtimeGraph or mockGraph
     const graph = connection === WS_STATE.CONNECTED ? realtimeGraph : mockGraph;
 
-    // FZ - what's this
     const messages =
         graph && selectedEdge.target
             ? graph['nodes'][selectedEdge.target]['upstreams'][
@@ -50,9 +49,7 @@ const Edge: React.FC = (): JSX.Element => {
               ]
             : [];
     const [open, setOpen] = React.useState(false);
-    const handleClose = () => {
-        setOpen(false);
-    };
+
     const handleToggle = () => {
         setOpen(!open);
     };
@@ -67,7 +64,7 @@ const Edge: React.FC = (): JSX.Element => {
             dispatch(
                 setMockRealtimeData([date, date % 10, date * 3, date / 4])
             );
-        }, 1000);
+        }, 100);
 
         return () => {
             clearInterval(id);
@@ -107,27 +104,44 @@ const Edge: React.FC = (): JSX.Element => {
                                     )}
                                     <TableRow>
                                         <Button onClick={handleToggle}>
-                                            Show Realtime Data
+                                            {open ? 'Show less' : 'Show more'}
                                         </Button>
                                     </TableRow>
+
                                     {Object.entries(message['fields']).map(
                                         (field, index) => {
                                             return (
                                                 <TableRow>
-                                                    <TableCell>
-                                                        {field[0]}
-                                                    </TableCell>
+                                                    {open && (
+                                                        <TableCell>
+                                                            {field[0]}
+                                                        </TableCell>
+                                                    )}
 
-                                                    <TableCell
-                                                        style={{
-                                                            whiteSpace:
-                                                                'normal',
-                                                            wordBreak:
-                                                                'break-word',
-                                                        }}
-                                                    >
-                                                        {field[1].content}
-                                                    </TableCell>
+                                                    {!open ? null : connection ===
+                                                      WS_STATE.CONNECTED ? (
+                                                        <TableCell
+                                                            style={{
+                                                                whiteSpace:
+                                                                    'normal',
+                                                                wordBreak:
+                                                                    'break-word',
+                                                            }}
+                                                        >
+                                                            {field[1].content}
+                                                        </TableCell>
+                                                    ) : (
+                                                        <TableCell
+                                                            style={{
+                                                                whiteSpace:
+                                                                    'normal',
+                                                                wordBreak:
+                                                                    'break-word',
+                                                            }}
+                                                        >
+                                                            {mockData.join(' ')}
+                                                        </TableCell>
+                                                    )}
                                                 </TableRow>
                                             );
                                         }
