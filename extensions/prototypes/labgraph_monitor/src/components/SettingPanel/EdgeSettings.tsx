@@ -14,10 +14,7 @@ import {
     TableHead,
     TableRow,
     Typography,
-    Card,
-    Switch,
     Button,
-    Backdrop,
 } from '@mui/material';
 import React, { useEffect } from 'react';
 import { RootState } from '../../redux/store';
@@ -76,7 +73,7 @@ const Edge: React.FC = (): JSX.Element => {
             clearInterval(id);
         };
     }, []);
-
+    // stretch goal: use [{mockData.join(', ')}], for mockGraph
     return (
         <React.Fragment>
             <Box data-testid="edge-settings">
@@ -95,44 +92,46 @@ const Edge: React.FC = (): JSX.Element => {
                                 <TableBody>
                                     {/* ZMQMessage Edge */}
                                     {Object.entries(message['fields']).map(
-                                        ([name, type]) => {
+                                        (field, index) => {
                                             return (
-                                                <TableRow key={name}>
+                                                <TableRow>
                                                     <TableCell>
-                                                        {name}
+                                                        {field[0]}
                                                     </TableCell>
                                                     <TableCell>
-                                                        {type}
+                                                        {field[1].type}
                                                     </TableCell>
                                                 </TableRow>
                                             );
                                         }
                                     )}
-
                                     <TableRow>
                                         <Button onClick={handleToggle}>
                                             Show Realtime Data
                                         </Button>
-                                        <Backdrop
-                                            sx={{
-                                                color: '#fff',
-                                                zIndex: (theme) =>
-                                                    theme.zIndex.drawer + 1,
-                                            }}
-                                            open={open}
-                                            onClick={handleClose}
-                                        >
-                                            {/* Dummy data */}
-                                            <Card
-                                                style={{
-                                                    width: 500,
-                                                    padding: 20,
-                                                }}
-                                            >
-                                                [{mockData.join(', ')}]
-                                            </Card>
-                                        </Backdrop>
                                     </TableRow>
+                                    {Object.entries(message['fields']).map(
+                                        (field, index) => {
+                                            return (
+                                                <TableRow>
+                                                    <TableCell>
+                                                        {field[0]}
+                                                    </TableCell>
+
+                                                    <TableCell
+                                                        style={{
+                                                            whiteSpace:
+                                                                'normal',
+                                                            wordBreak:
+                                                                'break-word',
+                                                        }}
+                                                    >
+                                                        {field[1].content}
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        }
+                                    )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
