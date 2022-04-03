@@ -38,7 +38,7 @@ setup(
         "kiwisolver==1.3.2",
         "matplotlib==3.1.1",
         "mypy==0.782",
-        "numpy==1.21",
+        "numpy==1.21.0",
         "psutil==5.6.7",
         "pylsl==1.15.0",
         "pytest==3.10.1",
