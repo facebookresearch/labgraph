@@ -1,6 +1,6 @@
 # Graphviz for LabGraph graphs
 
-This extension provides an API to generate a graphviz visualization of the LabGraph topology. 
+This extension provides an API to generate a [graphviz](https://graphviz.org/) visualization of the LabGraph topology. 
 
 ## Quick Start
 
@@ -23,22 +23,33 @@ python setup.py install
 
 To make sure things are working:
 
-1- Move to the root of the LabGraph directory:
-```
-labgraph\extensions\graphviz_support> cd ../..
+1. Move to the root of the LabGraph directory:
+
+```bash
+labgraph/extensions/graphviz_support> cd ../..
 labgraph>
 ```
-2- Run the following test
-```
+2. Run the following test
+
+```bash
 python -m extensions.graphviz_support.graphviz_support.tests.test_lg_graphviz_api
 ```
-**The output of the file for this test can be found at:**\
-extensions\graphviz_support\graphviz_support\tests\output
+
+**The output of the file for this test can be found at:**
+
+`extensions/graphviz_support/graphviz_support/tests/output/test.svg`
+
 ### Generating a graphviz file
 
 To generate a graph visualization just call 'generate_graphviz' function and pass the appropriate parameters
-```
-from extensions/graphviz_support/graphviz_support/generate_graphviz/generate_graphviz.py import generate_graphviz.py
 
-generate_graphviz(graph, output_file)
+```python
+from extensions.graphviz_support.graphviz_support.generate_graphviz.generate_graphviz import generate_graphviz
+from extensions.graphviz_support.graphviz_support.tests.demo_graph.demo import Demo
+
+generate_graphviz(Demo(), "output.png") # you can also use "output.svg"
 ```
+
+**It will produce the following diagram named `output.png` in your current directory:**
+
+![Graphviz diagram for nodes: RollingAverager, NoiseGenerator, Amplifier, Sink, and Attenuator](https://i.imgur.com/M4yL39x.png)

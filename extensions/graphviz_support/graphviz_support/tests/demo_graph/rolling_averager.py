@@ -18,14 +18,14 @@ class RollingConfig(lg.Config):
 
 
 class RollingAverager(lg.Node):
-    INPUT = lg.Topic(RandomMessage)
-    OUTPUT = lg.Topic(RandomMessage)
+    ROLLING_AVERAGER_INPUT = lg.Topic(RandomMessage)
+    ROLLING_AVERAGER_OUTPUT = lg.Topic(RandomMessage)
 
     state: RollingState
     config: RollingConfig
 
-    @lg.subscriber(INPUT)
-    @lg.publisher(OUTPUT)
+    @lg.subscriber(ROLLING_AVERAGER_INPUT)
+    @lg.publisher(ROLLING_AVERAGER_OUTPUT)
     async def average(self, message: RandomMessage) -> lg.AsyncPublisher:
         current_time = time.time()
         self.state.messages.append(message)
@@ -40,7 +40,7 @@ class RollingAverager(lg.Node):
             [message.data for message in self.state.messages]
         )
         mean_data = np.mean(all_data, axis=0)
-        yield self.OUTPUT, RandomMessage(
+        yield self.ROLLING_AVERAGER_OUTPUT, RandomMessage(
             timestamp=current_time,
             data=mean_data
         )

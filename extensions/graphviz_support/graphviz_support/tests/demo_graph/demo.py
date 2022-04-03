@@ -47,12 +47,12 @@ class Demo(lg.Graph):
 
     def connections(self) -> lg.Connections:
         return (
-            (self.NOISE_GENERATOR.OUTPUT, self.ROLLING_AVERAGER.INPUT),
-            (self.NOISE_GENERATOR.OUTPUT, self.AMPLIFIER.INPUT),
-            (self.NOISE_GENERATOR.OUTPUT, self.ATTENUATOR.INPUT),
-            (self.ROLLING_AVERAGER.OUTPUT, self.SINK.INPUT_1),
-            (self.AMPLIFIER.OUTPUT, self.SINK.INPUT_2),
-            (self.ATTENUATOR.OUTPUT, self.SINK.INPUT_3),
+            (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.ROLLING_AVERAGER.ROLLING_AVERAGER_INPUT),
+            (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.AMPLIFIER.AMPLIFIER_INPUT),
+            (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.ATTENUATOR.ATTENUATOR_INPUT),
+            (self.ROLLING_AVERAGER.ROLLING_AVERAGER_OUTPUT, self.SINK.SINK_INPUT_1),
+            (self.AMPLIFIER.AMPLIFIER_OUTPUT, self.SINK.SINK_INPUT_2),
+            (self.ATTENUATOR.ATTENUATOR_OUTPUT, self.SINK.SINK_INPUT_3),
         )
 
     def process_modules(self) -> Tuple[lg.Module, ...]:

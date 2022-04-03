@@ -14,13 +14,13 @@ class NoiseGeneratorConfig(lg.Config):
 
 
 class NoiseGenerator(lg.Node):
-    OUTPUT = lg.Topic(RandomMessage)
+    NOISE_GENERATOR_OUTPUT = lg.Topic(RandomMessage)
     config: NoiseGeneratorConfig
 
-    @lg.publisher(OUTPUT)
+    @lg.publisher(NOISE_GENERATOR_OUTPUT)
     async def generate_noise(self) -> lg.AsyncPublisher:
         while True:
-            yield self.OUTPUT, RandomMessage(
+            yield self.NOISE_GENERATOR_OUTPUT, RandomMessage(
                 timestamp=time.time(),
                 data=np.random.rand(self.config.num_features)
             )
