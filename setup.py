@@ -42,7 +42,7 @@ setup(
         "h5py>=3.3.0",
         "matplotlib>=3.1.2",
         "mypy>=0.910",
-        "numpy>=1.21.0",
+        "numpy>=1.19.5",
         "psutil>=5.6.7",
         "pytest>=3.10.1",
         "pytest_mock>=2.0.0",

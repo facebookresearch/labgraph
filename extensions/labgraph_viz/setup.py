@@ -14,7 +14,7 @@ setup(
         "dataclasses==0.6",
         "labgraph>=1.0.2",
         "matplotlib==3.1.1",
-        "numpy==1.21.0",
+        "numpy==1.19.5",
         "PyQt5-sip==12.8.1",
         "pyqtgraph==0.11.1",
     ],
