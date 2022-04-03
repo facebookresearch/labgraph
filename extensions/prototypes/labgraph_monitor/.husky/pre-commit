@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+cd ./extensions/prototypes/labgraph_monitor
+SRC_PATTERN="extensions/prototypes/labgraph_monitor"
+git diff --cached --name-only | if grep --quiet "$SRC_PATTERN"
+then
+    yarn check-code
+fi

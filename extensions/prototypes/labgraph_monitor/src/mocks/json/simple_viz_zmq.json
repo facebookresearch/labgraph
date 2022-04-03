@@ -1,0 +1,60 @@
+{
+    "stream_batch": {
+        "stream_id": "LABGRAPH.MONITOR",
+        "labgraph.monitor": {
+            "samples": [
+                {
+                    "data": {
+                        "name": "Demo",
+                        "nodes": {
+                            "Plot": {
+                                "upstreams": {
+                                    "RollingAverager": [
+                                        {
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "ZMQPollerNode": {
+                                "upstreams": {}
+                            },
+                            "ZMQDeserializer": {
+                                "upstreams": {
+                                    "ZMQPollerNode": [
+                                        {
+                                            "name": "ZMQMessage",
+                                            "fields": {
+                                                "data": "bytes"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "RollingAverager": {
+                                "upstreams": {
+                                    "ZMQDeserializer": [
+                                        {
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "produced_timestamp_s": 1644931059.3961816,
+                    "timestamp_s": 1644931059.3961816
+                }
+            ],
+            "batch_num": 132
+        }
+    }
+}

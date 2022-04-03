@@ -1,0 +1,35 @@
+{
+    "stream_batch": {
+        "stream_id": "LABGRAPH.MONITOR",
+        "labgraph.monitor": {
+            "samples": [
+                {
+                    "data": {
+                        "name": "Demo",
+                        "nodes": {
+                            "SimulationGenerator": {
+                                "upstreams": {}
+                            },
+                            "Plot": {
+                                "upstreams": {
+                                    "SimulationGenerator": [
+                                        {
+                                            "name": "SimulationMessage",
+                                            "fields": {
+                                                "timestamp": "ndarray",
+                                                "daub_data": "ndarray"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "produced_timestamp_s": 1644931259.3396878,
+                    "timestamp_s": 1644931259.3396878
+                }
+            ],
+            "batch_num": 24
+        }
+    }
+}

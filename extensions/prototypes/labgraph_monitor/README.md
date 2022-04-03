@@ -1,77 +1,95 @@
-# LabGraph Monitor
+# Labgraph Monitor
 
-LabGraph Monitor helps visualize the graph built. In order to run the application, you will need to first set it up using React using the below steps:
+This extension is an interactive visualization tool to monitor and make real-time changes to LabGraph graph and nodes.
 
-In case you do not have npm installed, follow the below steps to get started:
+## Quick Start
 
-Download Node.js from [here](https://nodejs.org/en/download/) 
+**Prerequisites**:
 
-Once Node is installed, you can verify that node/npm was installed successfully by running the following: 
+-   [Node.js](https://nodejs.org/en/)
+-   [Yarn](https://classic.yarnpkg.com/lang/en/docs/install)
+
+Check that node and yarn were properly installed by running the following commands
 
 ```
 node -v
-npm -v
-```
-
-The above should display the version of node/npm that were installed. For example:
-
-```
-6.14.13
-```
-
-Now that you have npm installed, you can create a new React application using the terminal. Navigate to the folder where you want the application to be installed and run the below code to create a new React application. We are going to call the application "labgraph_monitor_extension" for the sake of this example but feel free to choose another name. 
-
-Note: npx is a package that comes with npm 5.2+ 
-```
-npx create-react-app labgraph_monitor_extension
-```
-
-Next, you will need to install the dagre library, websocket, and ReactFlow that help in layouting the graph. 
-Run the code below to install them
-```
-npm i dagre
 ```
 
 ```
-npm install websocket
+yarn -v
 ```
 
-```
-npm install --save react-flow-renderer
-```
+**Set up the application**
 
-Once the application is created, we will need to change and add some files to get the LabGraph Monitor working. 
-
-First, you can validate that everything is going well so far by running the new sample React app in your browser. Navigate using the terminal to the labgraph_monitor_extension folder and run
+1. Be sure that you are inside **extensions/prototypes/labgraph_monitor** directory
 
 ```
-npm start
+cd extensions/prototypes/labgraph_monitor
 ```
 
-This should open a sample React app in your localhost and display the React icon. 
-
-Now that we have the initial application set up, we can start adding the new files. 
-
-Add the App.js, helper.js and App.css files downloaded from [labgraph repo](https://github.com/facebookresearch/labgraph) found at .\labgraph\extensions\prototypes\labgraph_monitor\src to your labgraph_monitor_extension application. You need to add them in the ./labgraph_monitor_extension/src folder 
-
-You can now navigate to your localhost in browser again to see the changes. As the backend server is not running yet, you will see a blank white page. 
-
-Note: incase you closed your react app while downloading other libraries, you will need to start it again by navigating to the labgraph_monitor_extension and running:
+2. Install dependencies by running **yarn** command
 
 ```
-npm start
+yarn
 ```
 
-With that, LabGraph Monitor is ready! Before you see the graph displayed in your browser, you will need to start the backend server. 
-
-## Running an example
-
-Inorder to run a sample graph, you can go to the simpleVizGraph.js file found under labgraph_monitor/examples/simpleVizGraph.js and replace the current code in App.js with the simpleVizGraph.js code. Next, you can start the application using
+3. Test the application by running the following command
 
 ```
-npm start
+yarn test --watchAll=false
 ```
 
-This code shows the sample graph of the simple_viz.py example found under labgraph/examples of the main repository. It works by having the expected JSON data the server should send using the parser and rendering it through our React application.
+4. Run the application
 
-You can also try other another example by following the above steps on the mockDataGraph.js found under labgraph_monitor/examples/mockDataGraph.js
+```
+yarn start
+```
+
+(!) The application will be running on **localhost:3000** by default
+
+## UI Overview
+
+<image src="https://i.ibb.co/nBn4mv9/main-screen-frame.png" alt=""/>
+
+### Mocks:
+
+Mocks are a quick way to get familiar with the user interface. They do not require any connection to the LabGraph Websockets API and provide visualization for most of the existing [LabGraph examples](https://github.com/facebookresearch/labgraph/tree/main/labgraph/examples).
+
+Mocks also can be useful to experiment with new UI features.
+
+### Realtime:
+
+This is the core feature of Labgraph Monitor, it provides real-time visualization of the graph by connecting to Labgraph Websockets API.
+
+To use this feature properly few steps are required:
+
+1. Within **extensions/prototypes/labgraph_monitor** directory, Create a **.env.local** that contains the following information
+
+```
+REACT_APP_WS_API="ws://127.0.0.1:9000"
+```
+
+(!) LabGraph Websocket server runs on localhost:9000 by default
+
+2. Run Labgraph Websockets server. The following tutorial shows how to run LabGraph Websocket server properly : [tutorial](https://github.com/facebookresearch/labgraph/pull/58/files#diff-247005c77570899ce53f81a83b2a5fe6e7535616cc96564d67378fe7f73dac49)
+
+3. Under LabGraph Monitor settings panel click on REALTIME option and click connect.
+
+### Nodes & Edges
+
+To see the information related to a specific node or edge, just click on it, the appropriate information will be automatically displayed on the setting panel.
+
+<table>
+  <tr>
+    <td>Node</td>
+     <td>Edge</td>
+  </tr>
+  <tr>
+    <td><img src="https://i.ibb.co/MnB045Z/node-frame.png"></td>
+    <td><img src="https://i.ibb.co/jkJgScf/edge-frame.png"></td>
+  </tr>
+ </table>
+
+**Nodes** : currently when a node is clicked its name will be displayed, However, this feature will be updated in the future to include more information.
+
+**Edges** : currently when an edge is clicked the "message_name", "message_fields" and "fields_datatypes" will be displayed, However, this feature will be updated in the future to include more information (E.g: the field value in realtime).
