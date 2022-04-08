@@ -15,6 +15,7 @@ import numpy as np
 
 class SerializerConfig(lg.Config):
     data: SerializedGraph
+    sub_pub_match: Dict
     sample_rate: int
     stream_name: str
     stream_id: str
@@ -30,74 +31,87 @@ class Serializer(lg.Node):
     Convenience node for sending messages to a `WSAPIServerNode`.
     """
 
-    TOPIC = lg.Topic(WSStreamMessage)
+    SERIALIZER_OUTPUT = lg.Topic(WSStreamMessage)
     config: SerializerConfig
     state: DataState
 
-    INPUT_1 = lg.Topic(RandomMessage)
-    INPUT_2 = lg.Topic(RandomMessage)
-    INPUT_3 = lg.Topic(RandomMessage)
-    INPUT_4 = lg.Topic(RandomMessage)
+    SERIALIZER_INPUT_1 = lg.Topic(RandomMessage)
+    SERIALIZER_INPUT_2 = lg.Topic(RandomMessage)
+    SERIALIZER_INPUT_3 = lg.Topic(RandomMessage)
+    SERIALIZER_INPUT_4 = lg.Topic(RandomMessage)
 
-    @lg.subscriber(INPUT_1)
+    def get_grouping(self, topic: lg.Topic) -> str:
+        """
+        Matches subscriber topics with grouping that produced information 
+        """
+        for key, value in self.config.sub_pub_match.items():
+            if topic.name in value["topics"]:
+                return key
+        return ""
+
+    @lg.subscriber(SERIALIZER_INPUT_1)
     def add_message_1(self, message: RandomMessage) -> None:
+        grouping = self.get_grouping(self.SERIALIZER_INPUT_1)
         self.state.data_1 = {
+            "grouping": grouping,
             "timestamp": message.timestamp,
             "numpy": list(message.data),
         }
 
-    @lg.subscriber(INPUT_2)
+    @lg.subscriber(SERIALIZER_INPUT_2)
     def add_message_2(self, message: RandomMessage) -> None:
+        grouping = self.get_grouping(self.SERIALIZER_INPUT_2)
         self.state.data_2 = {
+            "grouping": grouping,
             "timestamp": message.timestamp,
             "numpy": list(message.data),
         }
 
-    @lg.subscriber(INPUT_3)
+    @lg.subscriber(SERIALIZER_INPUT_3)
     def add_message_3(self, message: RandomMessage) -> None:
+        grouping = self.get_grouping(self.SERIALIZER_INPUT_3)
         self.state.data_3 = {
+            "grouping": grouping,
             "timestamp": message.timestamp,
             "numpy": list(message.data),
         }
         
-    @lg.subscriber(INPUT_4)
+    @lg.subscriber(SERIALIZER_INPUT_4)
     def add_message_4(self, message: RandomMessage) -> None:
+        grouping = self.get_grouping(self.SERIALIZER_INPUT_4)
         self.state.data_4 = {
+            "grouping": grouping,
             "timestamp": message.timestamp,
             "numpy": list(message.data),
         }
     
-    @lg.publisher(TOPIC)
+    def output(self, _in: Dict) -> Dict:
+        """
+        Updates serialized message with data according to grouping
+        
+        @params:
+            value of a dictionary that represents individual nodes
+        """
+        try:
+            for node, value in _in.items():
+                for state in self.state.__dict__.values():
+                    if state["grouping"] in value["upstreams"].keys():
+                        value["upstreams"][state["grouping"]][0]["fields"]["timestamp"]["content"] = state["timestamp"]
+                        value["upstreams"][state["grouping"]][0]["fields"]["data"]["content"] = state["numpy"]
+        except:
+            pass
+        return _in
+
+    @lg.publisher(SERIALIZER_OUTPUT)
     async def source(self) -> lg.AsyncPublisher:
         await asyncio.sleep(.1)
         while True:
             output_data = dict()
             if hasattr(self.config, "data"):
                 output_data = {
-                    key: value for key, value in self.config.data.items()
+                    key: self.output(value) for key, value in self.config.data.items()
                 }
-                # Populate Serializer Node
-                output_data["nodes"]["Serializer"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_1["timestamp"]
-                output_data["nodes"]["Serializer"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_1["numpy"]
-                output_data["nodes"]["Serializer"]["upstreams"]["RollingAverager"][0]["fields"]["timestamp"]["content"] = self.state.data_2["timestamp"]
-                output_data["nodes"]["Serializer"]["upstreams"]["RollingAverager"][0]["fields"]["data"]["content"] = self.state.data_2["numpy"]
-                output_data["nodes"]["Serializer"]["upstreams"]["Amplifier"][0]["fields"]["timestamp"]["content"] = self.state.data_3["timestamp"]
-                output_data["nodes"]["Serializer"]["upstreams"]["Amplifier"][0]["fields"]["data"]["content"] = self.state.data_3["numpy"]
-                output_data["nodes"]["Serializer"]["upstreams"]["Attenuator"][0]["fields"]["timestamp"]["content"] = self.state.data_4["timestamp"]
-                output_data["nodes"]["Serializer"]["upstreams"]["Attenuator"][0]["fields"]["data"]["content"] = self.state.data_4["numpy"]
-
-                # Populate RollingAverage Node
-                output_data["nodes"]["RollingAverager"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_1["timestamp"]
-                output_data["nodes"]["RollingAverager"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_1["numpy"]
-                
-                # Populate Amplifier Node
-                output_data["nodes"]["Amplifier"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_2["timestamp"]
-                output_data["nodes"]["Amplifier"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_2["numpy"]
-
-                # Populate Attenuator Node
-                output_data["nodes"]["Attenuator"]["upstreams"]["NoiseGenerator"][0]["fields"]["timestamp"]["content"] = self.state.data_3["timestamp"]
-                output_data["nodes"]["Attenuator"]["upstreams"]["NoiseGenerator"][0]["fields"]["data"]["content"] = self.state.data_3["numpy"]
-            yield self.TOPIC, WSStreamMessage(
+            yield self.SERIALIZER_OUTPUT, WSStreamMessage(
                 samples=output_data,
                 stream_name=self.config.stream_name,
                 stream_id=self.config.stream_id,

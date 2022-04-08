@@ -1,5 +1,5 @@
 import labgraph as lg
-from typing import Tuple
+from typing import Dict, Tuple
 
 # Make the imports work when running from LabGraph root directory
 import sys
@@ -53,8 +53,9 @@ class Demo(lg.Graph):
     ATTENUATOR: Attenuator
 
     # Provide graph topology with `generate_labgraph_monitor()`
-    def set_topology(self, topology: SerializedGraph) -> None:
+    def set_topology(self, topology: SerializedGraph, sub_pub_map: Dict) -> None:
         self._topology = topology
+        self._sub_pub_match = sub_pub_map
 
     def setup(self) -> None:
         self.WS_SERVER_NODE.configure(
@@ -71,6 +72,7 @@ class Demo(lg.Graph):
         self.SERIALIZER.configure(
             SerializerConfig(
                 data=self._topology,
+                sub_pub_match=self._sub_pub_match,
                 sample_rate=SAMPLE_RATE,
                 stream_name=STREAM.LABGRAPH_MONITOR,
                 stream_id=STREAM.LABGRAPH_MONITOR_ID,
@@ -100,14 +102,14 @@ class Demo(lg.Graph):
     
     def connections(self) -> lg.Connections:
         return (
-            (self.NOISE_GENERATOR.OUTPUT, self.ROLLING_AVERAGER.INPUT),
-            (self.NOISE_GENERATOR.OUTPUT, self.AMPLIFIER.INPUT),
-            (self.NOISE_GENERATOR.OUTPUT, self.ATTENUATOR.INPUT),
-            (self.NOISE_GENERATOR.OUTPUT, self.SERIALIZER.INPUT_1),
-            (self.ROLLING_AVERAGER.OUTPUT, self.SERIALIZER.INPUT_2),
-            (self.AMPLIFIER.OUTPUT, self.SERIALIZER.INPUT_3),
-            (self.ATTENUATOR.OUTPUT, self.SERIALIZER.INPUT_4),
-            (self.SERIALIZER.TOPIC, self.WS_SERVER_NODE.topic),
+            (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.ROLLING_AVERAGER.ROLLING_AVERAGER_INPUT),
+            (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.AMPLIFIER.AMPLIFIER_INPUT),
+            (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.ATTENUATOR.ATTENUATOR_INPUT),
+            (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.SERIALIZER.SERIALIZER_INPUT_1),
+            (self.ROLLING_AVERAGER.ROLLING_AVERAGER_OUTPUT, self.SERIALIZER.SERIALIZER_INPUT_2),
+            (self.AMPLIFIER.AMPLIFIER_OUTPUT, self.SERIALIZER.SERIALIZER_INPUT_3),
+            (self.ATTENUATOR.ATTENUATOR_OUTPUT, self.SERIALIZER.SERIALIZER_INPUT_4),
+            (self.SERIALIZER.SERIALIZER_OUTPUT, self.WS_SERVER_NODE.topic),
         )
 
     def process_modules(self) -> Tuple[lg.Module, ...]:
@@ -122,8 +124,8 @@ class Demo(lg.Graph):
 
 if __name__ == "__main__":
     graph = Demo()
-    topology = generate_graph_topology(graph=graph)
-    graph.set_topology(topology)
+    topology, sub_pub_map = generate_graph_topology(graph=graph)
+    graph.set_topology(topology, sub_pub_map)
 
     runner = lg.ParallelRunner(graph=graph)
     runner.run()

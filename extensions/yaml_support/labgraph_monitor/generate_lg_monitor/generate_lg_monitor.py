@@ -183,6 +183,44 @@ def serialize_graph(
 
     return serialized_graph
 
+def sub_pub_grouping_map(graph: lg.Graph) -> Dict[str, str]:
+    """
+    A function that matches subscribers with their publishers
+    
+    @params:
+        graph: An instance of the computational graph
+
+    @return: A dictionary where the key is a publisher grouping
+            and the value is a dictionary of sets of topic paths subscribed and their groupings
+    """
+    sub_pub_grouping_map: Dict[str, str] = {}
+    for stream in graph.__streams__.values():
+        difference = set(stream.topic_paths).difference(LabgraphMonitorNode.in_edges)
+        if difference:
+            upstream_edge = max(difference, key=len)
+            for edge in stream.topic_paths:
+                if edge != upstream_edge:
+                    # convert SERIALIZER/SERIALIZER_INPUT_1 to its grouping Serializer
+                    edge_path = "/".join(edge.split("/")[:-1])
+                    edge_grouping = type(graph.__descendants__[edge_path]).__name__
+                    
+                    # convert SERIALIZER/SERIALIZER_INPUT_1 to its topic SERIALIZER_INPUT_1
+                    topic_path = edge.split("/")[-1]
+
+                    # convert NOISE_GENERATOR/NOISE_GENERATOR_OUTPUT to its grouping NoiseGenerator
+                    group_path = "/".join(upstream_edge.split("/")[:-1])
+                    grouping = type(graph.__descendants__[group_path]).__name__
+
+                    if grouping in sub_pub_grouping_map:
+                        sub_pub_grouping_map[grouping]["topics"].add(topic_path)
+                        sub_pub_grouping_map[grouping]["subscribers"].add(edge_grouping)
+                    else:
+                        sub_pub_grouping_map[grouping] = {
+                            "topics": {topic_path},
+                            "subscribers": {edge_grouping},
+                        }
+                    
+    return sub_pub_grouping_map
 
 def generate_graph_topology(graph: lg.Graph) -> SerializedGraph:
     """
@@ -208,5 +246,8 @@ def generate_graph_topology(graph: lg.Graph) -> SerializedGraph:
         nodes
     )
 
-    # Return the serialized topology of the graph 
-    return serialized_graph
+    # Match subscribers with their publishers
+    sub_pub_map = sub_pub_grouping_map(graph)
+
+    # Return the serialized topology of the graph
+    return serialized_graph, sub_pub_map
