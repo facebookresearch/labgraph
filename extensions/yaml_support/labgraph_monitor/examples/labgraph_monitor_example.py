@@ -52,7 +52,7 @@ class Demo(lg.Graph):
     AMPLIFIER: Amplifier
     ATTENUATOR: Attenuator
 
-    # Provide graph topology with `generate_labgraph_monitor()`
+    # Used when running `generate_labgraph_monitor(graph)`
     def set_topology(self, topology: SerializedGraph, sub_pub_map: Dict) -> None:
         self._topology = topology
         self._sub_pub_match = sub_pub_map
@@ -124,8 +124,7 @@ class Demo(lg.Graph):
 
 if __name__ == "__main__":
     graph = Demo()
-    topology, sub_pub_map = generate_graph_topology(graph=graph)
-    graph.set_topology(topology, sub_pub_map)
+    generate_graph_topology(graph=graph)
 
     runner = lg.ParallelRunner(graph=graph)
     runner.run()

@@ -3,7 +3,7 @@
 
 import labgraph as lg
 from labgraph.graphs.stream import Stream
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from ..lg_monitor_node.lg_monitor_node import LabgraphMonitorNode
 from ..lg_monitor_node.lg_monitor_message import LabgraphMonitorMessage
 from ..aliases.aliases import SerializedGraph
@@ -222,7 +222,7 @@ def sub_pub_grouping_map(graph: lg.Graph) -> Dict[str, str]:
                     
     return sub_pub_grouping_map
 
-def generate_graph_topology(graph: lg.Graph) -> SerializedGraph:
+def generate_graph_topology(graph: lg.Graph) -> None:
     """
     A function that serialize the graph topology
     and send it using to LabGraphMonitor Front-End
@@ -249,5 +249,20 @@ def generate_graph_topology(graph: lg.Graph) -> SerializedGraph:
     # Match subscribers with their publishers
     sub_pub_map = sub_pub_grouping_map(graph)
 
-    # Return the serialized topology of the graph
-    return serialized_graph, sub_pub_map
+    # Set graph's topology and real-time messages matching
+    if hasattr(graph, "set_topology"):
+        graph.set_topology(serialized_graph, sub_pub_map)
+    else:
+        raise AttributeError(
+            """
+            Provided graph is missing `set_topology` method to establish 
+            its topology and possible real-time messsaging
+
+            Please add the following method to your graph
+            ```
+            def set_topology(self, topology: SerializedGraph, sub_pub_map: Dict) -> None:
+                self._topology = topology
+                self._sub_pub_match = sub_pub_map
+            ```
+            """
+        )

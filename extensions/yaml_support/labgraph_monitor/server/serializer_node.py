@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserve
 
+from dataclasses import field
 from typing import Dict, Optional
 import labgraph as lg
 import asyncio
@@ -11,11 +12,10 @@ from ..aliases.aliases import SerializedGraph
 
 # Make it work with RandomMessage
 from ....graphviz_support.graphviz_support.tests.demo_graph.random_message import RandomMessage
-import numpy as np
 
 class SerializerConfig(lg.Config):
     data: SerializedGraph
-    sub_pub_match: Dict
+    sub_pub_match: Optional[Dict] = field(default_factory=dict)
     sample_rate: int
     stream_name: str
     stream_id: str
@@ -92,14 +92,12 @@ class Serializer(lg.Node):
         @params:
             value of a dictionary that represents individual nodes
         """
-        try:
-            for node, value in _in.items():
-                for state in self.state.__dict__.values():
-                    if state["grouping"] in value["upstreams"].keys():
-                        value["upstreams"][state["grouping"]][0]["fields"]["timestamp"]["content"] = state["timestamp"]
-                        value["upstreams"][state["grouping"]][0]["fields"]["data"]["content"] = state["numpy"]
-        except:
-            pass
+        for node, value in _in.items():
+            for state in self.state.__dict__.values():
+                if state["grouping"] in value["upstreams"].keys():
+                    value["upstreams"][state["grouping"]][0]["fields"]["timestamp"]["content"] = state["timestamp"]
+                    value["upstreams"][state["grouping"]][0]["fields"]["data"]["content"] = state["numpy"]
+
         return _in
 
     @lg.publisher(SERIALIZER_OUTPUT)
@@ -108,8 +106,9 @@ class Serializer(lg.Node):
         while True:
             output_data = dict()
             if hasattr(self.config, "data"):
+                # Populate Serialized Graph with real-time data
                 output_data = {
-                    key: self.output(value) for key, value in self.config.data.items()
+                    key: self.output(value) for key, value in self.config.data.items() if key == "nodes"
                 }
             yield self.SERIALIZER_OUTPUT, WSStreamMessage(
                 samples=output_data,
