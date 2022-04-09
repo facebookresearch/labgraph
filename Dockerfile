@@ -4,7 +4,6 @@
 FROM quay.io/pypa/manylinux2014_x86_64
 
 # Install devtoolset-9
-RUN yum update -y
 RUN yum install -y centos-release-scl
 RUN yum install -y devtoolset-9
 RUN echo "source /opt/rh/devtoolset-9/enable" >> /etc/bashrc

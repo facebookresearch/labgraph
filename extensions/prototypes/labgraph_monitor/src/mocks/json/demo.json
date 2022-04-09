@@ -1,0 +1,92 @@
+{
+    "stream_batch": {
+        "stream_id": "LABGRAPH.MONITOR",
+        "labgraph.monitor": {
+            "samples": [
+                {
+                    "data": {
+                        "name": "Demo",
+                        "nodes": {
+                            "NoiseGenerator": {
+                                "upstreams": {}
+                            },
+                            "RollingAverager": {
+                                "upstreams": {
+                                    "NoiseGenerator": [
+                                        {
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "Amplifier": {
+                                "upstreams": {
+                                    "NoiseGenerator": [
+                                        {
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "Attenuator": {
+                                "upstreams": {
+                                    "NoiseGenerator": [
+                                        {
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "Sink": {
+                                "upstreams": {
+                                    "RollingAverager": [
+                                        {
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
+                                        }
+                                    ],
+                                    "Amplifier": [
+                                        {
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
+                                        }
+                                    ],
+                                    "Attenuator": [
+                                        {
+                                            "name": "RandomMessage",
+                                            "fields": {
+                                                "timestamp": "float",
+                                                "data": "ndarray"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "produced_timestamp_s": 1644931422.141309,
+                    "timestamp_s": 1644931422.141309
+                }
+            ],
+            "batch_num": 54
+        }
+    }
+}
