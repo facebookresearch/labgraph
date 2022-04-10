@@ -139,10 +139,7 @@ def connect_to_upstream(
     return nodes
 
 
-def serialize_graph(
-    name: str,
-    nodes: List[LabgraphMonitorNode]
-) -> SerializedGraph:
+def serialize_graph(graph: lg.Graph) -> SerializedGraph:
     """
     A function that returns a serialized version of the graph topology.
 
@@ -152,8 +149,17 @@ def serialize_graph(
 
     @return: A serialized version of the graph topology
     """
+    # List of graph nodes
+    nodes: List[LabgraphMonitorNode] = []
+
+    # Identify graph nodes
+    nodes = identify_graph_nodes(graph)
+
+    # Connect graph edges
+    nodes = connect_to_upstream(nodes, graph.__streams__.values())
+
     serialized_graph: SerializedGraph = {
-        "name": name,
+        "name": type(graph).__name__,
         "nodes": {}
     }
 
@@ -186,7 +192,8 @@ def serialize_graph(
 def sub_pub_grouping_map(graph: lg.Graph) -> Dict[str, str]:
     """
     A function that matches subscribers with their publishers
-    
+    to automate assigning real-time messages to serialized graph
+
     @params:
         graph: An instance of the computational graph
 
@@ -222,29 +229,33 @@ def sub_pub_grouping_map(graph: lg.Graph) -> Dict[str, str]:
                     
     return sub_pub_grouping_map
 
-def generate_graph_topology(graph: lg.Graph) -> None:
+def generate_graph_topology(graph: lg.Graph) -> SerializedGraph:
     """
-    A function that serialize the graph topology
-    and send it using to LabGraphMonitor Front-End
-    using Labgraph Websocket API
+    A function that serializes the graph topology
+    and sends it to LabGraph Monitor Front-End
+    using WebSockets API
 
     @params:
         graph: An instance of the computational graph
+    
+    @return: Serialized topology of the graph
     """
-    # Local variables
-    nodes: List[LabgraphMonitorNode] = []
+    serialized_graph = serialize_graph(graph)
 
-    # Identify graph nodes
-    nodes = identify_graph_nodes(graph)
+    return serialized_graph
 
-    # Connect graph edges
-    nodes = connect_to_upstream(nodes, graph.__streams__.values())
-
+def set_graph_topology(graph: lg.Graph) -> None:
+    """
+    A function that serializes the graph topology
+    and applies the information to serve as graph 
+    attribute for LabGraph Monitor Front-End 
+    real-time messaging using WebSockets API
+    
+    @params:
+        graph: An instance of the computational graph
+    """
     # Serialize the graph topology
-    serialized_graph = serialize_graph(
-        type(graph).__name__,
-        nodes
-    )
+    serialized_graph = serialize_graph(graph)
 
     # Match subscribers with their publishers
     sub_pub_map = sub_pub_grouping_map(graph)
