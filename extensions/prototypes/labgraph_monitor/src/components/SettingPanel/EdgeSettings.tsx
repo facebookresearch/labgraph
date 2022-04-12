@@ -14,6 +14,7 @@ import {
     TableHead,
     TableRow,
     Typography,
+    Button,
 } from '@mui/material';
 import React from 'react';
 import { RootState } from '../../redux/store';
@@ -22,7 +23,12 @@ import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
 
 interface IMessage {
     name: string;
-    fields: { [fieldName: string]: string };
+    fields: {
+        [fieldName: string]: {
+            type: string;
+            content: any;
+        };
+    };
 }
 
 /**
@@ -46,6 +52,12 @@ const Edge: React.FC = (): JSX.Element => {
                   selectedEdge.source
               ]
             : [];
+
+    const [open, setOpen] = React.useState(false);
+
+    const handleToggle = () => {
+        setOpen(!open);
+    };
     return (
         <React.Fragment>
             <Box data-testid="edge-settings">
@@ -62,16 +74,60 @@ const Edge: React.FC = (): JSX.Element => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {Object.entries(message.fields).map(
-                                        ([name, type]) => {
+                                    {/* ZMQMessage Edge */}
+                                    {Object.entries(message['fields']).map(
+                                        (field, index) => {
                                             return (
-                                                <TableRow key={name}>
+                                                <TableRow key={index}>
                                                     <TableCell>
-                                                        {name}
+                                                        {field[0]}
                                                     </TableCell>
                                                     <TableCell>
-                                                        {type}
+                                                        {field[1].type}
                                                     </TableCell>
+                                                </TableRow>
+                                            );
+                                        }
+                                    )}
+                                    <Button onClick={handleToggle}>
+                                        {open ? 'Show less' : 'Show more'}
+                                    </Button>
+
+                                    {Object.entries(message['fields']).map(
+                                        (field, index) => {
+                                            return (
+                                                <TableRow key={index}>
+                                                    {open && (
+                                                        <TableCell>
+                                                            {field[0]}
+                                                        </TableCell>
+                                                    )}
+
+                                                    {!open ? null : connection ===
+                                                      WS_STATE.CONNECTED ? (
+                                                        <TableCell
+                                                            style={{
+                                                                whiteSpace:
+                                                                    'normal',
+                                                                wordBreak:
+                                                                    'break-word',
+                                                            }}
+                                                        >
+                                                            {field[1].content}
+                                                        </TableCell>
+                                                    ) : (
+                                                        <TableCell
+                                                            style={{
+                                                                whiteSpace:
+                                                                    'normal',
+                                                                wordBreak:
+                                                                    'break-word',
+                                                            }}
+                                                        >
+                                                            Hello
+                                                            {/* {mockData.join(' ')} */}
+                                                        </TableCell>
+                                                    )}
                                                 </TableRow>
                                             );
                                         }

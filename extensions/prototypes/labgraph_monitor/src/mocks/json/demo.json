@@ -16,8 +16,14 @@
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type":"float",
+                                                    "content": 1644931422.141309
+                                                },
+                                                "data": {
+                                                    "type": "ndarray",
+                                                    "content": [0.77135353, 0.61299748, 0.34146919, 0.46154968, 0.19577749]
+                                                }
                                             }
                                         }
                                     ]
@@ -29,8 +35,14 @@
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type":"float",
+                                                    "content": 1644931422.141309
+                                                },
+                                                "data": {
+                                                    "type": "ndarray",
+                                                    "content": [0.77135353, 0.61299748, 0.34146919, 0.46154968, 0.19577749]
+                                                }
                                             }
                                         }
                                     ]
@@ -42,8 +54,14 @@
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type":"float",
+                                                    "content": 1644931422.141309
+                                                },
+                                                "data": {
+                                                    "type": "ndarray",
+                                                    "content": [0.77135353, 0.61299748, 0.34146919, 0.46154968, 0.19577749]
+                                                }
                                             }
                                         }
                                     ]
@@ -55,8 +73,14 @@
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type":"float",
+                                                    "content": 1644931422.141309
+                                                },
+                                                "data": {
+                                                    "type": "ndarray",
+                                                    "content": [0.77135353, 0.61299748, 0.34146919, 0.46154968, 0.19577749]
+                                                }
                                             }
                                         }
                                     ],
@@ -64,8 +88,14 @@
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type":"float",
+                                                    "content": 1644931422.141309
+                                                },
+                                                "data": {
+                                                    "type": "ndarray",
+                                                    "content": [0.77135353, 0.61299748, 0.34146919, 0.46154968, 0.19577749]
+                                                }
                                             }
                                         }
                                     ],
@@ -73,8 +103,14 @@
                                         {
                                             "name": "RandomMessage",
                                             "fields": {
-                                                "timestamp": "float",
-                                                "data": "ndarray"
+                                                "timestamp": {
+                                                    "type":"float",
+                                                    "content": 1644931422.141309
+                                                },
+                                                "data": {
+                                                    "type": "ndarray",
+                                                    "content": [0.77135353, 0.61299748, 0.34146919, 0.46154968, 0.19577749]
+                                                }
                                             }
                                         }
                                     ]

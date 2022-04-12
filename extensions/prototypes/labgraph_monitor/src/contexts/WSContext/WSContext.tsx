@@ -34,24 +34,37 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (!process.env.REACT_APP_WS_API) return;
+        console.log('test');
+        if (!process.env.REACT_APP_WS_API) {
+            alert(
+                'Error: .env.local file does not exist, check README.md on how to create it'
+            );
+            dispatch(setConnection(WS_STATE.DISCONNECTED));
+            // dispatch to be disocnnected disconnect
+            return;
+        }
         switch (connection) {
             case WS_STATE.IS_CONNECTING:
-                clientRef.current = new W3CWebSocket(
-                    process.env.REACT_APP_WS_API as string
-                );
+                try {
+                    console.log('connect - test');
+                    clientRef.current = new W3CWebSocket(
+                        process.env.REACT_APP_WS_API as string
+                    );
 
-                clientRef.current.onopen = () => {
-                    clientRef.current?.send(JSON.stringify(startStreamRequest));
-                    dispatch(setConnection(WS_STATE.CONNECTED));
-                };
+                    clientRef.current.onopen = () => {
+                        clientRef.current?.send(
+                            JSON.stringify(startStreamRequest)
+                        );
+                        dispatch(setConnection(WS_STATE.CONNECTED));
+                    };
 
-                clientRef.current.onerror = (err: any) => {
-                    dispatch(setConnection(WS_STATE.DISCONNECTED));
-                };
-
+                    clientRef.current.onerror = (err: any) => {
+                        dispatch(setConnection(WS_STATE.DISCONNECTED));
+                    };
+                } catch (error) {
+                    // catch error
+                }
                 break;
-
             case WS_STATE.CONNECTED:
                 if (!clientRef.current) return;
                 clientRef.current.onmessage = (message: any) => {
