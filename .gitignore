@@ -39,3 +39,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Sphinx
+sphinx/_build/
+*~
