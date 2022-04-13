@@ -23,7 +23,9 @@ LabGraph Documentation
    docs/websockets-api
    docs/zmq-support
 
-   docs/realtime-streaming-performance.md
+   docs/performance/realtime-streaming-performance
+   docs/installation/macos
+   docs/tools/codetools/README
    
 
 
