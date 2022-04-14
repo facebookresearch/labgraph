@@ -31,5 +31,5 @@ ln -s /usr/local/opt/python@3.8/bin/python3 /usr/local/bin/python3
 
 - Install LabGraph using PyPI:
 ```
-python3 -m pip install labgraph=2.0.0
+python3 -m pip install labgraph==2.0.0
 ```
