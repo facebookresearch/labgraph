@@ -9,6 +9,16 @@ This extension is an interactive visualization tool to monitor and make real-tim
 -   [Node.js](https://nodejs.org/en/)
 -   [Yarn](https://classic.yarnpkg.com/lang/en/docs/install) (**RECOMMENDED**)
 
+Check that node and yarn were properly installed by running the following commands
+
+```
+node -v
+```
+
+```
+yarn -v
+```
+
 **Set up the application**
 
 (!) The following tutorial utilizes **yarn** (recommended) however **npm** can be utilized as well.
