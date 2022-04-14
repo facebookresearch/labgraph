@@ -104,12 +104,14 @@ class Serializer(lg.Node):
     async def source(self) -> lg.AsyncPublisher:
         await asyncio.sleep(.1)
         while True:
-            output_data = dict()
-            if hasattr(self.config, "data"):
-                # Populate Serialized Graph with real-time data
+            output_data = self.config.data
+            # check if the monitor is in real-time mode
+            if self.config.sub_pub_match:
+                # populate Serialized Graph with real-time data
                 output_data = {
                     key: self.output(value) for key, value in self.config.data.items() if key == "nodes"
                 }
+            # otherwise, only send the topology
             yield self.SERIALIZER_OUTPUT, WSStreamMessage(
                 samples=output_data,
                 stream_name=self.config.stream_name,
