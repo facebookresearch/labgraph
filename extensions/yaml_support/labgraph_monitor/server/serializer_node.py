@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2004-present Facebook. All Rights Reserve
+# Copyright 2004-present Facebook. All Rights Reserved.
 
 from dataclasses import field
 from typing import Dict, Optional
