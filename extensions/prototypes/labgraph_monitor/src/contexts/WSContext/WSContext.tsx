@@ -36,9 +36,7 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     useEffect(() => {
         console.log('test');
         if (!process.env.REACT_APP_WS_API) {
-            alert(
-                'Error: .env.local file does not exist, check README.md on how to create it'
-            );
+            alert('Error: Undefined Environment Variable: REACT_APP_WS_API');
             dispatch(setConnection(WS_STATE.DISCONNECTED));
             // dispatch to be disocnnected disconnect
             return;
@@ -46,7 +44,6 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
         switch (connection) {
             case WS_STATE.IS_CONNECTING:
                 try {
-                    console.log('connect - test');
                     clientRef.current = new W3CWebSocket(
                         process.env.REACT_APP_WS_API as string
                     );
