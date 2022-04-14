@@ -16,10 +16,11 @@ import {
     Typography,
     Button,
 } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RootState } from '../../redux/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
+import { setMockRealtimeData } from '../../redux/reducers/graph/mock/mockReducer';
 
 interface IMessage {
     name: string;
@@ -43,7 +44,9 @@ const Edge: React.FC = (): JSX.Element => {
         (state: RootState) => state.ws
     );
     const { mockGraph } = useSelector((state: RootState) => state.mock);
-
+    const mockData = useSelector(
+        (state: RootState) => state.mock.mockRealtimeData
+    );
     const graph = connection === WS_STATE.CONNECTED ? realtimeGraph : mockGraph;
 
     const messages: IMessage[] =
@@ -58,6 +61,22 @@ const Edge: React.FC = (): JSX.Element => {
     const handleToggle = () => {
         setOpen(!open);
     };
+    // creating mock data, check mockReducer.ts, IMock.ts and EdgeSettings.tsx for future updates
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            const date = Date.now();
+
+            dispatch(
+                setMockRealtimeData([date, date % 10, date * 3, date / 4])
+            );
+        }, 100);
+
+        return () => {
+            clearInterval(id);
+        };
+    }, []);
     return (
         <React.Fragment>
             <Box data-testid="edge-settings">
@@ -124,8 +143,7 @@ const Edge: React.FC = (): JSX.Element => {
                                                                     'break-word',
                                                             }}
                                                         >
-                                                            Hello
-                                                            {/* {mockData.join(' ')} */}
+                                                            {mockData.join(' ')}
                                                         </TableCell>
                                                     )}
                                                 </TableRow>
