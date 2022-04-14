@@ -13,6 +13,7 @@ import {
     AlignHorizontalLeftOutlined,
     AlignVerticalTopOutlined,
 } from '@mui/icons-material';
+import React, { useCallback } from 'react';
 import SettingTabs from './SettingTabs';
 import { makeStyles } from '@mui/styles';
 import { useUIContext } from '../../contexts';
@@ -20,8 +21,9 @@ import { RootState } from '../../redux/store';
 import { useSelector, useDispatch } from 'react-redux';
 import { setPanel } from '../../redux/reducers/config/configReducer';
 
-const PANEL_WIDTH = 280;
-
+export const defaultPanelWidth = 280;
+const minPanelWidth = defaultPanelWidth;
+const maxPanelWidth = 600;
 const useStyles = makeStyles({
     root: {
         display: 'flex',
@@ -41,10 +43,10 @@ const useStyles = makeStyles({
     },
 
     settingPanel: {
-        width: PANEL_WIDTH,
+        width: defaultPanelWidth,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-            width: PANEL_WIDTH,
+            width: defaultPanelWidth,
         },
     },
 
@@ -54,6 +56,30 @@ const useStyles = makeStyles({
         justifyContent: 'space-around',
         alignItem: 'center',
         padding: '2px 4px 2px 4px',
+    },
+    dragger_light: {
+        width: '5px',
+        cursor: 'ew-resize',
+        padding: '4px 0 0',
+        borderTop: '1px solid #ddd',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        zIndex: '100',
+        backgroundColor: '#f4f7f9',
+    },
+    dragger_dark: {
+        width: '5px',
+        cursor: 'ew-resize',
+        padding: '4px 0 0',
+        borderTop: '1px solid #111827',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        zIndex: '100',
+        backgroundColor: '#1f2b3c',
     },
 });
 
@@ -68,7 +94,23 @@ const SettingPanel: React.FC = (): JSX.Element => {
     const { mode, layout, toggleMode, toggleLayout } = useUIContext();
     const { panelOpen } = useSelector((state: RootState) => state.config);
     const dispatch = useDispatch();
+    const [panelWidth, setPanelWidth] = React.useState(defaultPanelWidth);
 
+    const handleMouseDown = (e: any) => {
+        document.addEventListener('mouseup', handleMouseUp, true);
+        document.addEventListener('mousemove', handleMouseMove, true);
+    };
+    const handleMouseUp = () => {
+        document.removeEventListener('mouseup', handleMouseUp, true);
+        document.removeEventListener('mousemove', handleMouseMove, true);
+    };
+    const handleMouseMove = useCallback((e) => {
+        const newWidth =
+            document.body.offsetLeft + document.body.offsetWidth - e.clientX;
+        if (newWidth > minPanelWidth && newWidth < maxPanelWidth) {
+            setPanelWidth(newWidth);
+        }
+    }, []);
     return (
         <Box className={classes.root} data-testid="setting-panel">
             <CssBaseline />
@@ -96,6 +138,7 @@ const SettingPanel: React.FC = (): JSX.Element => {
                 className={classes.settingPanel}
                 variant="persistent"
                 anchor="right"
+                PaperProps={{ style: { width: panelWidth } }}
                 open={panelOpen}
             >
                 <Box>
@@ -106,6 +149,20 @@ const SettingPanel: React.FC = (): JSX.Element => {
                         <ChevronRight />
                     </IconButton>
                 </Box>
+
+                {mode === 'light' ? (
+                    <div
+                        id="dragger"
+                        onMouseDown={(e) => handleMouseDown(e)}
+                        className={classes.dragger_light}
+                    />
+                ) : (
+                    <div
+                        id="dragger"
+                        onMouseDown={(e) => handleMouseDown(e)}
+                        className={classes.dragger_dark}
+                    />
+                )}
                 <Divider />
                 <Box className={classes.themeBar}>
                     <IconButton
