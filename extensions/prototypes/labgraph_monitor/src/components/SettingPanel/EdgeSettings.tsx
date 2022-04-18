@@ -76,7 +76,7 @@ const Edge: React.FC = (): JSX.Element => {
         return () => {
             clearInterval(id);
         };
-    }, []);
+    }, [dispatch]);
     return (
         <React.Fragment>
             <Box data-testid="edge-settings">
@@ -132,7 +132,8 @@ const Edge: React.FC = (): JSX.Element => {
                                                                     'break-word',
                                                             }}
                                                         >
-                                                            {field[1].content}
+                                                            {field[1].content +
+                                                                ', '}
                                                         </TableCell>
                                                     ) : (
                                                         <TableCell

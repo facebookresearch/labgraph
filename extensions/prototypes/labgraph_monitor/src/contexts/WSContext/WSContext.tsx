@@ -34,7 +34,6 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        console.log('test');
         if (!process.env.REACT_APP_WS_API) {
             alert('Error: Undefined Environment Variable: REACT_APP_WS_API');
             dispatch(setConnection(WS_STATE.DISCONNECTED));
