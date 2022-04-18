@@ -26,7 +26,7 @@ To make sure things are working:
 
 1- Move to the root of the LabGraph directory:
 
-```
+```bash
 labgraph\extensions\yaml_support> cd ../..
 labgraph>
 ```
@@ -43,32 +43,28 @@ python -m extensions.yaml_support.labgraph_yaml_parser.tests.test_lg_yaml_api
 
 #### Stream Graph Topology Only:
 
- - **`generate_graph_topology(graph: lg.Graph) -> SerializedGraph`** : This function can be used to generate a serialized version of the graph
- - **`run_topology(data: SerializedGraph) -> None`**: This function can be used to send the generated serialized version of the graph instance via LabGraph WebSockets API
+ - **`LabgraphMonitor(graph: lg.Graph)`** : This class serves as a facade for monitor's functions, 
+ such as sending either topology or topology + real-time messages
+ - **`stream_graph_topology() -> None`**: This function is used to send the generated serialized version of the graph instance via LabGraph WebSockets API
 
 The serialized version of the graph will be streamed to the clients using LabGraph's [WebSockets API](https://github.com/facebookresearch/labgraph/blob/main/docs/websockets-api.md).
 
-1. Call **`generate_graph_topology(graph: lg.Graph) -> None`** to serialize your graph and stream via WebSockets API using **`run_topology(data: SerializedGraph) -> None`**
+1. Instantiate a monitor object with **`LabgraphMonitor(graph: lg.Graph)`** to serialize your graph and stream via WebSockets API using its method **`stream_graph_topology() -> None`**
 
 ```python
 from extensions.graphviz_support.graphviz_support.tests.demo_graph.demo import Demo
 
-from extensions.yaml_support.labgraph_monitor.generate_lg_monitor.generate_lg_monitor import (
-    generate_graph_topology,
-)
+from extensions.yaml_support.labgraph_monitor.labgraph_monitor import LabgraphMonitor
 
-from extensions.yaml_support.labgraph_monitor.server.lg_monitor_server import (
-    run_topology,
-)
 
 # Initialize a Demo graph
 graph = Demo()
 
-# Serialize its topology
-topology = generate_graph_topology(graph)
+# Initialize a monitor object
+monitor = LabgraphMonitor(graph)
 
 # Run the WebSockets API to send the topology to Front-End
-run_topology(topology)
+monitor.stream_graph_topology()
 ```
 
 This will start a websocket server on localhost port 9000 (127.0.0.1:9000)
@@ -303,18 +299,21 @@ This is used to stream both the graph topology and real-time messages received b
  2. You can then run your graph
 
     ```python
-    from extensions.yaml_support.labgraph_monitor.generate_lg_monitor.generate_lg_monitor import (
-        set_graph_topology,
-    )
+    from extensions.yaml_support.labgraph_monitor.examples.labgraph_monitor_example import Demo
+    
+    from extensions.yaml_support.labgraph_monitor.labgraph_monitor import LabgraphMonitor
 
+    # Initialize a Demo graph
     graph = Demo()
-    set_graph_topology(graph=graph)
 
-    runner = lg.ParallelRunner(graph=graph)
-    runner.run()
+    # Initialize a monitor object
+    monitor = LabgraphMonitor(graph)
+
+    # Run the WebSockets API to send the real-time topology to Front-End
+    monitor.stream_real_time_graph()
     ```
 
-3. For now, you can simply run the example graph LabGraph's root directory to try it put
+3. Alternatively, you can simply run the example graph to try it out
 
     ```bash
     labgraph> python extensions/yaml_support/labgraph_monitor/examples/labgraph_monitor_example.py
@@ -350,11 +349,11 @@ The graph representation has the following schema:
                         fields: {
                             "timestamp": {
                                 "type": "float",
-                                "content": "real-time value"
+                                "content": real-time value
                             },
                             "data": {
                                 "type": "ndarray",
-                                "content" "real-time value"
+                                "content" real-time value
                             }
                         }
                     }
@@ -1262,13 +1261,13 @@ The graph representation has the following schema:
 }
 ```
 
-#### Labgraph YAML Parser:
+# LabGraph YAML Parser:
 
 **`yamlify(python_file: str, yaml_file: str) -> str`** : This function can be used to generate a YAMLIFIED version of the passed LabGraph source code (.py). The serialized version will be saved as a YAML file at the specified folder (yml_file)
 
 1. Call **yamlify(python_file: str, yaml_file: str) -> str** and pass the appropriate parameters
 
-```
+```python
 from extensions.yaml_support.labgraph_yaml_parser.yamlify import (
     yamlify
 )
@@ -1277,3 +1276,88 @@ yamlify(python_file, output_yaml_file)
 ```
 
 This will generate a YAML file in the specified location
+
+Example of a YAML file produced for [`simple_viz.py`](https://github.com/facebookresearch/labgraph/blob/main/labgraph/examples/simple_viz.py) example:
+
+```python
+RandomMessage:
+  type: Message
+  fields:
+    timestamp: float
+    data: np.ndarray
+
+NoiseGeneratorConfig:
+  type: Config
+  fields:
+    sample_rate: float
+    num_features: int
+
+NoiseGenerator:
+  type: Node
+  config: NoiseGeneratorConfig
+  inputs: []
+  outputs:
+  - RandomMessage
+
+RollingState:
+  type: State
+  fields:
+    messages: List.RandomMessage
+
+RollingConfig:
+  type: Config
+  fields:
+    window: float
+
+RollingAverager:
+  type: Node
+  state: RollingState
+  config: RollingConfig
+  inputs:
+  - RandomMessage
+  outputs:
+  - RandomMessage
+
+AveragedNoiseConfig:
+  type: Config
+  fields:
+    sample_rate: float
+    num_features: int
+    window: float
+
+AveragedNoise:
+  type: Group
+  config: AveragedNoiseConfig
+  inputs: []
+  outputs:
+  - RandomMessage
+  connections:
+    NoiseGenerator: RollingAverager
+    RollingAverager: AveragedNoise
+
+PlotState:
+  type: State
+  fields:
+    data: Optional.np.ndarray
+
+PlotConfig:
+  type: Config
+  fields:
+    refresh_rate: float
+    num_bars: int
+
+Plot:
+  type: Node
+  state: PlotState
+  config: PlotConfig
+  inputs:
+  - RandomMessage
+  outputs: []
+
+Demo:
+  type: Graph
+  inputs: []
+  outputs: []
+  connections:
+    AveragedNoise: Plot
+```
