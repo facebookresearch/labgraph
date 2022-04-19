@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LabGraph Documentation &#8212; LabGraph  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction" href="docs/index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <p>LabGraph is a streaming framework built by the Facebook Reality Labs Research team at Facebook.
+LabGraph is mentioned in this story on <a class="reference external" href="https://tech.fb.com/ar-vr/2021/07/bci-milestone-new-research-from-ucsf-with-support-from-facebook-shows-the-potential-of-brain-computer-interfaces-for-restoring-speech-communication/">the potential of brain-computer interfaces for restoring speech communication</a>. More information can be found in Introduction</p>
+<div class="section" id="labgraph-documentation">
+<h1>LabGraph Documentation<a class="headerlink" href="#labgraph-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/index.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/index.html#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/index.html#opinions">Opinions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/index.html#team">Team</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docs/messages.html">Messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/concepts.html">LabGraph Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/concepts.html#messages">Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/concepts.html#streams-and-topics">Streams and Topics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/concepts.html#nodes">Nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/concepts.html#groups">Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/concepts.html#graphs">Graphs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docs/cpp-interop.html">C++ Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/cthulhu.html">Cthulhu</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/cthulhu.html#what-is-cthulhu">What is Cthulhu?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/cthulhu.html#why-should-i-care">Why should I care?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/cthulhu.html#streams">Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/cthulhu.html#nodes">Nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/cthulhu.html#clock">Clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/cthulhu.html#framework">Framework</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docs/lifecycles-and-configuration.html">Module Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/lifecycles-and-configuration.html#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/websockets-api-errors.html">WebSockets API Error Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/websockets-api.html">WebSockets API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/websockets-api.html#connecting-to-labgraph">Connecting to LabGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/websockets-api.html#api-requests">API Requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/websockets-api.html#api-errors">API Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/websockets-api.html#api-input-output-streams">API Input/Output Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/websockets-api.html#example-usage">Example Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docs/zmq-support.html">ZMQ Support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/zmq-support.html#zmqmessage">ZMQMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/zmq-support.html#zmqpollernode">ZMQPollerNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/zmq-support.html#zmqsendernode">ZMQSenderNode</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docs/performance/realtime-streaming-performance.html">Real-Time Streaming Performance in LabGraph &amp; Cthulhu</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/performance/realtime-streaming-performance.html#plots">Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/performance/realtime-streaming-performance.html#discussion">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/performance/realtime-streaming-performance.html#methodology">Methodology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/performance/realtime-streaming-performance.html#caveats-opportunities">Caveats &amp; Opportunities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/performance/realtime-streaming-performance.html#overall-takeaways">Overall Takeaways</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docs/installation/macos.html">MacOS Installation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/installation/macos.html#troubleshoot-for-python3-8-macos-monterey-and-big-sur">Troubleshoot for Python3.8 (MacOS Monterey and Big Sur):</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docs/tools/codetools/README.html">Use Flake8 for styling checks</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">LabGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/messages.html">Messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/concepts.html">LabGraph Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/cpp-interop.html">C++ Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/cthulhu.html">Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/lifecycles-and-configuration.html">Module Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/lifecycles-and-configuration.html#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/websockets-api-errors.html">WebSockets API Error Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/websockets-api.html">WebSockets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/zmq-support.html">ZMQ Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/performance/realtime-streaming-performance.html">Real-Time Streaming Performance in LabGraph &amp; Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/installation/macos.html">MacOS Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/tools/codetools/README.html">Use Flake8 for styling checks</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="docs/index.html" title="next chapter">Introduction</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2004 - present Facebook. All Rights Reserved..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

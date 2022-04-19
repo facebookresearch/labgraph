@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Introduction &#8212; LabGraph  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Messages" href="messages.html" />
+    <link rel="prev" title="LabGraph Documentation" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>LabGraph is a Python framework for building real-time research systems. The Facebook Reality Labs Research (FRLR) team at Facebook uses it to rapidly prototype and test new wearable hardware systems, experimental stimulus protocols, digital signal processing steps, and live visualizations. LabGraph has allowed FRLR to greatly accelerate its pace of experimentation. We hope for other groups to benefit from this tooling as well.</p>
+<p>More specifically, LabGraph provides a way to define a computational graph in a standardized way. This results in a less tedious development process for real-time algorithms and systems. In other words, the framework decides how data types, computations, and connections between the inputs and outputs of related computations should be stated, and then it sets up the boilerplate needed to run these streaming computations efficiently in parallel. In turn, the researcher is able to focus on developing individual real-time algorithms while assuming the rest of the system runs correctly.</p>
+<p>We built LabGraph because there was no existing solution that we felt was sufficiently user-friendly, performant, and flexible. Our primary goal was to minimize the time it takes for a scientist to get from an idea to an experiment. In addition, we wanted to support the high data rates (several MHz) that might come from certain sensors. Also, we wanted to make it easy to extract algorithms from existing projects for reuse in new ones.</p>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<p>LabGraph comes with built-in support for the following:</p>
+<ul class="simple">
+<li><p><strong>Performant real-time streaming:</strong> LabGraph depends on Cthulhu (a C++ framework for real-time streaming. The Facebook Reality Labs in Pittsburgh has used this framework to stream high data rates (on the order of MHz), and with LabGraph we are adapting it to work with  hardware. In particular Cthulhu uses shared memory to minimize copies and buffer recycling to minimize allocations.</p></li>
+<li><p><strong>Graph API:</strong> LabGraph allows us to define computational graphs as Python classes. Each LabGraph graph describes a real-time system that includes “nodes” for hardware streaming, signal processing, machine learning, and/or user interfaces. We can also define reusable groups of nodes - each group describes a subsystem that we can reuse in different graphs.</p></li>
+<li><p><strong>Data logging:</strong> A logger for the HDF5 disk format comes built-in, and additional formats can be implemented using a Logger abstraction. The data types used in streams and on disk are derived from Messages, which are an extension of dataclasses; creating and updating these types is as easy as working with dataclasses.</p></li>
+<li><p><strong>Python-C++ interoperability:</strong> LabGraph allows nodes to be written in C++, which can be useful in situations where tuning the performance of an algorithm in Python would be too difficult. Using pybind11, C++ nodes can be dropped into LabGraph graphs as if they were Python nodes. For more flexibility (but at the cost of access to LabGraph features), it is also possible to write C++ that interacts directly with the Cthulhu transport framework.</p></li>
+<li><p><strong>Stimulus events:</strong> We can write “event generators” to define the stimulus events that will occur in an experiment. This serves as a useful abstraction for the current state of the experiment.</p></li>
+<li><p><strong>Parallelism in Python:</strong> Writing parallel Python code is notoriously difficult. LabGraph helps ease some of this difficulty with a) a process manager that takes care of spawning and monitoring parallel processes, and b) asyncio support for concurrency within each process.</p></li>
+</ul>
+</div>
+<div class="section" id="opinions">
+<h2>Opinions<a class="headerlink" href="#opinions" title="Permalink to this headline">¶</a></h2>
+<p>The development of LabGraph has been motivated by the following beliefs:</p>
+<ol class="arabic simple">
+<li><p><strong>Modularization is critical to building many reliable experimental systems.</strong> Modularization is not the fastest way to build a single system, but it is essential when building many. By doing so, we build a library of well-tested components with behavior that can be isolated from any other part of the system. This keeps the debugging of complex systems tractable and also allows us to write good unit tests.</p></li>
+<li><p><strong>Python is the language of choice for closed-loop research.</strong> The Python ecosystem is uniquely well-positioned to support decoding efforts: we have access to sophisticated tools for numerical computation and machine learning, as well as a plethora of other well-tested software for working with hardware and UIs. As a result, LabGraph is a Python-first framework.</p></li>
+<li><p><strong>We need a better way to transition between real-time and analysis work.</strong> The search for the answer to this question has motivated many of our design decisions in LabGraph to date, although so far LabGraph has remained a real-time-only framework. We are just now starting to propose and implement the first designs for using LabGraph graphs &amp; data in an “offline” analysis context. When we are done with this effort we expect to greatly accelerate our cycles of analysis, development, and experimentation.</p></li>
+</ol>
+</div>
+<div class="section" id="team">
+<h2>Team<a class="headerlink" href="#team" title="Permalink to this headline">¶</a></h2>
+<p>LabGraph is currently maintained by Jimmy Feng (primary), Pradeep Damodara, George Gensure, Ryan Catoen and Allen Yin. A non-exhaustive but growing list needs to mention: Dev Chakraborty (primary), Pradeep Damodara, Dave Kotfis, Ryan Catoen, Ruben Sethi, Allen Yin, Rudy Sevile, Sho Nakagome, Ryan Orendorff, Anton Vorontsov, Rosemary Le, Ying Yang, Emily Mugler and Steph Naufel.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">LabGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#opinions">Opinions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#team">Team</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="messages.html">Messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">LabGraph Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp-interop.html">C++ Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cthulhu.html">Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lifecycles-and-configuration.html">Module Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lifecycles-and-configuration.html#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="websockets-api-errors.html">WebSockets API Error Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="websockets-api.html">WebSockets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zmq-support.html">ZMQ Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance/realtime-streaming-performance.html">Real-Time Streaming Performance in LabGraph &amp; Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation/macos.html">MacOS Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/codetools/README.html">Use Flake8 for styling checks</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">LabGraph Documentation</a></li>
+      <li>Next: <a href="messages.html" title="next chapter">Messages</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2004 - present Facebook. All Rights Reserved..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/docs/index.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

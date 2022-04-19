@@ -1,0 +1,329 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LabGraph Concepts &#8212; LabGraph  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="C++ Interoperability" href="cpp-interop.html" />
+    <link rel="prev" title="Messages" href="messages.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="labgraph-concepts">
+<h1>LabGraph Concepts<a class="headerlink" href="#labgraph-concepts" title="Permalink to this headline">¶</a></h1>
+<p>The fundamental units of systems built with LabGraph are:</p>
+<ul class="simple">
+<li><p><span class="xref myst"><strong>Messages</strong></span></p></li>
+<li><p><span class="xref myst"><strong>Streams</strong></span></p></li>
+<li><p><span class="xref myst"><strong>Topics</strong></span></p></li>
+<li><p><span class="xref myst"><strong>Nodes</strong></span></p></li>
+<li><p><span class="xref myst"><strong>Groups</strong></span></p></li>
+<li><p><span class="xref myst"><strong>Graphs</strong></span></p></li>
+</ul>
+<p>Together, these concepts allow us to construct <a class="reference external" href="https://en.wikipedia.org/wiki/Real-time_computing">real-time</a> computational [graphs](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics). These are “networks” of algorithms working together to produce some result within a time constraint. We want to be able to iterate on systems we build this way as efficiently as possible, which is what LabGraph is designed to enable. By enabling the fast plug-and-play of different nodes in such a graph, we can rapidly try out different hardware sensors, preprocessing pipelines, machine learning models, and user interfaces.</p>
+<p>In this overview we will use a toy example of a simple visualization. The example is intended to illustrate the end-to-end combination of a data source, processing step, and user interface. While this may not seem like a useful piece of software to build, this example is a jumping-off point that is extensible to any combination of hardware, processing, and UI.</p>
+<div class="section" id="messages">
+<h2>Messages<a class="headerlink" href="#messages" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>message</strong> is a piece of data with a consistent structure. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">labgraph.v1</span> <span class="k">as</span> <span class="nn">lg</span>
+
+<span class="k">class</span> <span class="nc">RandomMessage</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">Message</span><span class="p">):</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</pre></div>
+</div>
+<p>Here, we define two fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">timestamp</span></code>, a float which associates a timestamp with the data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data</span></code>, a numpy array that stores some data (which we will generate randomly in this example)</p></li>
+</ul>
+<p>This should look familiar if you are familiar with <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html">dataclasses</a> or <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple">named tuples</a> in Python – these are libraries that allow the concise construction of simple data-wrapping classes using Python typehints. Like these builtin libraries, LabGraph relies on Python type hints to allow users to specify how data is composed. As you’ll see when we look at groups, LabGraph relies heavily on type hints in general for composition.</p>
+<p>To create a message, we simply create an instance of the <code class="docutils literal notranslate"><span class="pre">RandomMessage</span></code> class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="n">random_message</span> <span class="o">=</span> <span class="n">RandomMessage</span><span class="p">(</span>
+    <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="c1"># Now LabGraph can use random_message</span>
+</pre></div>
+</div>
+<p>Suppose we were running an experiment where someone presses a button, and we wanted to include the state of the button with every frame. We could just add a <code class="docutils literal notranslate"><span class="pre">button_pressed</span></code> field to <code class="docutils literal notranslate"><span class="pre">RandomMessage</span></code>, but this would couple <code class="docutils literal notranslate"><span class="pre">RandomMessage</span></code> with that experiment and make reusing it with other experiments harder. Instead, we can <strong>compose message types</strong> via class inheritance (in the same way that the <code class="docutils literal notranslate"><span class="pre">dataclasses</span></code> module allows):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CustomMessage</span><span class="p">(</span><span class="n">RandomMessage</span><span class="p">):</span>
+  <span class="n">button_pressed</span><span class="p">:</span> <span class="nb">bool</span>
+</pre></div>
+</div>
+<p>Then <code class="docutils literal notranslate"><span class="pre">CustomMessage</span></code> retains all the fields of <code class="docutils literal notranslate"><span class="pre">RandomMessage</span></code>, and we can instantiate it like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">custom_message</span> <span class="o">=</span> <span class="n">CustomMessage</span><span class="p">(</span>
+  <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+  <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+  <span class="n">button_pressed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="streams-and-topics">
+<h2>Streams and Topics<a class="headerlink" href="#streams-and-topics" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>stream</strong> is a sequence of messages that is accessible in real-time. Streams are a useful construct when we want to build systems that respond in real-time to input from a hardware device. In this example we will stream <code class="docutils literal notranslate"><span class="pre">RandomMessage</span></code> which is not particularly useful, but you could imagine a sensor stream instead in an experimental setting.</p>
+<p>A <strong>topic</strong> is a named reference to a stream. This is useful because we usually want to refer to a stream by different names in different contexts.</p>
+<p>We’ll see how to create topics when we discuss nodes below, and we’ll see how to create streams when we discuss groups.</p>
+</div>
+<div class="section" id="nodes">
+<h2>Nodes<a class="headerlink" href="#nodes" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>node</strong> is a class that describes a self-contained algorithm that operates on topics. Nodes have the following properties:</p>
+<ul class="simple">
+<li><p>They define topics which act as inputs and outputs for streams</p></li>
+<li><p>They describe their algorithms using methods that are marked with special LabGraph “decorators”</p></li>
+<li><p>They are guaranteed to always be running in the same Python process throughout the life of a graph, with access to the same memory. This means a node can store state that is unique to the algorithm it implements.</p></li>
+</ul>
+<p>Nodes describe their algorithms using methods that are marked with special LabGraph decorators. Here is an example of a node that takes a rolling average of some data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RollingState</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RandomMessage</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">RollingConfig</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">Config</span><span class="p">):</span>
+    <span class="n">window</span><span class="p">:</span> <span class="nb">float</span>
+
+<span class="k">class</span> <span class="nc">RollingAverager</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="n">INPUT</span> <span class="o">=</span> <span class="n">lg</span><span class="o">.</span><span class="n">Topic</span><span class="p">(</span><span class="n">RandomMessage</span><span class="p">)</span>
+    <span class="n">OUTPUT</span> <span class="o">=</span> <span class="n">lg</span><span class="o">.</span><span class="n">Topic</span><span class="p">(</span><span class="n">RandomMessage</span><span class="p">)</span>
+
+    <span class="n">state</span><span class="p">:</span> <span class="n">RollingState</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">RollingConfig</span>
+
+    <span class="nd">@lg</span><span class="o">.</span><span class="n">subscriber</span><span class="p">(</span><span class="n">INPUT</span><span class="p">)</span>
+    <span class="nd">@lg</span><span class="o">.</span><span class="n">publisher</span><span class="p">(</span><span class="n">OUTPUT</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">RandomMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">lg</span><span class="o">.</span><span class="n">AsyncPublisher</span><span class="p">:</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">message</span>
+            <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">messages</span>
+            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">window</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">all_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">message</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">messages</span><span class="p">])</span>
+        <span class="n">mean_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="n">RandomMessage</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">current_time</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">mean_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>First, we define some state &amp; configuration - see <a class="reference internal" href="lifecycles-and-configuration.html"><span class="doc std std-doc">Lifecycles and Configuration</span></a> for details. Then we define the <code class="docutils literal notranslate"><span class="pre">RollingAverager</span></code> node:</p>
+<ul class="simple">
+<li><p>We define two topics, <code class="docutils literal notranslate"><span class="pre">INPUT</span></code> and <code class="docutils literal notranslate"><span class="pre">OUTPUT</span></code> which are references to streams of type <code class="docutils literal notranslate"><span class="pre">RandomMessage</span></code>. These topics are local to the <code class="docutils literal notranslate"><span class="pre">RolingAverager</span></code> node; it is the only node that can interact with them. When we construct a graph, we can point these topics at whatever streams we want.</p></li>
+<li><p>We define a method <code class="docutils literal notranslate"><span class="pre">average</span></code> to describe the averaging algorithm.</p>
+<ul>
+<li><p>The <strong>subscriber</strong> decorator indicates that this method subscribes to the <code class="docutils literal notranslate"><span class="pre">INPUT</span></code> topic. Whenever a message is sent into the stream that the <code class="docutils literal notranslate"><span class="pre">INPUT</span></code> topic points to, the <code class="docutils literal notranslate"><span class="pre">average</span></code> method will be called with that message.</p></li>
+<li><p>The <strong>publisher</strong> decorator indicates that this method publishes to the <code class="docutils literal notranslate"><span class="pre">OUTPUT</span></code> topic.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">async</span></code> keyword indicates that this is a asyncio-enabled method. <a class="reference external" href="https://docs.python.org/3/library/asyncio.html">asyncio</a> is a builtin Python library for writing concurrent code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AsyncPublisher</span></code> is a typehint provided by LabGraph to help type publisher functions..</p></li>
+<li><p>The averaging algorithm produces an average sample by looking at all previous samples over the window.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">yield</span></code> keyword is used to publish messages using asyncio. We yield a tuple containing the topic and the message to be published.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="groups">
+<h2>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>group</strong> is a container that includes some functionality that can be reused much like a node can be. A group can contain nodes, as well as other groups. As a result, groups enable composition and swappability of subgraphs.</p>
+<p>Suppose we wanted a way to quickly package together a data source and a transformation of that data. Here is a <code class="docutils literal notranslate"><span class="pre">Generator</span></code> node, as well as a group that packages it with <code class="docutils literal notranslate"><span class="pre">RollingAverager</span></code> above:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">GeneratorConfig</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">Config</span><span class="p">):</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">num_features</span><span class="p">:</span> <span class="nb">int</span>
+
+<span class="k">class</span> <span class="nc">Generator</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="n">OUTPUT</span> <span class="o">=</span> <span class="n">lg</span><span class="o">.</span><span class="n">Topic</span><span class="p">(</span><span class="n">RandomMessage</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">GeneratorConfig</span>
+
+    <span class="nd">@lg</span><span class="o">.</span><span class="n">publisher</span><span class="p">(</span><span class="n">OUTPUT</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">generate_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">lg</span><span class="o">.</span><span class="n">AsyncPublisher</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="n">RandomMessage</span><span class="p">(</span>
+                <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_features</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">AveragedNoiseConfig</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">Config</span><span class="p">):</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">num_features</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">window</span><span class="p">:</span> <span class="nb">float</span>
+
+<span class="k">class</span> <span class="nc">AveragedNoise</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">Group</span><span class="p">):</span>
+    <span class="n">OUTPUT</span> <span class="o">=</span> <span class="n">lg</span><span class="o">.</span><span class="n">Topic</span><span class="p">(</span><span class="n">RandomMessage</span><span class="p">)</span>
+
+    <span class="n">config</span><span class="p">:</span> <span class="n">AveragedNoiseConfig</span>
+    <span class="n">GENERATOR</span><span class="p">:</span> <span class="n">Generator</span>
+    <span class="n">ROLLING_AVERAGER</span><span class="p">:</span> <span class="n">RollingAverager</span>
+
+    <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">lg</span><span class="o">.</span><span class="n">Connections</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GENERATOR</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROLLING_AVERAGER</span><span class="o">.</span><span class="n">INPUT</span><span class="p">),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROLLING_AVERAGER</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Cascade configuration to contained nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">GENERATOR</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+            <span class="n">GeneratorConfig</span><span class="p">(</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+                <span class="n">num_features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_features</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ROLLING_AVERAGER</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">RollingConfig</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">window</span><span class="p">))</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>We create an output topic for the group - other groups that contain this group can connect to this topic</p></li>
+<li><p>We assign a configuration to this group that contains all the information both nodes require</p></li>
+<li><p>We add the type annotations <code class="docutils literal notranslate"><span class="pre">GENERATOR</span></code> and <code class="docutils literal notranslate"><span class="pre">ROLLING_AVERAGER</span></code> to indicate that each <code class="docutils literal notranslate"><span class="pre">AveragedNoise</span></code> group contains these nodes.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">connections</span></code> method lets us specify how topics will be connected. When two topics are connected, it means they will point to the same stream at runtime. In this case we specify that the <code class="docutils literal notranslate"><span class="pre">OUTPUT</span></code> topic of the <code class="docutils literal notranslate"><span class="pre">Generator</span></code> will be connected to the <code class="docutils literal notranslate"><span class="pre">INPUT</span></code> topic of the <code class="docutils literal notranslate"><span class="pre">RollingAverager</span></code>. We also create the <code class="docutils literal notranslate"><span class="pre">OUTPUT</span></code> topic in <code class="docutils literal notranslate"><span class="pre">AveragedNoise</span></code> that basically exposes the output stream from <code class="docutils literal notranslate"><span class="pre">RollingAverager</span></code>.</p></li>
+</ul>
+<p>Now we can use <code class="docutils literal notranslate"><span class="pre">AveragedNoise</span></code> as if it were a node – it is a self-contained module that we can reuse anywhere we want.</p>
+</div>
+<div class="section" id="graphs">
+<h2>Graphs<a class="headerlink" href="#graphs" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>graph</strong> is a complete set of topics and nodes that describes a functioning system. It is actually a group, but it is assumed to be the outermost container for the description of a system. Suppose we want to display a live visualization using our group from earlier. We can define a graph as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Demo</span><span class="p">(</span><span class="n">lg</span><span class="o">.</span><span class="n">Graph</span><span class="p">):</span>
+    <span class="n">AVERAGED_NOISE</span><span class="p">:</span> <span class="n">AveragedNoise</span>
+    <span class="n">PLOT</span><span class="p">:</span> <span class="n">Plot</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AVERAGED_NOISE</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+            <span class="n">AveragedNoiseConfig</span><span class="p">(</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="n">SAMPLE_RATE</span><span class="p">,</span> <span class="n">num_features</span><span class="o">=</span><span class="n">NUM_FEATURES</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">WINDOW</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PLOT</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+            <span class="n">PlotConfig</span><span class="p">(</span><span class="n">refresh_rate</span><span class="o">=</span><span class="n">REFRESH_RATE</span><span class="p">,</span> <span class="n">num_bars</span><span class="o">=</span><span class="n">NUM_FEATURES</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">lg</span><span class="o">.</span><span class="n">Connections</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">AVERAGED_NOISE</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PLOT</span><span class="o">.</span><span class="n">INPUT</span><span class="p">),)</span>
+
+    <span class="k">def</span> <span class="nf">process_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">lg</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AVERAGED_NOISE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PLOT</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>We add the <code class="docutils literal notranslate"><span class="pre">AVERAGED_NOISE</span></code> group from before, as well as a <code class="docutils literal notranslate"><span class="pre">Plot</span></code> node (implementation left out) that displays a live bar graph in a UI.</p></li>
+<li><p>Since graphs are groups, we can use <code class="docutils literal notranslate"><span class="pre">connections()</span></code> to connect <code class="docutils literal notranslate"><span class="pre">AveragedNoise</span></code> to <code class="docutils literal notranslate"><span class="pre">Plot</span></code>.</p></li>
+<li><p>Graphs have the additional functionality of being able to define <code class="docutils literal notranslate"><span class="pre">process_modules()</span></code> which lets us specify the process architecture of the groups and nodes the graph contains. In this case, by returning <code class="docutils literal notranslate"><span class="pre">(self.AVERAGED_NOISE,</span> <span class="pre">self.PLOT)</span></code> from this method, we cause the <code class="docutils literal notranslate"><span class="pre">AveragedNoise</span></code> group and the <code class="docutils literal notranslate"><span class="pre">Plot</span></code> node to run in separate processes. If we excluded this method, everything would run in a single process. In this way, <code class="docutils literal notranslate"><span class="pre">process_modules()</span></code> lets us concisely specify how a graph should be parallelized.</p></li>
+</ul>
+<p>Then we can run the graph using the <code class="docutils literal notranslate"><span class="pre">lg.run()</span></code> tool:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">lg</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">Demo</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That’s it! This will run the graph, which will generate noise and display it in real-time.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">LabGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="messages.html">Messages</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LabGraph Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#messages">Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#streams-and-topics">Streams and Topics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nodes">Nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#groups">Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#graphs">Graphs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cpp-interop.html">C++ Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cthulhu.html">Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lifecycles-and-configuration.html">Module Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lifecycles-and-configuration.html#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="websockets-api-errors.html">WebSockets API Error Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="websockets-api.html">WebSockets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zmq-support.html">ZMQ Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance/realtime-streaming-performance.html">Real-Time Streaming Performance in LabGraph &amp; Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation/macos.html">MacOS Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/codetools/README.html">Use Flake8 for styling checks</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="messages.html" title="previous chapter">Messages</a></li>
+      <li>Next: <a href="cpp-interop.html" title="next chapter">C++ Interoperability</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2004 - present Facebook. All Rights Reserved..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/docs/concepts.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

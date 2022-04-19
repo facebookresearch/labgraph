@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real-Time Streaming Performance in LabGraph &amp; Cthulhu &#8212; LabGraph  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="MacOS Installation Guide" href="../installation/macos.html" />
+    <link rel="prev" title="ZMQ Support" href="../zmq-support.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="real-time-streaming-performance-in-labgraph-cthulhu">
+<h1>Real-Time Streaming Performance in LabGraph &amp; Cthulhu<a class="headerlink" href="#real-time-streaming-performance-in-labgraph-cthulhu" title="Permalink to this headline">¶</a></h1>
+<p>TL;DR: Based on a performance test in this doc, LabGraph and Cthulhu support 100s of MB/s of data transfer in several kHz of samples.</p>
+<div class="section" id="plots">
+<h2>Plots<a class="headerlink" href="#plots" title="Permalink to this headline">¶</a></h2>
+<p><img alt="Sample Rate and Data Transfer cross Platfrom and Language" src="https://raw.githubusercontent.com/facebookresearch/labgraph/master/docs/performance/images/sample_rate_data_transfer_cross_platform_language.png" /></p>
+<p><img alt="Sample Rate and Data Transfer by Block Size" src="https://raw.githubusercontent.com/facebookresearch/labgraph/master/docs/performance/images/sample_rate_data_transfer_rate_by_block_size.png" /></p>
+<p align="center">
+   <img width="460*2" height="300*2" src="https://raw.githubusercontent.com/facebookresearch/labgraph/master/docs/performance/images/sample_latency.png">
+</p>
+</div>
+<div class="section" id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The difference between C++ and Python performance is not as large in this analysis. There is still a significant scalar difference on macOS and Linux, but it likely leaves many high-throughput use cases on the table for use with Python.</p></li>
+<li><p>In a few cases (Windows sample rate, macOS data rate), the Python performance is actually <em>greater</em> than the C++ performance! The way we allocate samples in Python and C++ follow fairly different code paths, so it may be the case that the C++ test is incurring some overhead that the Python test isn’t. One difference between the two is that the C++ test makes use of a subclass of <code class="docutils literal notranslate"><span class="pre">cthulhu::AutoStreamSample</span></code> whereas Python always stays at the more generic <code class="docutils literal notranslate"><span class="pre">cthulhu::StreamSample</span></code> level. Another difference is that Python uses numpy to deal with blocks whereas C++ doesn’t. However, a deeper analysis will help to get to the bottom of this.</p></li>
+<li><p>In this study, data rate we can achieve generally plateaus around a 2 MB block size; beyond this point the cost of constructing and reading the blocks presumably outpaces the gains from a larger block.</p></li>
+<li><p>In C++, the sample rate on Windows is a lot slower than on macOS and Linux, which may be explained by the signalling mechanism used by Boost::Interprocess on Windows.</p></li>
+</ul>
+</div>
+<div class="section" id="methodology">
+<h2>Methodology<a class="headerlink" href="#methodology" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The root process decides the number of tests to run, and their parameters, based on command-line arguments. In particular, because we are interested in the effect of the block size, there is a –dynamic-size parameter which selects a single chosen dynamic block size, or –many-dynamic-sizes which runs many tests for a battery of different dynamic block sizes. For this analysis a log scale from 2^3 to 2^23 bytes is used for the block sizes. The –duration parameter controls how long each block size is streamed for; 2 minutes (–duration 120) are chosen.</p></li>
+<li><p>These tests often provide variable results because of the OS’s scheduler, which can technically put the test to sleep for as long as it wants. To minimize this variability tools of the OSes are used to maximize the priority given to the root process (this priority then cascades to the child processes we spawn). For macOS and Linux this meant the load test is run with sudo nice -n -20 and on Windows start /realtime is used.</p></li>
+<li><p>For each test, a publisher process and a subscriber process are started. The publisher process creates a stream and starts publishing samples to it as quickly as the CPU allows (i.e., the publisher doesn’t try to sleep between samples). The subscriber subscribes to the stream and logs some minimal timing information for each sample received.</p></li>
+<li><p>Once the specified duration has elapsed, the publisher and subscriber shut down. Each process logs some statistics, and also writes statistics to an HDF5 file. Each HDF5 file is uploaded to notebook for further analysis and the plots you see here.</p></li>
+</ul>
+</div>
+<div class="section" id="caveats-opportunities">
+<h2>Caveats &amp; Opportunities<a class="headerlink" href="#caveats-opportunities" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>These results are only as good as the tests. As mentioned above, some discrepancy between the C++ and Python versions of the load test is making it so that Python sometimes outperforms C++. This could be pointing to either a mistake in the load test implementation adding extra overhead to C++. It could also be the case that the code paths in these cases are so different that the performance really does turn out this way.</p></li>
+<li><p>In these tests a very simple graph topology is used: one publisher streaming to one subscriber. More sophisticated graph topologies with many publishers and/or subscribers could be tested.</p></li>
+<li><p>Only the low-level transport is tested here, but there are many common real-time algorithms we will wish to profile and tune as well. For example, we will want stream alignment to be about as performant as the transport.</p></li>
+<li><p>These results are subject to the state of the overall machine, which can change over time. These results change somewhat upon repeated runs. This could be dealt with a little bit by extending the length of the test. (the duration is kept to 2 minutes for now because this is already a 42-minute test for the 21 block size options.)</p></li>
+<li><p>The hardware used likely contributes significantly to these results. For this analysis, a 2017 Macbook Pro, a Razer Full HD, and a 57 GB RAM machine running CentOS.</p></li>
+<li><p>Beyond hardware, there may be operating system differences in performance, such as the signalling performance issue on Windows discussed above.</p></li>
+<li><p>IPC backend in Cthulhu is checked which uses Boost::Interprocess to signal between multiple processes, and is the most common use case in LabGraph. It is also possible to use the Local backend, which is expected to produce performance results far superior to what is seen here since interprocess signalling is likely what bottlenecks the sample rate.</p></li>
+<li><p>The overhead in the subscriber process is tried to minimized upon receiving a sample, but there may be some remaining overhead.</p></li>
+</ul>
+</div>
+<div class="section" id="overall-takeaways">
+<h2>Overall Takeaways<a class="headerlink" href="#overall-takeaways" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>This study provides a high level picture of how LabGraph and Cthulhu perform on different platforms. What we can see for sure is that the order of magnitude we are dealing with is several kHz of samples and 100s of MB/s of data transfer that Dragonfly can support. The uncertainty comes from the tests that were written, in particular when we try to compare across languages. Still, from speaking with our colleagues in Pittsburgh who work on Cthulhu, it sounds like this is a reasonable starting point for understanding our performance that we can build upon. For example, we can take these metrics, start logging them, and monitor for regressions; even if the metrics aren’t perfect, sudden movements in them could alert us to potentially faulty changes. This also gives us a reasonable ballpark for whether or not we would be able to support the data rate of a proposed hardware system.</p></li>
+<li><p>Please share your thoughts and suggestions! Measuring and tuning the performance of our frameworks is a work in progress. Additional ideas for testing methods and analyses are welcomed.</p></li>
+</ul>
+<p>More details on the analysis can be found <a class="reference external" href="https://github.com/facebookresearch/labgraph/tree/master/docs/performance">here</a>.
+Sample test run: python load_test.py –duration 30 –output load_test.h5</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">LabGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../messages.html">Messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">LabGraph Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp-interop.html">C++ Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cthulhu.html">Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lifecycles-and-configuration.html">Module Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lifecycles-and-configuration.html#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../websockets-api-errors.html">WebSockets API Error Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../websockets-api.html">WebSockets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zmq-support.html">ZMQ Support</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Real-Time Streaming Performance in LabGraph &amp; Cthulhu</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plots">Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discussion">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#methodology">Methodology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#caveats-opportunities">Caveats &amp; Opportunities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#overall-takeaways">Overall Takeaways</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/macos.html">MacOS Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/codetools/README.html">Use Flake8 for styling checks</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../zmq-support.html" title="previous chapter">ZMQ Support</a></li>
+      <li>Next: <a href="../installation/macos.html" title="next chapter">MacOS Installation Guide</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2004 - present Facebook. All Rights Reserved..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/docs/performance/realtime-streaming-performance.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

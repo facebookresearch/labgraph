@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZMQ Support &#8212; LabGraph  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Real-Time Streaming Performance in LabGraph &amp; Cthulhu" href="performance/realtime-streaming-performance.html" />
+    <link rel="prev" title="WebSockets API" href="websockets-api.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="zmq-support">
+<h1>ZMQ Support<a class="headerlink" href="#zmq-support" title="Permalink to this headline">¶</a></h1>
+<p>LabGraph has two types of nodes which allow us to use the <a class="reference external" href="https://zeromq.org/languages/python/">ZeroMQ (ZMQ) library</a>: <code class="docutils literal notranslate"><span class="pre">ZMQPollerNode</span></code> and <code class="docutils literal notranslate"><span class="pre">ZMQSenderNode</span></code>. They work with ZMQ sockets that use the PUB and SUB modes; other modes like REQ/REP and PAIR are currently unsupported.</p>
+<div class="section" id="zmqmessage">
+<h2>ZMQMessage<a class="headerlink" href="#zmqmessage" title="Permalink to this headline">¶</a></h2>
+<p>The basic message type that is used by both the <code class="docutils literal notranslate"><span class="pre">ZMQPollerNode</span></code> and <code class="docutils literal notranslate"><span class="pre">ZMQSenderNode</span></code> to communicate ZMQ data to the graph. It has just one field, <code class="docutils literal notranslate"><span class="pre">data</span></code>, which contains the raw bytes sent over the ZMQ socket.</p>
+</div>
+<div class="section" id="zmqpollernode">
+<h2>ZMQPollerNode<a class="headerlink" href="#zmqpollernode" title="Permalink to this headline">¶</a></h2>
+<p>This node polls ZMQ data of a particular ZMQ topic at a particular read address (both configurable). Any data polled by the node is published as a <code class="docutils literal notranslate"><span class="pre">ZMQMessage</span></code> back to the rest of the graph. This node has the following configuration parameters via <code class="docutils literal notranslate"><span class="pre">ZMQPollerConfig</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">read_addr</span></code>: The address through which ZMQ data should be polled.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zmq_topic</span></code>: The ZMQ topic being polled.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poll_time</span></code>: How long each iteration of the polling loop should take (in seconds)</p></li>
+</ul>
+</div>
+<div class="section" id="zmqsendernode">
+<h2>ZMQSenderNode<a class="headerlink" href="#zmqsendernode" title="Permalink to this headline">¶</a></h2>
+<p>This node subscribes to a stream of <code class="docutils literal notranslate"><span class="pre">ZMQMessage</span></code>s, and publishes its contents over ZMQ at a configured address/topic. This node has the following configuration parameters via <code class="docutils literal notranslate"><span class="pre">ZMQSenderConfig</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">write_addr</span></code>: The address to which ZMQ data should be written.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zmq_topic</span></code>: The ZMQ topic being written to.</p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">LabGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="messages.html">Messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">LabGraph Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp-interop.html">C++ Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cthulhu.html">Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lifecycles-and-configuration.html">Module Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lifecycles-and-configuration.html#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="websockets-api-errors.html">WebSockets API Error Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="websockets-api.html">WebSockets API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ZMQ Support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#zmqmessage">ZMQMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zmqpollernode">ZMQPollerNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zmqsendernode">ZMQSenderNode</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="performance/realtime-streaming-performance.html">Real-Time Streaming Performance in LabGraph &amp; Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation/macos.html">MacOS Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/codetools/README.html">Use Flake8 for styling checks</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="websockets-api.html" title="previous chapter">WebSockets API</a></li>
+      <li>Next: <a href="performance/realtime-streaming-performance.html" title="next chapter">Real-Time Streaming Performance in LabGraph &amp; Cthulhu</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2004 - present Facebook. All Rights Reserved..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/docs/zmq-support.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Module Lifecycle &#8212; LabGraph  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="WebSockets API Error Codes" href="websockets-api-errors.html" />
+    <link rel="prev" title="Cthulhu" href="cthulhu.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-lifecycle">
+<h1>Module Lifecycle<a class="headerlink" href="#module-lifecycle" title="Permalink to this headline">¶</a></h1>
+<p>A node, group, or graph (a module) goes through the following steps in its lifetime:</p>
+<ol class="arabic simple">
+<li><p><strong>Definition</strong>: The module type is defined in Python code which the Python interpreter reads into memory.</p></li>
+<li><p><strong>Construction</strong>: We construct an instance of the module. If the module is a graph, then the user explicitly constructs a graph like <code class="docutils literal notranslate"><span class="pre">graph</span> <span class="pre">=</span> <span class="pre">MyGraph()</span></code>. Otherwise, a module is implicitly constructed by its containing graph when that graph is constructed.</p></li>
+<li><p><strong>Setup</strong>: As a LabGraph graph is starting up, <code class="docutils literal notranslate"><span class="pre">setup()</span></code> is called on every module. If a group contains some other modules, the group’s <code class="docutils literal notranslate"><span class="pre">setup()</span></code> will always be called before those modules’ <code class="docutils literal notranslate"><span class="pre">setup()</span></code>s are called. During the <code class="docutils literal notranslate"><span class="pre">setup()</span></code> call, the module can prepare itself for execution. If the module is a group, then it can also configure the modules it contains - see <span class="xref myst">Configuration</span>.</p></li>
+<li><p><strong>Execution</strong>: When the graph is ready, LabGraph will begin execution of all modules simultaneously.</p></li>
+<li><p><strong>Cleanup</strong>: When all modules have terminated, LabGraph will run <code class="docutils literal notranslate"><span class="pre">cleanup()</span></code> on every module. <code class="docutils literal notranslate"><span class="pre">cleanup()</span></code> will be called in the same order that <code class="docutils literal notranslate"><span class="pre">setup()</span></code> was called.</p></li>
+</ol>
+</div>
+<div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>LabGraph provides a way to concisely specify configuration that is given to a graph and forwarded to its descendant nodes. We start by defining a configuration type:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyNodeConfig</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Config</span><span class="p">):</span>
+  <span class="n">num_trials</span><span class="p">:</span> <span class="nb">int</span>
+  <span class="n">participant_name</span><span class="p">:</span> <span class="nb">str</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Config</span></code> classes actually just <code class="docutils literal notranslate"><span class="pre">Message</span></code> classes, except that they also provide special utilities for configuring graphs, as you’ll see.</p>
+<p>We specify the configuration for a <code class="docutils literal notranslate"><span class="pre">Node</span></code>, <code class="docutils literal notranslate"><span class="pre">Group</span></code>, or <code class="docutils literal notranslate"><span class="pre">Graph</span></code> by giving it a <code class="docutils literal notranslate"><span class="pre">config</span></code> type annotation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyNode</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+  <span class="n">config</span><span class="p">:</span> <span class="n">MyNodeConfig</span>
+
+  <span class="o">...</span>
+</pre></div>
+</div>
+<p>Then we can configure it by calling <code class="docutils literal notranslate"><span class="pre">configure()</span></code> on it. We configure a node or group in the <code class="docutils literal notranslate"><span class="pre">setup()</span></code> method of its containing group:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyGroupConfig</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Config</span><span class="p">):</span>
+  <span class="o">...</span>
+
+<span class="k">class</span> <span class="nc">MyGroup</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Config</span><span class="p">):</span>
+  <span class="n">config</span><span class="p">:</span> <span class="n">MyGroupConfig</span>
+  <span class="n">MY_NODE</span><span class="p">:</span> <span class="n">MyNode</span>
+
+  <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># Cascade config to MY_NODE based on the</span>
+    <span class="c1"># group&#39;s config</span>
+    <span class="n">my_node_config</span> <span class="o">=</span> <span class="n">MyNodeConfig</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">MY_NODE</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">my_node_config</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The exception to this is graphs, which we can construct and configure directly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_graph</span> <span class="o">=</span> <span class="n">MyGraph</span><span class="p">()</span>
+<span class="n">my_graph</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">MyGraphConfig</span><span class="p">(</span><span class="o">...</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Rather than hard-coding the top-level configuration like this, though, we can automatically build the configuration from from command-line arguments like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_config</span> <span class="o">=</span> <span class="n">MyGraphConfig</span><span class="o">.</span><span class="n">fromargs</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">df.run</span></code> function actually gets configuration using <code class="docutils literal notranslate"><span class="pre">fromargs()</span></code>, so we can also just run a graph using command-line arguments like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">MyGraph</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">LabGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="messages.html">Messages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">LabGraph Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp-interop.html">C++ Interoperability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cthulhu.html">Cthulhu</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Module Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="websockets-api-errors.html">WebSockets API Error Codes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="websockets-api.html">WebSockets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zmq-support.html">ZMQ Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance/realtime-streaming-performance.html">Real-Time Streaming Performance in LabGraph &amp; Cthulhu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation/macos.html">MacOS Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/codetools/README.html">Use Flake8 for styling checks</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="cthulhu.html" title="previous chapter">Cthulhu</a></li>
+      <li>Next: <a href="websockets-api-errors.html" title="next chapter">WebSockets API Error Codes</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2004 - present Facebook. All Rights Reserved..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/docs/lifecycles-and-configuration.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
