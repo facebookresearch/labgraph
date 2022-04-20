@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserve
 
+import os
 import labgraph as lg
 from labgraph.graphs.stream import Stream
 from graphviz import Digraph
@@ -79,7 +80,7 @@ def in_out_edge_mapper(streams: Stream) -> Dict[str, str]:
         difference = set(stream.topic_paths).difference(GraphVizNode.in_edges)
 
         if difference:
-            upstream_edge = difference.pop()
+            upstream_edge = max(difference, key=len)
             for edge in stream.topic_paths:
                 if edge != upstream_edge:
                     in_out_edge_map[edge] = upstream_edge
@@ -171,7 +172,8 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
         raise GenerateGraphvizError(
             "Parameter 'output_file' cannot be null or empty string."
         )
-    filename, format = output_file.split('.')
+
+    filename, format = os.path.splitext(output_file)
 
     # Local variables
     nodes: List[GraphVizNode] = []
@@ -187,5 +189,5 @@ def generate_graphviz(graph: lg.Graph, output_file: str) -> None:
         type(graph).__name__,
         nodes,
         filename,
-        format
+        format[1:]
     )
