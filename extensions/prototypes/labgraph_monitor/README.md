@@ -74,7 +74,8 @@ REACT_APP_WS_API="ws://127.0.0.1:9000"
 
 (!) LabGraph Websocket server runs on localhost:9000 by default
 
-2. Run Labgraph Websockets server. The following tutorial shows how to run LabGraph Websocket server properly: [tutorial](https://github.com/facebookresearch/labgraph/pull/58/files#diff-247005c77570899ce53f81a83b2a5fe6e7535616cc96564d67378fe7f73dac49)
+2. Run Labgraph Websockets server.
+   `python3 extensions/yaml_support/labgraph_monitor/examples/labgraph_monitor_example.py`
 
 3. Under LabGraph Monitor settings panel click on REALTIME option and click connect.
 
