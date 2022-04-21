@@ -54,7 +54,7 @@ labgraph\extensions\prototypes\labgraph_monitor> yarn start
 
 <image src="https://i.ibb.co/nBn4mv9/main-screen-frame.png" alt=""/>
 
-### Mocks :
+### Mocks:
 
 Mocks are a quick way to get familiar with the user interface. They do not require any connection to the LabGraph Websockets API and provide visualization for most of the existing [LabGraph examples](https://github.com/facebookresearch/labgraph/tree/main/labgraph/examples).
 
@@ -74,7 +74,7 @@ REACT_APP_WS_API="ws://127.0.0.1:9000"
 
 (!) LabGraph Websocket server runs on localhost:9000 by default
 
-2. Run Labgraph Websockets server. The following tutorial show how to run LabGraph Websocket server properly : [tutorial](https://github.com/facebookresearch/labgraph/pull/58/files#diff-247005c77570899ce53f81a83b2a5fe6e7535616cc96564d67378fe7f73dac49)
+2. Run Labgraph Websockets server. The following tutorial shows how to run LabGraph Websocket server properly: [tutorial](https://github.com/facebookresearch/labgraph/pull/58/files#diff-247005c77570899ce53f81a83b2a5fe6e7535616cc96564d67378fe7f73dac49)
 
 3. Under LabGraph Monitor settings panel click on REALTIME option and click connect.
 
@@ -99,7 +99,7 @@ To see the information related to a specific node or edge, just click on it, the
 
 ## Architecture Overview
 
-This the birdview architecture of the Labgraph Monitor.
+This is a bird's-eye view of the architecture of Labgraph Monitor.
 
 <image src="https://i.ibb.co/chtfM5R/lg-Architecture.png" width="500px" alt="labgraph monitor's architecture overview"/>
 

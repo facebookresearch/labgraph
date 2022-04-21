@@ -12,6 +12,7 @@ import {
     SettingsApplicationsRounded,
     AlignHorizontalLeftOutlined,
     AlignVerticalTopOutlined,
+    Mode,
 } from '@mui/icons-material';
 import React, { useCallback } from 'react';
 import SettingTabs from './SettingTabs';
@@ -21,9 +22,9 @@ import { RootState } from '../../redux/store';
 import { useSelector, useDispatch } from 'react-redux';
 import { setPanel } from '../../redux/reducers/config/configReducer';
 
-export const defaultPanelWidth = 280;
-const minPanelWidth = defaultPanelWidth;
-const maxPanelWidth = 600;
+export const DEFAULT_PANEL_WIDTH = 280;
+export const MIN_PANEL_WIDTH = 280;
+export const MAX_PANEL_WIDTH = 600;
 const useStyles = makeStyles({
     root: {
         display: 'flex',
@@ -43,10 +44,10 @@ const useStyles = makeStyles({
     },
 
     settingPanel: {
-        width: defaultPanelWidth,
+        width: DEFAULT_PANEL_WIDTH,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-            width: defaultPanelWidth,
+            width: DEFAULT_PANEL_WIDTH,
         },
     },
 
@@ -94,9 +95,8 @@ const SettingPanel: React.FC = (): JSX.Element => {
     const { mode, layout, toggleMode, toggleLayout } = useUIContext();
     const { panelOpen } = useSelector((state: RootState) => state.config);
     const dispatch = useDispatch();
-    const [panelWidth, setPanelWidth] = React.useState(defaultPanelWidth);
-
-    const handleMouseDown = (e: any) => {
+    const [panelWidth, setPanelWidth] = React.useState(DEFAULT_PANEL_WIDTH);
+    const handleMouseDown = () => {
         document.addEventListener('mouseup', handleMouseUp, true);
         document.addEventListener('mousemove', handleMouseMove, true);
     };
@@ -107,7 +107,7 @@ const SettingPanel: React.FC = (): JSX.Element => {
     const handleMouseMove = useCallback((e) => {
         const newWidth =
             document.body.offsetLeft + document.body.offsetWidth - e.clientX;
-        if (newWidth > minPanelWidth && newWidth < maxPanelWidth) {
+        if (newWidth > MIN_PANEL_WIDTH && newWidth < MAX_PANEL_WIDTH) {
             setPanelWidth(newWidth);
         }
     }, []);
@@ -150,19 +150,16 @@ const SettingPanel: React.FC = (): JSX.Element => {
                     </IconButton>
                 </Box>
 
-                {mode === 'light' ? (
-                    <div
-                        id="dragger"
-                        onMouseDown={(e) => handleMouseDown(e)}
-                        className={classes.dragger_light}
-                    />
-                ) : (
-                    <div
-                        id="dragger"
-                        onMouseDown={(e) => handleMouseDown(e)}
-                        className={classes.dragger_dark}
-                    />
-                )}
+                <div
+                    id="dragger"
+                    onMouseDown={() => handleMouseDown()}
+                    className={
+                        mode === 'light'
+                            ? classes.dragger_light
+                            : classes.dragger_dark
+                    }
+                />
+
                 <Divider />
                 <Box className={classes.themeBar}>
                     <IconButton

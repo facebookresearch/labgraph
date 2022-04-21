@@ -12,7 +12,7 @@ interface INode {
                 fields: {
                     [fieldName: string]: {
                         type: string;
-                        content: any;
+                        content: number | number[];
                     };
                 };
             }>;

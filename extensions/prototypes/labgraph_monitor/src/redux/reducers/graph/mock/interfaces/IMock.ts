@@ -8,7 +8,7 @@ import IGraph from '../../common/interfaces/IGraph';
 
 interface IMock {
     mockGraph: IGraph;
-    mockRealtimeData: any;
+    mockRealtimeData: number[];
 }
 
 export default IMock;
