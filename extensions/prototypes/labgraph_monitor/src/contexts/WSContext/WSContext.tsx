@@ -58,7 +58,7 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
                         dispatch(setConnection(WS_STATE.DISCONNECTED));
                     };
                 } catch (error) {
-                    // catch error
+                    dispatch(setConnection(WS_STATE.DISCONNECTED));
                 }
                 break;
             case WS_STATE.CONNECTED:
