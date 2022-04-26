@@ -18,6 +18,9 @@ const useStyles = makeStyles({
     root: {
         width: '100%',
     },
+    tab: {
+        width: '33%',
+    },
 });
 
 /**
@@ -44,9 +47,9 @@ const SettingTabs: React.FC = (): JSX.Element => {
                         }
                         data-testid="tab-list"
                     >
-                        <Tab label="graph" value="1" />
-                        <Tab label="node" value="2" />
-                        <Tab label="edge" value="3" />
+                        <Tab label="graph" value="1" className={classes.tab} />
+                        <Tab label="node" value="2" className={classes.tab} />
+                        <Tab label="edge" value="3" className={classes.tab} />
                     </TabList>
                 </Box>
                 <TabPanel style={{ padding: 0 }} value="1">

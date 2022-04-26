@@ -16,8 +16,14 @@
                                         {
                                             "name": "SimulationMessage",
                                             "fields": {
-                                                "timestamp": "ndarray",
-                                                "daub_data": "ndarray"
+                                                "timestamp": {
+                                                    "type":"ndarray",
+                                                    "content": 1644931259.3396878
+                                                },
+                                                "data": {
+                                                    "type": "ndarray",
+                                                    "content": [0.77135353, 0.61299748, 0.34146919, 0.46154968, 0.19577749]
+                                                }
                                             }
                                         }
                                     ]

@@ -10,7 +10,10 @@ interface INode {
             [upstream: string]: Array<{
                 name: string;
                 fields: {
-                    [fieldName: string]: string;
+                    [fieldName: string]: {
+                        type: string;
+                        content: number | number[];
+                    };
                 };
             }>;
         };

@@ -34,24 +34,33 @@ const WSContextProvider: React.FC<ReactNode> = ({ children }): JSX.Element => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (!process.env.REACT_APP_WS_API) return;
+        if (!process.env.REACT_APP_WS_API) {
+            alert('Error: Undefined Environment Variable: REACT_APP_WS_API');
+            dispatch(setConnection(WS_STATE.DISCONNECTED));
+            // dispatch to be disocnnected disconnect
+            return;
+        }
         switch (connection) {
             case WS_STATE.IS_CONNECTING:
-                clientRef.current = new W3CWebSocket(
-                    process.env.REACT_APP_WS_API as string
-                );
+                try {
+                    clientRef.current = new W3CWebSocket(
+                        process.env.REACT_APP_WS_API as string
+                    );
 
-                clientRef.current.onopen = () => {
-                    clientRef.current?.send(JSON.stringify(startStreamRequest));
-                    dispatch(setConnection(WS_STATE.CONNECTED));
-                };
+                    clientRef.current.onopen = () => {
+                        clientRef.current?.send(
+                            JSON.stringify(startStreamRequest)
+                        );
+                        dispatch(setConnection(WS_STATE.CONNECTED));
+                    };
 
-                clientRef.current.onerror = (err: any) => {
+                    clientRef.current.onerror = (err: any) => {
+                        dispatch(setConnection(WS_STATE.DISCONNECTED));
+                    };
+                } catch (error) {
                     dispatch(setConnection(WS_STATE.DISCONNECTED));
-                };
-
+                }
                 break;
-
             case WS_STATE.CONNECTED:
                 if (!clientRef.current) return;
                 clientRef.current.onmessage = (message: any) => {

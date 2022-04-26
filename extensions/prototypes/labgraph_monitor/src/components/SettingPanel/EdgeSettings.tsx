@@ -14,15 +14,22 @@ import {
     TableHead,
     TableRow,
     Typography,
+    Button,
 } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RootState } from '../../redux/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import WS_STATE from '../../redux/reducers/graph/ws/enums/WS_STATE';
+import { setMockRealtimeData } from '../../redux/reducers/graph/mock/mockReducer';
 
 interface IMessage {
     name: string;
-    fields: { [fieldName: string]: string };
+    fields: {
+        [fieldName: string]: {
+            type: string;
+            content: any;
+        };
+    };
 }
 
 /**
@@ -37,8 +44,11 @@ const Edge: React.FC = (): JSX.Element => {
         (state: RootState) => state.ws
     );
     const { mockGraph } = useSelector((state: RootState) => state.mock);
-
+    const mockData = useSelector(
+        (state: RootState) => state.mock.mockRealtimeData
+    );
     const graph = connection === WS_STATE.CONNECTED ? realtimeGraph : mockGraph;
+    const [open, setOpen] = React.useState(false);
 
     const messages: IMessage[] =
         graph && selectedEdge.target
@@ -46,6 +56,23 @@ const Edge: React.FC = (): JSX.Element => {
                   selectedEdge.source
               ]
             : [];
+    const handleToggle = () => {
+        setOpen(!open);
+    };
+    // creating mock data, check mockReducer.ts, IMock.ts and EdgeSettings.tsx for future updates
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            const date = Date.now();
+
+            dispatch(
+                setMockRealtimeData([date, date % 10, date * 3, date / 4])
+            );
+        }, 100);
+
+        return () => clearInterval(id);
+    }, [dispatch]);
     return (
         <React.Fragment>
             <Box data-testid="edge-settings">
@@ -62,16 +89,51 @@ const Edge: React.FC = (): JSX.Element => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
+                                    {/* ZMQMessage Edge */}
                                     {Object.entries(message.fields).map(
-                                        ([name, type]) => {
+                                        (field, index) => {
                                             return (
-                                                <TableRow key={name}>
+                                                <TableRow key={index}>
                                                     <TableCell>
-                                                        {name}
+                                                        {field[0]}
                                                     </TableCell>
                                                     <TableCell>
-                                                        {type}
+                                                        {field[1].type}
                                                     </TableCell>
+                                                </TableRow>
+                                            );
+                                        }
+                                    )}
+                                    <Button onClick={handleToggle}>
+                                        {open ? 'Show less' : 'Show more'}
+                                    </Button>
+
+                                    {Object.entries(message.fields).map(
+                                        (field, index) => {
+                                            return (
+                                                <TableRow key={index}>
+                                                    {open && (
+                                                        <TableCell>
+                                                            {field[0]}
+                                                        </TableCell>
+                                                    )}
+                                                    {open ? (
+                                                        <TableCell
+                                                            style={{
+                                                                whiteSpace:
+                                                                    'normal',
+                                                                wordBreak:
+                                                                    'break-word',
+                                                            }}
+                                                        >
+                                                            {connection ===
+                                                            WS_STATE.CONNECTED
+                                                                ? `${field[1].content}, `
+                                                                : mockData.join(
+                                                                      ' '
+                                                                  )}
+                                                        </TableCell>
+                                                    ) : null}
                                                 </TableRow>
                                             );
                                         }
