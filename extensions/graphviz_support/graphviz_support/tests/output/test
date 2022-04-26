@@ -1,0 +1,17 @@
+digraph Demo {
+	center=true rankdir=LR
+	node [fontsize=12 height=1.5 shape=circle width=1.5]
+	NoiseGenerator
+	RollingAverager
+	Amplifier
+	Attenuator
+	Sink
+	Sink
+	Sink
+	NoiseGenerator -> RollingAverager
+	NoiseGenerator -> Amplifier
+	NoiseGenerator -> Attenuator
+	RollingAverager -> Sink
+	Amplifier -> Sink
+	Attenuator -> Sink
+}

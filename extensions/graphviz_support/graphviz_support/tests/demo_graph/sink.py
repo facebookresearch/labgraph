@@ -14,20 +14,20 @@ class SinkState(lg.State):
 
 
 class Sink(lg.Node):
-    INPUT_1 = lg.Topic(RandomMessage)
-    INPUT_2 = lg.Topic(RandomMessage)
-    INPUT_3 = lg.Topic(RandomMessage)
+    SINK_INPUT_1 = lg.Topic(RandomMessage)
+    SINK_INPUT_2 = lg.Topic(RandomMessage)
+    SINK_INPUT_3 = lg.Topic(RandomMessage)
     state: SinkState
 
-    @lg.subscriber(INPUT_1)
+    @lg.subscriber(SINK_INPUT_1)
     def got_message(self, message: RandomMessage) -> None:
         self.state.data_1 = message.data
 
-    @lg.subscriber(INPUT_2)
+    @lg.subscriber(SINK_INPUT_2)
     def got_message_2(self, message: RandomMessage) -> None:
         self.state.data_2 = message.data
 
-    @lg.subscriber(INPUT_3)
+    @lg.subscriber(SINK_INPUT_3)
     def got_message_3(self, message: RandomMessage) -> None:
         self.state.data_3 = message.data
 

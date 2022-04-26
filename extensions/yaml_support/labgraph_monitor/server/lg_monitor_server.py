@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2004-present Facebook. All Rights Reserve
+# Copyright 2004-present Facebook. All Rights Reserved.
 
 import labgraph as lg
 from typing import Tuple
@@ -20,7 +20,7 @@ DEFAULT_API_VERSION = WS_SERVER.DEFAULT_API_VERSION
 SAMPLE_RATE = 5
 
 
-def run_server(data: SerializedGraph) -> None:
+def run_topology(data: SerializedGraph) -> None:
     """
     A function that creates a Websocket server graph.
     The server graph streams the lagraph topology to the clients
@@ -50,7 +50,7 @@ def run_server(data: SerializedGraph) -> None:
             self.WS_SERVER_NODE.configure(wsapi_server_config)
 
         def connections(self) -> lg.Connections:
-            return ((self.SERIALIZER.TOPIC, self.WS_SERVER_NODE.topic),)
+            return ((self.SERIALIZER.SERIALIZER_OUTPUT, self.WS_SERVER_NODE.topic),)
 
         def process_modules(self) -> Tuple[lg.Module, ...]:
             return (self.SERIALIZER, self.WS_SERVER_NODE, )

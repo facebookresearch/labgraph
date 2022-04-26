@@ -12,20 +12,20 @@ class AttenuatorConfig(lg.Config):
 
 
 class Attenuator(lg.Node):
-    INPUT = lg.Topic(RandomMessage)
-    OUTPUT = lg.Topic(RandomMessage)
+    ATTENUATOR_INPUT = lg.Topic(RandomMessage)
+    ATTENUATOR_OUTPUT = lg.Topic(RandomMessage)
     config: AttenuatorConfig
 
     def output(self, _in: float) -> float:
         return pow(10, (self.config.attenuation / 20)) * _in
 
-    @lg.subscriber(INPUT)
-    @lg.publisher(OUTPUT)
+    @lg.subscriber(ATTENUATOR_INPUT)
+    @lg.publisher(ATTENUATOR_OUTPUT)
     async def attenuate(self, message: RandomMessage) -> lg.AsyncPublisher:
         current_time = time.time()
         output_data = np.array(
             [self.output(_in) for _in in message.data]
         )
-        yield self.OUTPUT, RandomMessage(
+        yield self.ATTENUATOR_OUTPUT, RandomMessage(
             timestamp=current_time, data=output_data
         )

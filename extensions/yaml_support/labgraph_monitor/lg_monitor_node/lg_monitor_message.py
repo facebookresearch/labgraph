@@ -34,6 +34,6 @@ class LabgraphMonitorMessage:
             name = annotation[0]
             type = (annotation[1]).__name__
 
-            serialized_message['fields'][name] = type
+            serialized_message['fields'][name] = {"type":  type}
 
         return serialized_message

@@ -33,47 +33,47 @@ class TestLabgraphGraphvizAPI(unittest.TestCase):
         self.assertEqual(4, len(out_edge_node_map))
         self.assertEqual(
             'generate_noise',
-            out_edge_node_map['NOISE_GENERATOR/OUTPUT'].name
+            out_edge_node_map['NOISE_GENERATOR/NOISE_GENERATOR_OUTPUT'].name
         )
         self.assertEqual(
             'average',
-            out_edge_node_map['ROLLING_AVERAGER/OUTPUT'].name
+            out_edge_node_map['ROLLING_AVERAGER/ROLLING_AVERAGER_OUTPUT'].name
         )
         self.assertEqual(
             'amplify',
-            out_edge_node_map['AMPLIFIER/OUTPUT'].name
+            out_edge_node_map['AMPLIFIER/AMPLIFIER_OUTPUT'].name
         )
         self.assertEqual(
             'attenuate',
-            out_edge_node_map['ATTENUATOR/OUTPUT'].name
+            out_edge_node_map['ATTENUATOR/ATTENUATOR_OUTPUT'].name
         )
 
     def test_in_out_edge_mapper(self) -> None:
         in_out_edge_map = in_out_edge_mapper(self.graph.__streams__.values())
         self.assertEqual(6, len(in_out_edge_map))
         self.assertEqual(
-            'NOISE_GENERATOR/OUTPUT',
-            in_out_edge_map['ROLLING_AVERAGER/INPUT']
+            'NOISE_GENERATOR/NOISE_GENERATOR_OUTPUT',
+            in_out_edge_map['ROLLING_AVERAGER/ROLLING_AVERAGER_INPUT']
         )
         self.assertEqual(
-            'NOISE_GENERATOR/OUTPUT',
-            in_out_edge_map['AMPLIFIER/INPUT']
+            'NOISE_GENERATOR/NOISE_GENERATOR_OUTPUT',
+            in_out_edge_map['AMPLIFIER/AMPLIFIER_INPUT']
         )
         self.assertEqual(
-            'NOISE_GENERATOR/OUTPUT',
-            in_out_edge_map['ATTENUATOR/INPUT']
+            'NOISE_GENERATOR/NOISE_GENERATOR_OUTPUT',
+            in_out_edge_map['ATTENUATOR/ATTENUATOR_INPUT']
         )
         self.assertEqual(
-            'ROLLING_AVERAGER/OUTPUT',
-            in_out_edge_map['SINK/INPUT_1']
+            'ROLLING_AVERAGER/ROLLING_AVERAGER_OUTPUT',
+            in_out_edge_map['SINK/SINK_INPUT_1']
         )
         self.assertEqual(
-            'AMPLIFIER/OUTPUT',
-            in_out_edge_map['SINK/INPUT_2']
+            'AMPLIFIER/AMPLIFIER_OUTPUT',
+            in_out_edge_map['SINK/SINK_INPUT_2']
         )
         self.assertEqual(
-            'ATTENUATOR/OUTPUT',
-            in_out_edge_map['SINK/INPUT_3']
+            'ATTENUATOR/ATTENUATOR_OUTPUT',
+            in_out_edge_map['SINK/SINK_INPUT_3']
         )
 
     def test_connect_to_upstream(self) -> None:

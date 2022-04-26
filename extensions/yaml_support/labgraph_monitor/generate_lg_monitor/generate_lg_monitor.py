@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-# Copyright 2004-present Facebook. All Rights Reserve
+# Copyright 2004-present Facebook. All Rights Reserved.
 
 import labgraph as lg
 from labgraph.graphs.stream import Stream
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from ..lg_monitor_node.lg_monitor_node import LabgraphMonitorNode
 from ..lg_monitor_node.lg_monitor_message import LabgraphMonitorMessage
 from ..aliases.aliases import SerializedGraph
-from ..server.lg_monitor_server import run_server
-
 
 def identify_upstream_message(
     in_edge: str,
@@ -141,10 +139,7 @@ def connect_to_upstream(
     return nodes
 
 
-def serialize_graph(
-    name: str,
-    nodes: List[LabgraphMonitorNode]
-) -> SerializedGraph:
+def serialize_graph(graph: lg.Graph) -> SerializedGraph:
     """
     A function that returns a serialized version of the graph topology.
 
@@ -154,8 +149,17 @@ def serialize_graph(
 
     @return: A serialized version of the graph topology
     """
+    # List of graph nodes
+    nodes: List[LabgraphMonitorNode] = []
+
+    # Identify graph nodes
+    nodes = identify_graph_nodes(graph)
+
+    # Connect graph edges
+    nodes = connect_to_upstream(nodes, graph.__streams__.values())
+
     serialized_graph: SerializedGraph = {
-        "name": name,
+        "name": type(graph).__name__,
         "nodes": {}
     }
 
@@ -185,31 +189,91 @@ def serialize_graph(
 
     return serialized_graph
 
-
-def generate_labgraph_monitor(graph: lg.Graph) -> None:
+def sub_pub_grouping_map(graph: lg.Graph) -> Dict[str, str]:
     """
-    A function that serialize the graph topology
-    and send it using to LabGraphMonitor Front-End
-    using Labgraph Websocket API
+    A function that matches subscribers with their publishers
+    to automate assigning real-time messages to serialized graph
 
     @params:
         graph: An instance of the computational graph
+
+    @return: A dictionary where the key is a publisher grouping
+            and the value is a dictionary of sets of topic paths subscribed and their groupings
     """
-    # Local variables
-    nodes: List[LabgraphMonitorNode] = []
+    sub_pub_grouping_map: Dict[str, str] = {}
+    for stream in graph.__streams__.values():
+        difference = set(stream.topic_paths).difference(LabgraphMonitorNode.in_edges)
+        if difference:
+            upstream_edge = max(difference, key=len)
+            for edge in stream.topic_paths:
+                if edge != upstream_edge:
+                    # convert SERIALIZER/SERIALIZER_INPUT_1 to its grouping Serializer
+                    edge_path = "/".join(edge.split("/")[:-1])
+                    edge_grouping = type(graph.__descendants__[edge_path]).__name__
+                    
+                    # convert SERIALIZER/SERIALIZER_INPUT_1 to its topic SERIALIZER_INPUT_1
+                    topic_path = edge.split("/")[-1]
 
-    # Identify graph nodes
-    nodes = identify_graph_nodes(graph)
+                    # convert NOISE_GENERATOR/NOISE_GENERATOR_OUTPUT to its grouping NoiseGenerator
+                    group_path = "/".join(upstream_edge.split("/")[:-1])
+                    grouping = type(graph.__descendants__[group_path]).__name__
 
-    # Connect graph edges
-    nodes = connect_to_upstream(nodes, graph.__streams__.values())
+                    if grouping in sub_pub_grouping_map:
+                        sub_pub_grouping_map[grouping]["topics"].add(topic_path)
+                        sub_pub_grouping_map[grouping]["subscribers"].add(edge_grouping)
+                    else:
+                        sub_pub_grouping_map[grouping] = {
+                            "topics": {topic_path},
+                            "subscribers": {edge_grouping},
+                        }
+                    
+    return sub_pub_grouping_map
 
+def generate_graph_topology(graph: lg.Graph) -> SerializedGraph:
+    """
+    A function that serializes the graph topology
+    and sends it to LabGraph Monitor Front-End
+    using WebSockets API
+
+    @params:
+        graph: An instance of the computational graph
+    
+    @return: Serialized topology of the graph
+    """
+    serialized_graph = serialize_graph(graph)
+
+    return serialized_graph
+
+def set_graph_topology(graph: lg.Graph) -> None:
+    """
+    A function that serializes the graph topology
+    and applies the information to serve as graph 
+    attribute for LabGraph Monitor Front-End 
+    real-time messaging using WebSockets API
+    
+    @params:
+        graph: An instance of the computational graph
+    """
     # Serialize the graph topology
-    serialized_graph = serialize_graph(
-        type(graph).__name__,
-        nodes
-    )
+    serialized_graph = serialize_graph(graph)
 
-    # Send the serialized graph to Front-End
-    # using LabGraph Websockets API
-    run_server(serialized_graph)
+    # Match subscribers with their publishers
+    sub_pub_map = sub_pub_grouping_map(graph)
+
+    # Set graph's topology and real-time messages matching
+    if hasattr(graph, "set_topology"):
+        graph.set_topology(serialized_graph, sub_pub_map)
+    else:
+        raise AttributeError(
+            """
+            Provided graph is missing `set_topology` method to establish 
+            its topology and possible real-time messsaging
+
+            Please add the following method to your graph
+            ```
+            def set_topology(self, topology: SerializedGraph, sub_pub_map: Dict) -> None:
+                self._topology = topology
+                self._sub_pub_match = sub_pub_map
+            ```
+            """
+        )
