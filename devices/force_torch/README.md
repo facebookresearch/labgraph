@@ -10,5 +10,5 @@ Detailed Setup Instructions can be found [here](https://docs.google.com/document
 python force_torch_ati.py
 ```
 
-### Contributers:
-Ryan Orendorff, Ajay Srivastava, Aditya Vasan, Laura Matloff, Jimmy Feng
+### Contributors:
+Aditya Vasan, Jimmy Feng, Ryan Orendorff, Ajay Srivastava, Laura Matloff
