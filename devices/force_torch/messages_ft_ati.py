@@ -24,4 +24,3 @@ class ForceTorchATIMessage(lg.TimestampedMessage):
     tx: int
     ty: int
     tz: int
-
