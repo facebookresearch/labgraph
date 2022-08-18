@@ -56,6 +56,10 @@ class Serializer(lg.Node):
             "grouping": grouping,
             "timestamp": message.timestamp,
             "numpy": list(message.data),
+
+            "latency": message.latency,
+            "throughput": message.throughput,
+            "datarate": message.datarate,
         }
 
     @lg.subscriber(SERIALIZER_INPUT_2)
@@ -65,6 +69,10 @@ class Serializer(lg.Node):
             "grouping": grouping,
             "timestamp": message.timestamp,
             "numpy": list(message.data),
+
+            "latency": message.latency,
+            "throughput": message.throughput,
+            "datarate": message.datarate,
         }
 
     @lg.subscriber(SERIALIZER_INPUT_3)
@@ -74,6 +82,11 @@ class Serializer(lg.Node):
             "grouping": grouping,
             "timestamp": message.timestamp,
             "numpy": list(message.data),
+
+            "latency": message.latency,
+            "throughput": message.throughput,
+            "datarate": message.datarate,
+            
         }
         
     @lg.subscriber(SERIALIZER_INPUT_4)
@@ -83,6 +96,10 @@ class Serializer(lg.Node):
             "grouping": grouping,
             "timestamp": message.timestamp,
             "numpy": list(message.data),
+            
+            "latency": message.latency,
+            "throughput": message.throughput,
+            "datarate": message.datarate,
         }
     
     def output(self, _in: Dict) -> Dict:
@@ -97,6 +114,10 @@ class Serializer(lg.Node):
                 if state["grouping"] in value["upstreams"].keys():
                     value["upstreams"][state["grouping"]][0]["fields"]["timestamp"]["content"] = state["timestamp"]
                     value["upstreams"][state["grouping"]][0]["fields"]["data"]["content"] = state["numpy"]
+                    
+                    value["upstreams"][state["grouping"]][0]["fields"]["latency"]["content"] = state["latency"]
+                    value["upstreams"][state["grouping"]][0]["fields"]["throughput"]["content"] = state["throughput"]
+                    value["upstreams"][state["grouping"]][0]["fields"]["datarate"]["content"] = state["datarate"]
 
         return _in
 

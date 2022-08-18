@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# Copyright 2004-present Facebook. All Rights Reserved.
-# -*- coding: utf-8 -*-
+# Copyright 2004-present Facebook. All Rights Reserve
 
-# Built-in imports
-
-# Import labgraph
 import labgraph as lg
-
-# Imports required for this example
 import numpy as np
 
 
-# A data type used in streaming, see docs: Messages
 class RandomMessage(lg.Message):
-    timestamp: float
+    timestamp: any
     data: np.ndarray
+
+    latency: any = 1.0
+    throughput: any = 2.0
+    datarate: any  = 3.0

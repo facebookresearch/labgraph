@@ -112,11 +112,22 @@ const Edge: React.FC = (): JSX.Element => {
                                         (field, index) => {
                                             return (
                                                 <TableRow key={index}>
-                                                    {open && (
-                                                        <TableCell>
-                                                            {field[0]}
+                                                    {open ? (
+                                                        <TableCell
+                                                            style={{
+                                                                whiteSpace:
+                                                                    'normal',
+                                                                wordBreak:
+                                                                    'break-word',
+                                                            }}
+                                                        >
+                                                            {field[0] ===
+                                                                'timestamp' ||
+                                                            field[0] === 'data'
+                                                                ? `${field[0]} `
+                                                                : null}
                                                         </TableCell>
-                                                    )}
+                                                    ) : null}
                                                     {open ? (
                                                         <TableCell
                                                             style={{
@@ -127,11 +138,18 @@ const Edge: React.FC = (): JSX.Element => {
                                                             }}
                                                         >
                                                             {connection ===
-                                                            WS_STATE.CONNECTED
-                                                                ? `${field[1].content}, `
-                                                                : mockData.join(
+                                                                WS_STATE.CONNECTED &&
+                                                            (field[0] ===
+                                                                'timestamp' ||
+                                                                field[0] ===
+                                                                    'data')
+                                                                ? `${field[1].content} `
+                                                                : connection ===
+                                                                  WS_STATE.DISCONNECTED
+                                                                ? mockData.join(
                                                                       ' '
-                                                                  )}
+                                                                  )
+                                                                : null}
                                                         </TableCell>
                                                     ) : null}
                                                 </TableRow>
