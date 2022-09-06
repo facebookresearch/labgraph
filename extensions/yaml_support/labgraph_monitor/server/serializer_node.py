@@ -55,7 +55,7 @@ class Serializer(lg.Node):
         self.state.data_1 = {
             "grouping": grouping,
             "timestamp": message.timestamp,
-            "numpy": list(message.data),
+            "data": list(message.data),
         }
 
     @lg.subscriber(SERIALIZER_INPUT_2)
@@ -64,7 +64,7 @@ class Serializer(lg.Node):
         self.state.data_2 = {
             "grouping": grouping,
             "timestamp": message.timestamp,
-            "numpy": list(message.data),
+            "data": list(message.data),
         }
 
     @lg.subscriber(SERIALIZER_INPUT_3)
@@ -73,7 +73,7 @@ class Serializer(lg.Node):
         self.state.data_3 = {
             "grouping": grouping,
             "timestamp": message.timestamp,
-            "numpy": list(message.data),
+            "data": list(message.data),
         }
         
     @lg.subscriber(SERIALIZER_INPUT_4)
@@ -82,7 +82,7 @@ class Serializer(lg.Node):
         self.state.data_4 = {
             "grouping": grouping,
             "timestamp": message.timestamp,
-            "numpy": list(message.data),
+            "data": list(message.data),
         }
     
     def output(self, _in: Dict) -> Dict:
@@ -96,7 +96,7 @@ class Serializer(lg.Node):
             for state in self.state.__dict__.values():
                 if state["grouping"] in value["upstreams"].keys():
                     value["upstreams"][state["grouping"]][0]["fields"]["timestamp"]["content"] = state["timestamp"]
-                    value["upstreams"][state["grouping"]][0]["fields"]["data"]["content"] = state["numpy"]
+                    value["upstreams"][state["grouping"]][0]["fields"]["data"]["content"] = state["data"]
 
         return _in
 
