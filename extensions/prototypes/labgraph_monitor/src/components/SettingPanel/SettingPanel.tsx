@@ -12,7 +12,6 @@ import {
     SettingsApplicationsRounded,
     AlignHorizontalLeftOutlined,
     AlignVerticalTopOutlined,
-    Mode,
 } from '@mui/icons-material';
 import React, { useCallback } from 'react';
 import SettingTabs from './SettingTabs';
