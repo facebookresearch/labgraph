@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
-from ctypes.wintypes import HANDLE
 import cv2
 import h5py
 import os
