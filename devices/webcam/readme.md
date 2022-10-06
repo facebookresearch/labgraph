@@ -50,6 +50,12 @@ Run Hand Tracking Utility
 
 Press Esc to exit.
 
+#### Testing
+
+    python hand_tracking_utility.py --test
+
+will run a series of tests to ensure that everything works. Does not require a camera device.
+
 Hand Tracking Utility's functionality is flexible, see the command line arguments for details:
 
 ```
@@ -59,6 +65,7 @@ usage: hand_tracking_utility.py [-h] [-li] [-lp] [-lf {hdf5}] [-ld LOG_DIR] [-ln
 
 optional arguments:
   -h, --help            show this help message and exit
+  -te, --test           enable test mode
   -li, --log-images     add image data to logs
   -lp, --log-poses      add pose estimation data to logs
   -lf {hdf5}, --log-format {hdf5}
