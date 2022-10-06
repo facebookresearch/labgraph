@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+from ctypes.wintypes import HANDLE
 import cv2
 import h5py
 import os
@@ -27,6 +28,7 @@ mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
 mp_hands: HandsType = mp.solutions.hands
 
 parser = ap.ArgumentParser()
+parser.add_argument("-te", "--test", help = "enable test mode", action = "store_true", required = False)
 parser.add_argument("-li", "--log-images", help = "add image data to logs", action = "store_true", required = False)
 parser.add_argument("-lp", "--log-poses", help = "add pose estimation data to logs", action = "store_true", required = False)
 parser.add_argument("-lf", "--log-format", type = str, nargs = 1, choices = ["hdf5"], help = "sepcify logging format. Supports hdf5, default is hdf5", action = "store", required = False)
@@ -214,7 +216,7 @@ class LogStream(lg.Node):
     state: LoggingState
 
     @lg.publisher(OUTPUT)
-    async def reaf_file(self) -> lg.AsyncPublisher:
+    async def read_file(self) -> lg.AsyncPublisher:
         while not self.state.closed:
             start_time_ns = time.time_ns()
 
@@ -329,10 +331,11 @@ class HandTrackingUtilityConfig(lg.Config):
     device_resolution: np.ndarray
     rescale_image: bool
     rescale_resolution: np.ndarray
+    test_image_dimensions: Tuple[int]
 
 def setup_basic(graph: lg.Graph):
     """
-    Initialize shared configuration of nodes between HandTrackingUtilityWebcam and HandTrackingUtilityReplay graphs
+    Initialize shared configuration of nodes between HandTrackingUtilityWebcam, HandTrackingUtilityReplay and TestHandler graphs
 
     @arguments:
         graph: Graph
@@ -346,6 +349,14 @@ def setup_basic(graph: lg.Graph):
     file_name = "{}_{}.{}".format(graph.config.log_name, count, graph.config.log_format)
     file_path = "{}/{}".format(graph.config.log_dir, file_name)
     graph.LOGGING.configure(LoggingConfig(log_images = graph.config.log_images, log_poses = graph.config.log_poses, file_path = file_path))
+
+def setup_display(graph: lg.Graph):
+    """
+    Initialize shared configuration of nodes between HandTrackingUtilityWebcam and HandTrackingUtilityReplay graphs
+
+    @arguments:
+        graph: Graph
+    """
 
     graph.DISPLAY.configure(DisplayConfig(resize = graph.config.rescale_image, resize_dimensions = graph.config.rescale_resolution))
 
@@ -376,6 +387,8 @@ class HandTrackingUtilityWebcam(lg.Graph):
     
     def setup(self) -> None:
         setup_basic(self)
+        setup_display(self)
+
         self.STREAM.configure(WebcamStreamConfig(sample_rate = self.config.sample_rate, device_number = self.config.device_number, device_resolution = self.config.device_resolution))
 
 class HandTrackingUtilityReplay(lg.Graph):
@@ -405,13 +418,144 @@ class HandTrackingUtilityReplay(lg.Graph):
     
     def setup(self) -> None:
         setup_basic(self)
+        setup_display(self)
 
         file_name = "{}.{}".format(graph.config.log_name, graph.config.log_format)
         file_path = "{}/{}".format(graph.config.log_dir, file_name)
         self.STREAM.configure(LogStreamConfig(sample_rate = self.config.sample_rate, file_path = file_path))
 
+class TestVideoStream(lg.Node):
+    """
+    Outputs a single VideoFrame message for use in test cases
+
+    @topics:
+        OUTPUT: VideoFrame
+    """
+
+    OUTPUT = lg.Topic(VideoFrame)
+
+    @lg.publisher(OUTPUT)
+    async def send_frame(self) -> lg.AsyncPublisher:
+        path = os.path.dirname(os.path.realpath(__file__))
+        frame = cv2.imread("{}/test/thumbs_up.png".format(path), flags = cv2.IMREAD_COLOR)
+        yield self.OUTPUT, VideoFrame(timestamp = time.time(), frame = frame)
+
+class TestHandlerConfig(lg.Config):
+    """
+    Config object for TestHandler node
+
+    @attributes:
+        image_dimensions: Tuple[int], will be compared to PoseFrame's frame.shape attribute
+    """
+
+    image_dimensions: Tuple[int]
+
+class TestHandlerState(lg.State):
+    """
+    State object for tracking whether or not TestHandler has received a PoseFrame
+    """
+    got_pose: bool = False
+
+class TestHandler(lg.Node):
+    """
+    Node for testing functionality
+
+    @topics:
+        INPUT: PoseFrame
+    
+    @attributes:
+        state: TestHandlerState
+        config: TestHandlerConfig
+    """
+
+    INPUT = lg.Topic(PoseFrame)
+    state: TestHandlerState
+    config: TestHandlerConfig
+
+    @lg.subscriber(INPUT)
+    def got_message(self, message: PoseFrame) -> None:
+        assert message.frame.shape == self.config.image_dimensions, "Video stream frame failed dimension check"
+        assert len(message.landmarks) == 2, "Pose landmark list failed length check"
+        assert len(message.landmarks[0].landmark) == 21, "Hand 1 landmark list failed length check"
+        assert len(message.landmarks[1].landmark) == 21, "Hand 2 landmark list failed length check"
+        self.state.got_pose = True
+    
+    @lg.main
+    def check(self) -> None:
+        start_time = time.time()
+        while not self.state.got_pose:
+            time.sleep(1)
+            if time.time() - start_time > 30.0:
+                break
+        assert self.state.got_pose, "PoseFrame failed to arrive within 30 seconds"
+        raise lg.NormalTermination()
+
+class TestGraph(lg.Graph):
+    """
+    Graph for testing functionality
+
+    @attributes:
+        POSE: PoseEstimation
+        LOGGING: Logging
+        HANDLER: Handler
+        STREAM: LogStream
+        config: HandTrackingUtilityConfig
+    """
+
+    STREAM: TestVideoStream
+    POSE: PoseEstimation
+    LOGGING: Logging
+    HANDLER: TestHandler
+    config: HandTrackingUtilityConfig
+
+    def connections(self) -> lg.Connections:
+        return ((self.STREAM.OUTPUT, self.POSE.INPUT), (self.POSE.OUTPUT, self.HANDLER.INPUT), (self.POSE.OUTPUT, self.LOGGING.INPUT))
+    
+    def process_modules(self) -> Tuple[lg.Module, ...]:
+        return (self.STREAM, self.POSE, self.LOGGING, self.HANDLER)
+
+    def setup(self):
+        setup_basic(self)
+        self.HANDLER.configure(TestHandlerConfig(image_dimensions = self.config.test_image_dimensions))
+
+def run_tests(config: HandTrackingUtilityConfig):
+    """
+    Begins a series of tests:
+        Checks that the test image ./test/thumbs_up.png exists
+
+        Ensures PoseFrame comes back with correctly sized data
+
+        Ensures logs are created
+
+        Deletes test log data when finished
+    
+    @arguments:
+        config: HandTrackingUtilityConfig
+    """
+
+    path = os.path.dirname(os.path.realpath(__file__))
+    test_img_path = "{}/test/thumbs_up.png".format(path)
+    assert os.path.isfile(test_img_path), "{} failed isfile()".format(test_img_path)
+
+    graph = TestGraph()
+    graph.configure(config)
+    runner = lg.ParallelRunner(graph = graph)
+    runner.run()
+
+    assert os.path.isfile(graph.LOGGING.config.file_path), "{} failed isfile()".format(graph.LOGGING.config.file_path)
+    os.remove(graph.LOGGING.config.file_path)
+    os.rmdir("{}/test_log".format(path))
+
+    print("All test cases passed")
+
 if __name__ == "__main__":
     args = parser.parse_args()
+
+    if args.test:
+        args.log_images = True
+        args.log_poses = True
+        args.log_dir = ["./test_log"]
+        args.log_name = ["test_log"]
 
     path = ""
     if args.log_dir:
@@ -440,14 +584,18 @@ if __name__ == "__main__":
         sample_rate = args.sample_rate[0] if args.sample_rate else 30,
         device_resolution = np.array([args.device_resolution[0], args.device_resolution[1]] if args.device_resolution else np.array([854, 480])),
         rescale_image = args.rescale_image,
-        rescale_resolution = np.array([args.rescale_resolution[0], args.rescale_resolution[1]] if args.rescale_resolution else np.array([1280, 720]))
+        rescale_resolution = np.array([args.rescale_resolution[0], args.rescale_resolution[1]] if args.rescale_resolution else np.array([1280, 720])),
+        test_image_dimensions = (778, 860, 3)
     )
     graph = None
-    if args.replay:
-        graph = HandTrackingUtilityReplay()
-        graph.configure(config)
+    if args.test:
+        run_tests(config)
     else:
-        graph = HandTrackingUtilityWebcam()
-        graph.configure(config)
-    runner = lg.ParallelRunner(graph = graph)
-    runner.run()
+        if args.replay:
+            graph = HandTrackingUtilityReplay()
+            graph.configure(config)
+        else:
+            graph = HandTrackingUtilityWebcam()
+            graph.configure(config)
+        runner = lg.ParallelRunner(graph = graph)
+        runner.run()

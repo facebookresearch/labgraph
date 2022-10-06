@@ -1,7 +1,7 @@
 # Webcam Node and Real-time Hand Tracking Utility
 
 ## Webcam Stream Node
-Provides stream of VideoFrame messages which contain a numpy array of any connected webcam device. Uses CV2 to capture the video feed.
+Provides stream of VideoFrame messages which contain a numpy array of an image from any connected webcam device. Uses CV2 to capture the video feed.
 
 ### Usage
 Configuration:
