@@ -85,4 +85,4 @@ class VideoStreamCombiner(lg.Node):
                     self.state.frames_received = 0
                     self.state.last_yeild_time = time.time_ns()
 
-            await asyncio.sleep(0)
+            await asyncio.sleep(1.0 / self.config.sample_rate)

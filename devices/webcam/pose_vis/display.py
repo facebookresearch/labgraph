@@ -37,6 +37,9 @@ class Display(lg.Node):
     INPUT = lg.Topic(CombinedVideoStream)
     OUTPUT = lg.Topic(ReadyMessage)
     EXTENSION_INPUT0 = lg.Topic(ExtensionResult)
+    EXTENSION_INPUT1 = lg.Topic(ExtensionResult)
+    EXTENSION_INPUT2 = lg.Topic(ExtensionResult)
+    EXTENSION_INPUT3 = lg.Topic(ExtensionResult)
     state: DisplayState
     config: DisplayConfig
 
@@ -56,6 +59,18 @@ class Display(lg.Node):
 
     @lg.subscriber(EXTENSION_INPUT0)
     async def on_extension_received_0(self, message: ExtensionResult) -> None:
+        await self.update_extension_results(message)
+    
+    @lg.subscriber(EXTENSION_INPUT1)
+    async def on_extension_received_1(self, message: ExtensionResult) -> None:
+        await self.update_extension_results(message)
+
+    @lg.subscriber(EXTENSION_INPUT2)
+    async def on_extension_received_2(self, message: ExtensionResult) -> None:
+        await self.update_extension_results(message)
+
+    @lg.subscriber(EXTENSION_INPUT3)
+    async def on_extension_received_3(self, message: ExtensionResult) -> None:
         await self.update_extension_results(message)
 
     def setup(self) -> None:
