@@ -8,6 +8,8 @@ import mediapipe as mp
 import mediapipe.python.solutions.face_detection as FaceType
 import mediapipe.python.solutions.drawing_utils as DrawingUtilsType
 import mediapipe.python.solutions.drawing_styles as DrawingStylesType
+from labgraph.graphs.method import AsyncPublisher, publisher
+from labgraph.messages import message
 
 # Every extension will probably need these imports
 from pose_vis.extension import PoseVisExtension, PoseVisConfiguration, ExtensionResult, ResultData
@@ -35,4 +37,15 @@ class FaceDetectionConfig(lg.Config):
 class FaceDetectionState(lg.State):
     face: Optional[FaceType.FaceDetection] = None
 
-    
+# face detection node
+class FaceDetection(lg.Node):
+    INPUT = lg.Topic(CombinedVideoStream)
+    OUTPUT = lg.Topic(ExtensionResult)
+    config : FaceDetectionConfig
+    state : FaceDetectionState
+
+
+    @lg.subscriber(INPUT)
+    @lg.publisher(OUTPUT
+    async def process_frames(self, message:CombinedVideoStream) -> lg.AsyncPublisher:
+        pass
