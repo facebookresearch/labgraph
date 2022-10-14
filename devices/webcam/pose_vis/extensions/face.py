@@ -1,4 +1,5 @@
 from distutils import extension
+from unittest import result
 import cv2
 import time
 import labgraph as lg
@@ -23,29 +24,29 @@ from typing import NamedTuple, Optional, Tuple
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
 # mp_hands: HandsType = mp.solutions.hands
-mp_face: FaceType = mp.solutions.face 
+mp_face: FaceType = mp.solutions.face  
 
-# config class for the face detection node
-class FaceDetectionConfig(lg.Config):
-    extension_id: int
-    #? maybe not needed
-    model_complexity: int
-    min_detection_confidence: float
-    min_tracking_confidence: float
+class FaceExtension(PoseVisExtension):
+    face : Optional[FaceType.FaceDetection]
 
-# state class for the face detection node
-class FaceDetectionState(lg.State):
-    face: Optional[FaceType.FaceDetection] = None
+    # argument to enable or disable the face detection extention
+    def register_args(self, parser: ArgumentParser) -> None:
+        parser.add_argument("--face", help="enable the face detection extention", action="store_true", required=False)
 
-# face detection node
-class FaceDetection(lg.Node):
-    INPUT = lg.Topic(CombinedVideoStream)
-    OUTPUT = lg.Topic(ExtensionResult)
-    config : FaceDetectionConfig
-    state : FaceDetectionState
+    #? ake sure this is correct
+    def check_enabled(self, args: Namespace) -> bool:
+        return args.face 
 
+    def setup(self) -> None:
+        self.face = mp_face.FaceDetection()
 
-    @lg.subscriber(INPUT)
-    @lg.publisher(OUTPUT
-    async def process_frames(self, message:CombinedVideoStream) -> lg.AsyncPublisher:
-        pass
+    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
+        # convert from BGR to RGB
+        results: NamedTuple = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+
+        landmarks = results.multi_face_landmarks #? not sure if this is correct
+
+        if landmarks is None:
+            landmarks = []
+
+        

@@ -2,3 +2,4 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 from pose_vis.extensions import hands
+from pose_vis.extension import face
