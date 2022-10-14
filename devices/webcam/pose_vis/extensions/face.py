@@ -15,6 +15,7 @@ from labgraph.messages import message
 # Every extension will probably need these imports
 from pose_vis.extension import PoseVisExtension, PoseVisConfiguration, ExtensionResult, ResultData
 from pose_vis.stream_combiner import CombinedVideoStream
+from pose_vis.video_stream import StreamMetaData
 from pose_vis.performance_tracking import PerfUtility
 from argparse import ArgumentParser, Namespace
 
@@ -46,7 +47,25 @@ class FaceExtension(PoseVisExtension):
 
         landmarks = results.multi_face_landmarks #? not sure if this is correct
 
+        # make sure results is not None
         if landmarks is None:
             landmarks = []
 
+        # blank image
+        overlay = np.zeros(shape=frame.shape, dtype=np.uint8)
+
+        #todo THIS NEEDS TO BE REWRITTEN 
+        for landmark_list in landmarks:
+            mp_drawing.draw_detection(
+                overlay, 
+                mp_drawing_styles.get_default_face_mesh_contours_style(), #? maybe not needed for this extention
+                mp_drawing_styles.get_default_face_mesh_tesselation_style()
+            )
         
+        return (overlay, ExtensionResult(data=landmarks)) #! ExtentionResult might neeed to be changed 
+
+
+    # clean up
+    def cleanup(self) -> None:
+        #? maybe add something
+        pass
