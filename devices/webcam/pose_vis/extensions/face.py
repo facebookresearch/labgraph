@@ -1,3 +1,4 @@
+from distutils import extension
 import cv2
 import time
 import labgraph as lg
@@ -15,3 +16,23 @@ from pose_vis.performance_tracking import PerfUtility
 from argparse import ArgumentParser, Namespace
 
 from typing import NamedTuple, Optional, Tuple
+
+
+mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
+mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
+# mp_hands: HandsType = mp.solutions.hands
+mp_face: FaceType = mp.solutions.face 
+
+# config class for the face detection node
+class FaceDetectionConfig(lg.Config):
+    extension_id: int
+    #? maybe not needed
+    model_complexity: int
+    min_detection_confidence: float
+    min_tracking_confidence: float
+
+# state class for the face detection node
+class FaceDetectionState(lg.State):
+    face: Optional[FaceType.FaceDetection] = None
+
+    
