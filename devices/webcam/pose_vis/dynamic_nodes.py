@@ -50,7 +50,7 @@ class DynamicGraph(lg.Graph):
             node1: lg.Node = self.__getattribute__(con_list[0])
             node2: lg.Node = self.__getattribute__(con_list[2])
             cons.append((node1.__getattribute__(con_list[1]), node2.__getattribute__(con_list[3])))
-        return (cons) if len(cons) > 1 else (cons,)
+        return tuple(cons)
     
     def process_modules(self) -> Tuple[lg.Module, ...]:
         mods = ()
@@ -105,4 +105,4 @@ class DynamicGroup(lg.Group):
             node1: lg.Node = self.__getattribute__(con_list[0])
             node2: lg.Node = self.__getattribute__(con_list[2])
             cons.append((node1.__getattribute__(con_list[1]), node2.__getattribute__(con_list[3])))
-        return (cons) if len(cons) > 1 else (cons,)
+        return tuple(cons)

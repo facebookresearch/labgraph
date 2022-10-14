@@ -34,7 +34,8 @@ class PerfUtility():
     def get_sleep_time_ns(cls, start_time_ns: int, target_update_rate: int) -> int:
         target_delta_time_ns = int(PerfUtility.NANOSECOND / target_update_rate)
         actual_delta_time_ns = time.time_ns() - start_time_ns
-        return target_delta_time_ns - actual_delta_time_ns
+        sleep_time = target_delta_time_ns - actual_delta_time_ns
+        return 0 if sleep_time < 0 else sleep_time
     
     @classmethod
     def ns_to_s(cls, time_ns: int) -> float:

@@ -15,11 +15,14 @@ class StreamMetaData():
     frame_index: int
     device_id: int
     stream_id: int
+    frame_timestamp: float
 
 class CombinedVideoStream(lg.Message):
     frames: List[lg.NumpyDynamicType]
     metadatas: List[StreamMetaData]
     update_time_ms: int
+    got_frame_at: float
+    sent_frame_at: float
 
 class VideoStreamConbinerConfig(lg.Config):
     num_devices: int
@@ -30,7 +33,8 @@ class VideoStreamCombinerState(lg.State):
     metadata_list: List[StreamMetaData] = field(default_factory = list)
     frames_received: int = 0
     lock: Optional[Lock] = None
-    last_yeild_time: int = 0
+    last_yeild_time: float = 0.0
+    last_frame_time: float = 0.0
 
 class VideoStreamCombiner(lg.Node):
     INPUT0 = lg.Topic(VideoFrame)
@@ -47,6 +51,8 @@ class VideoStreamCombiner(lg.Node):
         self.state.lock = Lock()
 
     async def update_state(self, message: VideoFrame) -> None:
+        start_time = time.time_ns()
+        self.state.last_frame_time = time.time()
         with self.state.lock:
             self.state.frame_list[message.stream_id] = message.frame
             self.state.metadata_list[message.stream_id] = StreamMetaData(
@@ -54,8 +60,11 @@ class VideoStreamCombiner(lg.Node):
                 update_time_ms = message.update_time_ms,
                 frame_index = message.frame_index,
                 device_id = message.device_id,
-                stream_id = message.stream_id)
+                stream_id = message.stream_id,
+                frame_timestamp = message.timestamp)
             self.state.frames_received += 1
+        #print(f"update_state(): {PerfUtility.ns_to_ms(time.time_ns() - start_time)}ms")
+        #print(f"Combiner received frame: {time.time()}")
 
     @lg.subscriber(INPUT0)
     async def on_frame_received_0(self, message: VideoFrame) -> None:
@@ -76,13 +85,19 @@ class VideoStreamCombiner(lg.Node):
     @lg.publisher(OUTPUT)
     async def send_frames(self) -> lg.AsyncPublisher:
         while True:
+            start_time = time.time_ns()
             with self.state.lock:
                 if self.state.frames_received >= self.config.num_devices:
                     yield self.OUTPUT, CombinedVideoStream(
                         frames = self.state.frame_list.copy(),
                         metadatas = self.state.metadata_list.copy(),
-                        update_time_ms = self.state.last_yeild_time if self.state.last_yeild_time == 0 else PerfUtility.ns_to_ms(time.time_ns() - self.state.last_yeild_time))
+                        update_time_ms = 0,
+                        sent_frame_at = time.time(),
+                        got_frame_at = self.state.last_frame_time)
                     self.state.frames_received = 0
-                    self.state.last_yeild_time = time.time_ns()
+                    self.state.last_yeild_time = time.time()
+                    #print(f"Combiner sent frame: {time.time()}")
+                    #print(f"Frame received -> sent: {PerfUtility.ns_to_ms(time.time_ns() - self.state.last_frame_time)}ms")
+            #print(f"send_frames(): {PerfUtility.ns_to_ms(time.time_ns() - start_time)}ms")
 
             await asyncio.sleep(1.0 / self.config.sample_rate)

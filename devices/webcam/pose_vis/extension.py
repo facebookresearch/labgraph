@@ -1,37 +1,108 @@
+import numpy as np
 import labgraph as lg
 
+from pose_vis.video_stream import StreamMetaData
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from argparse import ArgumentParser, Namespace
-from typing import List, Any, Tuple
+from typing import Any, Tuple, List
 
 @dataclass
 class PoseVisConfiguration():
+    """
+    Utility dataclass for Pose Vis information
+
+    Attributes:
+        `num_devices`: `int`, the number of input streams being initialized
+        `num_extensions`: `int`, the number of extensions each stream will run
+        `args`: `Namespace` the variable produced by `ArgumentParer.parse_args()` during graph startup
+    """
     num_devices: int
     num_extensions: int
     args: Namespace
 
 @dataclass
-class ResultData():
-    frame_index: int
+class ExtensionResult():
+    """
+    Produced by `PoseVisExtension`
+
+    Attributes:
+        `data`: `Any`
+    """
     data: Any
 
-class ExtensionResult(lg.Message):
-    extension_id: int
-    update_time_ms: int
-    result_frames: List[lg.NumpyDynamicType]
-    result_data: List[ResultData]
+class CombinedExtensionResult(lg.Message):
+    results: List[ExtensionResult]
 
-class PoseVisExtension(ABC):
+class PoseVisExtensionBase(ABC):
+    """
+    Abstract base class for `PoseVisExtension`
 
+    Abstract methods:
+        `register_args(self, parser: ArgumentParser) -> None`
+
+        `check_enabled(self, args: Namespace) -> bool`
+
+        `setup(self) -> None`
+
+        `process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]`
+        
+        `cleanup(self) -> None`
+    """
     @abstractmethod
-    def register_args(self, parser: ArgumentParser):
+    def register_args(self, parser: ArgumentParser) -> None:
+        """
+        Called before graph initialization and argument parsing
+        Use this to register an argument that will allow this extension to be enabled or disabled
+        """
         pass
 
     @abstractmethod
     def check_enabled(self, args: Namespace) -> bool:
+        """
+        Check the `ArgumentParser.parse_args()` result to determine if this extension should be enabled
+        """
         pass
 
     @abstractmethod
-    def configure_node(self, extension_id: int, config: PoseVisConfiguration) -> Tuple[type, lg.Config, lg.Topic, lg.Topic]:
+    def setup(self) -> None:
+        """
+        Called on video stream setup
+        """
         pass
+
+    @abstractmethod
+    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
+        """
+        Called once per frame inside of a video stream node
+        Output should be a `Tuple` with an overlay image and the data used to produce that overlay
+        """
+        pass
+
+    @abstractmethod
+    def cleanup(self) -> None:
+        """
+        Called on graph shutdown
+        """
+        pass
+
+class PoseVisExtension(PoseVisExtensionBase):
+    """
+    An extension of the base class that Pose Vis uses to automatically initialize the following variables:
+
+    Attributes:
+        `extension_id`: `int`, a contiguous identifier for each enabled extension
+        `config`: `PoseVisConfiguration`
+    
+    Methods:
+        `set_enabled(self, extension_id: int, config: PoseVisConfiguration) -> None`
+    """
+    extension_id: int
+    config: PoseVisConfiguration
+
+    def set_enabled(self, extension_id: int, config: PoseVisConfiguration) -> None:
+        """
+        Called if this extension passes the `check_enabled` method
+        """
+        self.extension_id = extension_id
+        self.config = config
