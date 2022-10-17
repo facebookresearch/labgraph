@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+
 import labgraph as lg
 import argparse as ap
 import pose_vis.extensions
@@ -13,7 +16,7 @@ MAX_STREAMS = 4
 
 parser = ap.ArgumentParser()
 parser.add_argument("--device-ids", type = int, nargs = "*", help = "which device ids to stream", action = "store", required = True)
-parser.add_argument("--target-display-framerate", type = int, nargs = "?", const = 60, default = 60, help = "specify update rate for video stream presentation. Seperate from stream framerate (default: 60)", action = "store", required = False)
+parser.add_argument("--target-display-framerate", type = int, nargs = "?", const = 60, default = 60, help = "specify update rate for video stream presentation. Seperate from stream framerate. (default: 60)", action = "store", required = False)
 parser.add_argument("--device-resolutions", type = str, nargs = "*", help = "specify resolution/framerate per device; format is <device_id or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)", action = "store", required = False)
 
 extensions: List[PoseVisExtension] = []

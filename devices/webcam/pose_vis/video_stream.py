@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+
 import labgraph as lg
 import numpy as np
 

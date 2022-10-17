@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -37,7 +40,7 @@ class HandsExtension(PoseVisExtension):
     def setup(self) -> None:
         self.hands = mp_hands.Hands()
 
-    # Called from a multiprocess pool on each new frame from the stream
+    # Called from `FrameProcessor` on each new frame from the stream
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         # MediaPipe likes RGB images, not BGR
         results: NamedTuple = self.hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))

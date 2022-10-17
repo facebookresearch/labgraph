@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+
 import numpy as np
 import labgraph as lg
 
@@ -53,6 +56,7 @@ class PoseVisExtensionBase(ABC):
     def register_args(self, parser: ArgumentParser) -> None:
         """
         Called before graph initialization and argument parsing
+        
         Use this to register an argument that will allow this extension to be enabled or disabled
         """
         pass
@@ -75,6 +79,7 @@ class PoseVisExtensionBase(ABC):
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         """
         Called once per frame inside of a video stream node
+
         Output should be a `Tuple` with an overlay image and the data used to produce that overlay
         """
         pass
