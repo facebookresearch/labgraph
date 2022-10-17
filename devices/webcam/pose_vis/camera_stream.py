@@ -8,7 +8,7 @@ import numpy as np
 
 from pose_vis.video_stream import ProcessedVideoFrame, StreamMetaData
 from pose_vis.frame_processor import FrameProcessor
-from pose_vis.extension import PoseVisExtension
+from pose_vis.extension import PoseVisExtension, CombinedExtensionResult
 from pose_vis.performance_tracking import PerfUtility
 from typing import Optional, Tuple, List
 
@@ -26,11 +26,13 @@ class CameraStreamState(lg.State):
     frame_processor: Optional[FrameProcessor] = None
 
 class CameraStream(lg.Node):
-    OUTPUT = lg.Topic(ProcessedVideoFrame)
+    OUTPUT_FRAMES = lg.Topic(ProcessedVideoFrame)
+    OUTPUT_EXTENSIONS = lg.Topic(CombinedExtensionResult)
     config: CameraStreamConfig
     state: CameraStreamState
 
-    @lg.publisher(OUTPUT)
+    @lg.publisher(OUTPUT_FRAMES)
+    @lg.publisher(OUTPUT_EXTENSIONS)
     async def read_camera(self) -> lg.AsyncPublisher:
         while True:
             self.state.perf.update_start()
@@ -55,7 +57,8 @@ class CameraStream(lg.Node):
                 frame = np.zeros(shape = (self.config.device_resolution[1], self.config.device_resolution[0], 3), dtype = np.uint8)
             
             overlayed, ext_results = self.state.frame_processor.process_frame(frame.copy(), self.state.metadata)
-            yield self.OUTPUT, ProcessedVideoFrame(original = frame, overlayed = overlayed, frame_index = self.state.frame_index, metadata = self.state.metadata)
+            yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = frame, overlayed = overlayed, frame_index = self.state.frame_index, metadata = self.state.metadata)
+            yield self.OUTPUT_EXTENSIONS, CombinedExtensionResult(results = ext_results)
 
             self.state.metadata.actual_framerate = self.state.perf.updates_per_second
             self.state.frame_index += 1
@@ -63,13 +66,14 @@ class CameraStream(lg.Node):
             self.state.perf.update_end()
 
     def setup(self) -> None:
+        print(f"CameraStream: opening device id: {self.config.device_id}")
         self.state.cap = cv2.VideoCapture(self.config.device_id)
         if self.state.cap and self.state.cap.isOpened():
             self.state.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.config.device_resolution[0])
             self.state.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.config.device_resolution[1])
             self.state.cap.set(cv2.CAP_PROP_FPS, self.config.device_resolution[2])
         else:
-            print("CameraStream: warning: device {} does not exist".format(self.config.device_id))
+            print("CameraStream: warning: device id {} does not exist".format(self.config.device_id))
         self.state.metadata = StreamMetaData(
             target_framerate = self.config.device_resolution[2],
             device_id = self.config.device_id,
@@ -82,4 +86,5 @@ class CameraStream(lg.Node):
     def cleanup(self) -> None:
         self.state.frame_processor.cleanup()
         if self.state.cap and self.state.cap.isOpened():
+            print(f"CameraStream: closing device id: {self.config.device_id}")
             self.state.cap.release()

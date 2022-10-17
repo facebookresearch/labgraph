@@ -65,7 +65,7 @@ if __name__ == "__main__":
         input_name = f"INPUT{i}"
         device_id = args.device_ids[i]
         device_resolution = device_resolutions[device_id] if device_id in device_resolutions else device_resolutions[-1]
-        PoseVis.add_node(stream_name, CameraStream, [stream_name, "OUTPUT", "DISPLAY", input_name],
+        PoseVis.add_node(stream_name, CameraStream, [stream_name, "OUTPUT_FRAMES", "DISPLAY", input_name],
             CameraStreamConfig(stream_id = i,
             device_id = device_id,
             device_resolution = device_resolution,
