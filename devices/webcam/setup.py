@@ -4,11 +4,11 @@
 from setuptools import find_packages, setup
 
 setup(
-    name = "hand_tracking_utility",
+    name = "pose_vis",
     version = "1.0.0",
-    description = "Example hand tracking estimation visualizaion using LabGraph and Mediapipe",
+    description = "Pose visualization with LabGraph and MediaPipe",
     packages = find_packages(),
-    python_requires = ">=3.6",
+    python_requires = ">=3.8",
     install_requires = [
         "labgraph==2.0.0",
         "opencv-python>=4.6.0",
