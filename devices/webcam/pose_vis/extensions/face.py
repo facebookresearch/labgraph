@@ -44,25 +44,28 @@ class FaceExtension(PoseVisExtension):
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         # convert from BGR to RGB
         results: NamedTuple = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        
+        detections = results.detections # a list of the detected face location data
 
-        landmarks = results.multi_face_landmarks #? not sure if this is correct
-
-        # make sure results is not None
-        if landmarks is None:
-            landmarks = []
+        # check if a face is detected
+        if detections is None:
+            detections = []
 
         # blank image
         overlay = np.zeros(shape=frame.shape, dtype=np.uint8)
 
         #todo THIS NEEDS TO BE REWRITTEN 
-        for landmark_list in landmarks:
+        for detection in detections:
             mp_drawing.draw_detection(
-                overlay, 
-                mp_drawing_styles.get_default_face_mesh_contours_style(), #? maybe not needed for this extention
-                mp_drawing_styles.get_default_face_mesh_tesselation_style()
+                overlay,
+                detection,  
+                #! these two below might not be the correct styles 
+                #? switch order maybe?
+                mp_drawing_styles.get_default_face_mesh_contours_style(), 
+                mp_drawing_styles.get_default_face_mesh_tesselation_style(),
             )
         
-        return (overlay, ExtensionResult(data=landmarks)) #! ExtentionResult might neeed to be changed 
+        return (overlay, ExtensionResult(data=detections)) 
 
 
     # clean up
