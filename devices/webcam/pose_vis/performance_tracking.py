@@ -28,8 +28,8 @@ class PerfUtility():
 
         `ns_to_ms(cls, time_ns: int) -> int`
     """
-    NANOSECOND: int = 1^9
-    MILISECOND: int = 1^6
+    NANOSECOND: int = 10**9
+    MILISECOND: int = 10**6
 
     delta_time_ns: int = 0
     last_update_start_ns: int = 0
