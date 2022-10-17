@@ -18,6 +18,7 @@ parser = ap.ArgumentParser()
 parser.add_argument("--device-ids", type = int, nargs = "*", help = "which device ids to stream", action = "store", required = True)
 parser.add_argument("--target-display-framerate", type = int, nargs = "?", const = 60, default = 60, help = "specify update rate for video stream presentation. Seperate from stream framerate. (default: 60)", action = "store", required = False)
 parser.add_argument("--device-resolutions", type = str, nargs = "*", help = "specify resolution/framerate per device; format is <device_id or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)", action = "store", required = False)
+parser.add_argument("--logging", help = "enable logging", action = "store_true", required = False)
 
 extensions: List[PoseVisExtension] = []
 
@@ -28,6 +29,8 @@ if __name__ == "__main__":
     for cls in PoseVisExtension.__subclasses__():
         extensions.append(cls())
 
+    print("PoseVis: building graph")
+
     ext: PoseVisExtension
     for ext in extensions:
         ext.register_args(parser)
@@ -37,13 +40,14 @@ if __name__ == "__main__":
     enabled_extensions: List[PoseVisExtension] = []
     for ext in extensions:
         if ext.check_enabled(args):
+            print(f"PoseVis: enabling extension: {ext.__class__.__name__}")
             enabled_extensions.append(ext)
     num_extensions = len(enabled_extensions)
 
     num_devices = len(args.device_ids)
     if num_devices > MAX_STREAMS:
         num_devices = MAX_STREAMS
-        print(f"Pose Vis: warning: too many streams, initializing only the first {MAX_STREAMS} provided streams")
+        print(f"PoseVis: warning: too many streams, initializing only the first {MAX_STREAMS} provided streams")
     
     config = PoseVisConfiguration(num_devices = num_devices, num_extensions = num_extensions, args = args)
     for i in range(num_extensions):
@@ -60,6 +64,8 @@ if __name__ == "__main__":
     if -1 not in device_resolutions:
         device_resolutions[-1] = (1280, 720, 30)
 
+    print(f"PoseVis: creating {num_devices} stream(s) with device ids {args.device_ids} and resolutions {device_resolutions}")
+
     for i in range(num_devices):
         stream_name = f"STREAM{i}"
         input_name = f"INPUT{i}"
@@ -70,9 +76,17 @@ if __name__ == "__main__":
             device_id = device_id,
             device_resolution = device_resolution,
             extensions = enabled_extensions))
+        if args.logging:
+            camera_log_name = f"camera_stream_{i}"
+            extension_log_name = f"extension_stream_{i}"
+            PoseVis.add_logger_connection((camera_log_name, stream_name, "OUTPUT_FRAMES"))
+            PoseVis.add_logger_connection((extension_log_name, stream_name, "OUTPUT_EXTENSIONS"))
+            print(f"PoseVis: enabling logging for stream {i} with the following paths: {camera_log_name}, {extension_log_name}")
+        print(f"PoseVis: created stream {i} with device id {args.device_ids[i]} and resolution {device_resolution}")
     
     PoseVis.add_node("DISPLAY", Display, config = DisplayConfig(target_framerate = args.target_display_framerate, num_streams = num_devices))
 
+    print("PoseVis: running graph")
     graph = PoseVis()
     runner = lg.ParallelRunner(graph = graph)
     runner.run()

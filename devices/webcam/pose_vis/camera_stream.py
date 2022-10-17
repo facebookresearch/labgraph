@@ -72,6 +72,7 @@ class CameraStream(lg.Node):
             self.state.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.config.device_resolution[0])
             self.state.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.config.device_resolution[1])
             self.state.cap.set(cv2.CAP_PROP_FPS, self.config.device_resolution[2])
+            print(f"CameraStream: device {self.config.device_id} opened and configured")
         else:
             print("CameraStream: warning: device id {} does not exist".format(self.config.device_id))
         self.state.metadata = StreamMetaData(
@@ -81,6 +82,7 @@ class CameraStream(lg.Node):
             actual_framerate = 0)
         self.state.frame_processor = FrameProcessor()
         self.state.frame_processor.extensions = self.config.extensions
+        self.state.frame_processor.stream_id = self.config.stream_id
         self.state.frame_processor.setup()
 
     def cleanup(self) -> None:

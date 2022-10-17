@@ -6,7 +6,7 @@ Pose Vis is a real-time multi-camera streaming and visualization framework built
 
 ### Overview
 
-The `PoseVis` graph is initialized with up to 4 video streams, provided by `CameraStream`. Each `CameraStream` instance initializes enabled extensions (`PoseVisExtension` class). Image data is processed within each `CameraStream` process, and then sent to the `Display` and `Logger` processes simultanously, for real-time visual feedback and data logging.
+The `PoseVis` graph is initialized with up to 4 video streams, provided by `CameraStream`. Each `CameraStream` instance initializes enabled extensions (`PoseVisExtension` class). Image data is processed within each `CameraStream` process, and then sent to the `Display` node, for real-time visual feedback.
 
 We initially intended to initialize extensions as their own nodes (and therefore processes) but ran into issues synchronizing the entire graph at an acceptable framerate.
 

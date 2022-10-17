@@ -11,10 +11,12 @@ from pose_vis.extension import PoseVisExtension, ExtensionResult
 
 @dataclass
 class FrameProcessor():
+    stream_id: int = -1
     extensions: List[PoseVisExtension] = field(default_factory = list)
 
     def setup(self) -> None:
         for ext in self.extensions:
+            print(f"CameraStream.FrameProcessor: stream {self.stream_id}: setting up extension {ext.__class__.__name__}")
             ext.setup()
 
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, List[ExtensionResult]]:

@@ -2,9 +2,7 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import labgraph as lg
-from typing import List, Tuple
-
-Connection = List[str]
+from typing import List, Tuple, Dict
 
 class DynamicGraph(lg.Graph):
 
@@ -20,12 +18,13 @@ class DynamicGraph(lg.Graph):
         `ExampleGraph.add_node("TestNode2", TestNode2, ["TestNode2", "INPUT", "TestNode1", "OUTPUT", TestNode2Config(...)])`
     """
 
-    _connections: List[Connection] = []
+    _connections: List[List[str]] = []
+    _logger_connections: List[Tuple[str, str, str]] = []
     _configs: dict = {}
     _cls: type = None
 
     @classmethod
-    def add_node(cls, name: str, _type: type, connection: List[Connection] = None, config: lg.Config = None) -> None:
+    def add_node(cls, name: str, _type: type, connection: List[List[str]] = None, config: lg.Config = None) -> None:
         setattr(cls, name, None)
         cls.__annotations__[name] = _type
         cls.__children_types__[name] = _type
@@ -37,8 +36,12 @@ class DynamicGraph(lg.Graph):
             cls._configs[name] = config
 
     @classmethod
-    def add_connection(cls, connection: List[Connection]) -> None:
+    def add_connection(cls, connection: List[List[str]]) -> None:
         cls._connections.append(connection)
+    
+    @classmethod
+    def add_logger_connection(cls, connection: Tuple[str, str, str]) -> None:
+        cls._logger_connections.append(connection)
 
     def setup(self) -> None:
         for key in type(self)._configs:
@@ -52,6 +55,12 @@ class DynamicGraph(lg.Graph):
             cons.append((node1.__getattribute__(con_list[1]), node2.__getattribute__(con_list[3])))
         return tuple(cons)
     
+    def logging(self) -> Dict[str, lg.Topic]:
+        _dict = {}
+        for con in type(self)._logger_connections:
+            _dict[con[0]] = self.__getattribute__(con[1]).__getattribute__(con[2])
+        return _dict
+
     def process_modules(self) -> Tuple[lg.Module, ...]:
         mods = ()
         for key in type(self).__children_types__:
@@ -72,11 +81,11 @@ class DynamicGroup(lg.Group):
         `DynamicGroup.add_node("TestNode2", TestNode2, ["TestNode2", "INPUT", "TestNode1", "OUTPUT", TestNode2Config(...)])`
     """
 
-    _connections: List[Connection] = []
+    _connections: List[List[str]] = []
     _configs: dict = {}
 
     @classmethod
-    def add_node(cls, name: str, _type: type, connection: List[Connection] = None, config: lg.Config = None) -> None:
+    def add_node(cls, name: str, _type: type, connection: List[List[str]] = None, config: lg.Config = None) -> None:
         setattr(cls, name, None)
         cls.__annotations__[name] = _type
         cls.__children_types__[name] = _type
@@ -88,7 +97,7 @@ class DynamicGroup(lg.Group):
             cls._configs[name] = config
 
     @classmethod
-    def add_connection(cls, connection: List[Connection]) -> None:
+    def add_connection(cls, connection: List[List[str]]) -> None:
         cls._connections.append(connection)
 
     @classmethod
