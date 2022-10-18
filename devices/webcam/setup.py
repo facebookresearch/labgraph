@@ -10,6 +10,9 @@ setup(
     packages = find_packages(),
     python_requires = ">=3.8",
     install_requires = [
+        # On Windows, LabGraph 2.0.1 gives a ModuleNotFound error relating to 'buck_ext'
+        # However, on Linux, LabGraph 2.0.0 gives this error
+        # If installing on Linux change LabGraph's version to 2.0.1
         "labgraph==2.0.0",
         "opencv-python>=4.6.0",
         "mediapipe>=0.8.11"])
