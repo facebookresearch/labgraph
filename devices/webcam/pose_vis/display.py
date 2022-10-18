@@ -13,16 +13,48 @@ from pose_vis.performance_tracking import PerfUtility
 from pose_vis.video_stream import ProcessedVideoFrame, StreamMetaData
 
 class DisplayState(lg.State):
+    """
+    State for Display node
+
+    Attributes:
+        `frames`: `List[Optional[np.ndarray]]` aggregation of all running streams' latest frame
+        `metadatas`: `List[Optional[StreamMetaData]]` aggregation of all running streams' latest metadata
+        `lock`: `Lock` used when accessing `frames` or `metadatas`
+        `perf`: `PerfUtility` to measure performance
+    
+    It is assumed `frames` and `metadatas` will contain `None` before video streams send messages
+    """
     frames: List[Optional[np.ndarray]] = field(default_factory = list)
     metadatas: List[Optional[StreamMetaData]] = field(default_factory = list)
+    # Initialize this during setup to avoid pickling issues
     lock: Optional[Lock] = None
     perf: PerfUtility = PerfUtility()
 
 class DisplayConfig(lg.Config):
+    """
+    Config for Display node
+
+    Attributes:
+        `num_streams`: `int` the total number of used inputs
+        `target_framerate`: `int` target framerate for updating CV2 windows
+    """
     num_streams: int
     target_framerate: int
 
 class Display(lg.Node):
+    """
+    Display, aggregates all stream sources and displays the overlayed frames
+
+    Topics:
+        `INPUT0`: `ProcessedVideoFrame`
+        `INPUT1`: `ProcessedVideoFrame`
+        `INPUT2`: `ProcessedVideoFrame`
+        `INPUT3`: `ProcessedVideoFrame`
+    
+    Attributes:
+        `state`: `DisplayState`
+        `config`: `DisplayConfig`
+    """
     INPUT0 = lg.Topic(ProcessedVideoFrame)
     INPUT1 = lg.Topic(ProcessedVideoFrame)
     INPUT2 = lg.Topic(ProcessedVideoFrame)
@@ -30,8 +62,10 @@ class Display(lg.Node):
     state: DisplayState
     config: DisplayConfig
 
+    # Async declaration may not be needed here
     async def update_state(self, message: ProcessedVideoFrame) -> None:
         with self.state.lock:
+            # Reshape given array into (H, W, 3) for CV2
             self.state.frames[message.metadata.stream_id] = message.overlayed.reshape(message.resolution[1], message.resolution[0], 3)
             self.state.metadatas[message.metadata.stream_id] = message.metadata
     
@@ -52,6 +86,7 @@ class Display(lg.Node):
         await self.update_state(message)
 
     def setup(self) -> None:
+        # Resize each array to the number of streams
         self.state.frames = [None] * self.config.num_streams
         self.state.metadatas = [None] * self.config.num_streams
         self.state.lock = Lock()

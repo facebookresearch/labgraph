@@ -24,7 +24,19 @@ class DynamicGraph(lg.Graph):
     _cls: type = None
 
     @classmethod
-    def add_node(cls, name: str, _type: type, connection: List[List[str]] = None, config: lg.Config = None) -> None:
+    def add_node(cls, name: str, _type: type, connection: List[str] = None, config: lg.Config = None) -> None:
+        """
+        Add a node to the graph
+
+        `name`: `str` the node's desired variable name
+        `_type`: `type` the node's type
+        `connection`: `List[str]` optional, expected to have a length of 4
+
+        Example:
+            `[Node1Name, Node1TopicName, Node2Name, Node2TopicName]`
+        
+        `config`: `lg.Config` optional, config object to be given to this node during setup
+        """
         setattr(cls, name, None)
         cls.__annotations__[name] = _type
         cls.__children_types__[name] = _type
@@ -36,11 +48,27 @@ class DynamicGraph(lg.Graph):
             cls._configs[name] = config
 
     @classmethod
-    def add_connection(cls, connection: List[List[str]]) -> None:
+    def add_connection(cls, connection: List[str]) -> None:
+        """
+        Add a connection between two nodes
+
+        `connection`: `List[str]` expected to have a length of 4
+
+        Example:
+            `[Node1Name, Node1TopicName, Node2Name, Node2TopicName]`
+        """
         cls._connections.append(connection)
     
     @classmethod
     def add_logger_connection(cls, connection: Tuple[str, str, str]) -> None:
+        """
+        Add a connection to the logger
+
+        `connection`: `Tuple[str, str, str]`
+
+        Example:
+            `(logged stream path, node variable name, node output variable name)`
+        """
         cls._logger_connections.append(connection)
 
     def setup(self) -> None:
@@ -85,7 +113,19 @@ class DynamicGroup(lg.Group):
     _configs: dict = {}
 
     @classmethod
-    def add_node(cls, name: str, _type: type, connection: List[List[str]] = None, config: lg.Config = None) -> None:
+    def add_node(cls, name: str, _type: type, connection: List[str] = None, config: lg.Config = None) -> None:
+        """
+        Add a node to the group
+
+        `name`: `str` the node's desired variable name
+        `_type`: `type` the node's type
+        `connection`: `List[str]` optional, expected to have a length of 4
+
+        Example:
+            `[Node1Name, Node1TopicName, Node2Name, Node2TopicName]`
+        
+        `config`: `lg.Config` optional, config object to be given to this node during setup
+        """
         setattr(cls, name, None)
         cls.__annotations__[name] = _type
         cls.__children_types__[name] = _type
@@ -97,11 +137,25 @@ class DynamicGroup(lg.Group):
             cls._configs[name] = config
 
     @classmethod
-    def add_connection(cls, connection: List[List[str]]) -> None:
+    def add_connection(cls, connection: List[str]) -> None:
+        """
+        Add a connection between two nodes
+
+        `connection`: `List[str]` expected to have a length of 4
+
+        Example:
+            `[Node1Name, Node1TopicName, Node2Name, Node2TopicName]`
+        """
         cls._connections.append(connection)
 
     @classmethod
     def add_topic(cls, name: str, topic: lg.Topic) -> None:
+        """
+        Add a topic object
+
+        `name`: `str` the variable's name
+        `topic`: `lg.Topic` the topic object to add
+        """
         setattr(cls, name, topic)
 
     def setup(self) -> None:

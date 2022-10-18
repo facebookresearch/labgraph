@@ -13,12 +13,33 @@ from pose_vis.performance_tracking import PerfUtility
 from typing import Optional, Tuple, List
 
 class CameraStreamConfig(lg.Config):
+    """
+    Config for CameraStream
+
+    Attributes:
+        `device_id`: `int` the device id to initialize
+        `stream_id`: `int` the id for this stream
+        `device_resolution`: `Tuple[int, int, int]` image width, height, and framerate
+        `extensions`: `List[PoseVisExtension]` extension objects to be executed on each frame
+    """
     device_id: int
     stream_id: int
     device_resolution: Tuple[int, int, int]
     extensions: List[PoseVisExtension]
 
 class CameraStreamState(lg.State):
+    """
+    State for CameraStream
+
+    Attributes:
+        `cap`: `cv2.VideoCapture` interfaces with camera devices
+        `metadata`: `StreamMetaData` utility class sent with ProcessedVideoFrame messages
+        `perf`: `PerfUtility` utility to track frames per second
+        `frame_index`: `int` current frame index since startup
+        `frame_processor`: `FrameProcessor` handles extension execution
+    """
+    # Using optional here as LabGraph expects state attributes to be initialized
+    # We create and assign these objects during setup
     cap: Optional[cv2.VideoCapture] = None
     metadata: Optional[StreamMetaData] = None
     perf: PerfUtility = PerfUtility()
@@ -26,6 +47,17 @@ class CameraStreamState(lg.State):
     frame_processor: Optional[FrameProcessor] = None
 
 class CameraStream(lg.Node):
+    """
+    CameraStream node, captures an image from configured device on a loop, runs the image through each configured extension, and outputs the results
+
+    Topics:
+        `OUTPUT_FRAMES`: `ProcessedVideoFrame`
+        `OUTPUT_EXTENSIONS`: `CombinedExtensionResult`
+    
+    Attributes:
+        `config`: `CameraStreamConfig`
+        `state`: `CameraStreamState`
+    """
     OUTPUT_FRAMES = lg.Topic(ProcessedVideoFrame)
     OUTPUT_EXTENSIONS = lg.Topic(CombinedExtensionResult)
     config: CameraStreamConfig
@@ -54,9 +86,13 @@ class CameraStream(lg.Node):
                     print("CameraStream: warning: device {} capture has encountered an error and has been closed".format(self.config.device_id))
             
             if not cap_state or error:
+                # Give a blank image if there's an issue with the device, instead of crashing
+                # CV2 uses H x W
                 frame = np.zeros(shape = (self.config.device_resolution[1], self.config.device_resolution[0], 3), dtype = np.uint8)
             
             overlayed, ext_results = self.state.frame_processor.process_frame(frame.copy(), self.state.metadata)
+            # Flatten the images since we don't know their sizes until runtime or data will be stripped when logging
+            # https://github.com/facebookresearch/labgraph/issues/20
             yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = frame.reshape(-1),
                 overlayed = overlayed.reshape(-1),
                 resolution = np.asarray(self.config.device_resolution),

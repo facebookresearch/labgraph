@@ -12,6 +12,13 @@ from pose_vis.extension import PoseVisExtension
 
 @dataclass
 class FrameProcessor():
+    """
+    Handles extension execution
+
+    Attributes:
+        `stream_id`: `int` should be set when creating this object
+        `extensions`: `List[PoseVisExtension]` the list of extensions to execute
+    """
     stream_id: int = -1
     extensions: List[PoseVisExtension] = field(default_factory = list)
 
@@ -22,10 +29,9 @@ class FrameProcessor():
 
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, str]:
         ext_results = {}
-        overlayed = frame.copy()
         for ext in self.extensions:
             overlay, ext_result = ext.process_frame(frame, metadata)
-            overlayed = cv2.addWeighted(overlay, 0.5, overlayed, 0.5, 0.0)
+            overlayed = cv2.addWeighted(overlay, 0.5, frame, 0.5, 0.0)
             ext_results[ext.__class__.__name__] = ext_result.data
         return (overlayed, json.dumps(ext_results))
 

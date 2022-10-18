@@ -44,10 +44,14 @@ class HandsExtension(PoseVisExtension):
     # Called from `FrameProcessor` on each new frame from the stream
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         # MediaPipe likes RGB images, not BGR
-        # Grab the results we're looking for
+        # Convert and grab the results we're looking for
         mp_results: NormalizedLandmarkList = self.hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).multi_hand_landmarks
+        # `multi_hand_landmarks` can be null, so if it is make sure we're working on an empty list
         if mp_results is None:
             mp_results = []
+        
+        # I can't find documentation on NormalizedLandmarkList
+        # We convert this to a normal Python list below
 
         # Create a blank image for drawing as it'll be overlayed onto the video stream
         overlay = np.zeros(shape = frame.shape, dtype = np.uint8)
@@ -61,7 +65,7 @@ class HandsExtension(PoseVisExtension):
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style())
         
-        # Convert MediaPipe's results into a JSON-able list
+        # Convert MediaPipe's results into a list so it's easier to work with down the line
         result_length = len(mp_results)
         results = [None] * result_length
         for i in range(result_length):
@@ -70,7 +74,7 @@ class HandsExtension(PoseVisExtension):
             for id, landmark in enumerate(landmark_list):
                 landmarks[id] = [landmark.x, landmark.y, landmark.z]
             results[i] = landmarks
-            
+
         # Return the overlay for presentation, along with any data to be picked up by the logger
         return (overlay, ExtensionResult(data = results))
 
