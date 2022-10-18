@@ -8,7 +8,7 @@ from pose_vis.video_stream import StreamMetaData
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from argparse import ArgumentParser, Namespace
-from typing import Any, Tuple, List
+from typing import Tuple, List, Union, Dict
 
 @dataclass
 class PoseVisConfiguration():
@@ -30,12 +30,34 @@ class ExtensionResult():
     Produced by `PoseVisExtension`
 
     Attributes:
-        `data`: `Any`
+        `data`: `Union[List, Dict, Tuple]`
     """
-    data: Any
+    data: Union[List, Dict, Tuple]
 
 class CombinedExtensionResult(lg.Message):
-    results: List[ExtensionResult]
+    """
+    All extension results combined into a dictionary and serialized to JSON
+    
+    Attributes:
+    `results`: `str`
+
+    Example output:
+    ```
+    {
+        "HandsExtension":[
+            [
+                [
+                    0.40868595242500305,
+                    0.834717333316803,
+                    -1.2446137986898975e-07
+                ],
+                ...
+            ]
+        ]
+    }
+    ```
+    """
+    results: str
 
 class PoseVisExtensionBase(ABC):
     """

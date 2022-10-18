@@ -57,7 +57,11 @@ class CameraStream(lg.Node):
                 frame = np.zeros(shape = (self.config.device_resolution[1], self.config.device_resolution[0], 3), dtype = np.uint8)
             
             overlayed, ext_results = self.state.frame_processor.process_frame(frame.copy(), self.state.metadata)
-            yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = frame, overlayed = overlayed, frame_index = self.state.frame_index, metadata = self.state.metadata)
+            yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = frame.reshape(-1),
+                overlayed = overlayed.reshape(-1),
+                resolution = np.asarray(self.config.device_resolution),
+                frame_index = self.state.frame_index,
+                metadata = self.state.metadata)
             yield self.OUTPUT_EXTENSIONS, CombinedExtensionResult(results = ext_results)
 
             self.state.metadata.actual_framerate = self.state.perf.updates_per_second
@@ -76,7 +80,6 @@ class CameraStream(lg.Node):
         else:
             print("CameraStream: warning: device id {} does not exist".format(self.config.device_id))
         self.state.metadata = StreamMetaData(
-            target_framerate = self.config.device_resolution[2],
             device_id = self.config.device_id,
             stream_id = self.config.stream_id,
             actual_framerate = 0)

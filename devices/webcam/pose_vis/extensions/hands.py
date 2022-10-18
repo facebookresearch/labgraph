@@ -8,13 +8,14 @@ import mediapipe as mp
 import mediapipe.python.solutions.hands as HandsType
 import mediapipe.python.solutions.drawing_utils as DrawingUtilsType
 import mediapipe.python.solutions.drawing_styles as DrawingStylesType
+from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
 
 # Every extension will probably need these imports
 from pose_vis.extension import PoseVisExtension, ExtensionResult
 from pose_vis.video_stream import StreamMetaData
 from argparse import ArgumentParser, Namespace
 
-from typing import NamedTuple, Optional, Tuple
+from typing import Optional, Tuple
 
 # MediaPipe setup: https://google.github.io/mediapipe/solutions/hands.html
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
@@ -43,23 +44,35 @@ class HandsExtension(PoseVisExtension):
     # Called from `FrameProcessor` on each new frame from the stream
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         # MediaPipe likes RGB images, not BGR
-        results: NamedTuple = self.hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        landmarks = results.multi_hand_landmarks
-        # If we didn't get a result, make sure it's not None
-        if landmarks is None:
-                landmarks = []
+        # Grab the results we're looking for
+        mp_results: NormalizedLandmarkList = self.hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).multi_hand_landmarks
+        if mp_results is None:
+            mp_results = []
+
         # Create a blank image for drawing as it'll be overlayed onto the video stream
         overlay = np.zeros(shape = frame.shape, dtype = np.uint8)
+
         # Draw the detected hand landmarks onto the overlay image
-        for landmark_list in landmarks:
+        for landmark_list in mp_results:
             mp_drawing.draw_landmarks(
                 overlay,
                 landmark_list,
                 mp_hands.HAND_CONNECTIONS,
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style())
+        
+        # Convert MediaPipe's results into a JSON-able list
+        result_length = len(mp_results)
+        results = [None] * result_length
+        for i in range(result_length):
+            landmark_list = mp_results[i].landmark
+            landmarks = [None] * len(landmark_list)
+            for id, landmark in enumerate(landmark_list):
+                landmarks[id] = [landmark.x, landmark.y, landmark.z]
+            results[i] = landmarks
+            
         # Return the overlay for presentation, along with any data to be picked up by the logger
-        return (overlay, ExtensionResult(data = landmarks))
+        return (overlay, ExtensionResult(data = results))
 
     # Called when the graph shuts down
     def cleanup(self) -> None:

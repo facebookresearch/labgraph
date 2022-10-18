@@ -32,7 +32,7 @@ class Display(lg.Node):
 
     async def update_state(self, message: ProcessedVideoFrame) -> None:
         with self.state.lock:
-            self.state.frames[message.metadata.stream_id] = message.overlayed
+            self.state.frames[message.metadata.stream_id] = message.overlayed.reshape(message.resolution[1], message.resolution[0], 3)
             self.state.metadatas[message.metadata.stream_id] = message.metadata
     
     @lg.subscriber(INPUT0)
@@ -64,7 +64,7 @@ class Display(lg.Node):
             with self.state.lock:
                 for i in range(self.config.num_streams):
                     if self.state.frames[i] is not None:
-                        title = f"Pose Vis (stream {self.state.metadatas[i].stream_id}, device {self.state.metadatas[i].device_id})"
+                        title = f"PoseVis (stream {self.state.metadatas[i].stream_id}, device {self.state.metadatas[i].device_id})"
                         cv2.imshow(title, self.state.frames[i])
                         cv2.setWindowTitle(title, f"{title} stream: {self.state.metadatas[i].actual_framerate}fps, display: {self.state.perf.updates_per_second}fps")
 
