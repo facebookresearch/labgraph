@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import re
+import os
 import labgraph as lg
 import argparse as ap
 import pose_vis.extensions
 
+from pathlib import Path
 from pose_vis.dynamic_nodes import DynamicGraph
 from pose_vis.camera_stream import CameraStream, CameraStreamConfig
 from pose_vis.display import Display, DisplayConfig
@@ -16,9 +19,12 @@ MAX_STREAMS = 4
 
 parser = ap.ArgumentParser()
 parser.add_argument("--device-ids", type = int, nargs = "*", help = "which device ids to stream", action = "store", required = True)
-parser.add_argument("--target-display-framerate", type = int, nargs = "?", const = 60, default = 60, help = "specify update rate for video stream presentation. Seperate from stream framerate. (default: 60)", action = "store", required = False)
+parser.add_argument("--target-display-framerate", type = int, nargs = "?", const = 60, default = 60, help = "specify update rate for video stream presentation; seperate from stream framerate (default: 60)", action = "store", required = False)
 parser.add_argument("--device-resolutions", type = str, nargs = "*", help = "specify resolution/framerate per device; format is <device_id or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)", action = "store", required = False)
-parser.add_argument("--logging", help = "enable logging", action = "store_true", required = False)
+parser.add_argument("--log-images", help = "enable image logging (default: false)", action = "store_true", required = False)
+parser.add_argument("--log-poses", help = "enable pose data logging (default: false)", action = "store_true", required = False)
+parser.add_argument("--log-dir", type = str, nargs = "?", const = "../logs", default = "../logs", help = "set log directory (default: ../logs)", action = "store", required = False)
+parser.add_argument("--log-name", type = str, help = "set log name (default: random)", action = "store", required = False)
 
 extensions: List[PoseVisExtension] = []
 
@@ -54,6 +60,8 @@ if __name__ == "__main__":
         ext.set_enabled(i, config)
 
     device_resolutions: DefaultDict[int, Tuple[int, int, int]] = {}
+    # Convert 'ID:WxHxFPS' string into a dictionary with a tuple entry: {ID: (W, H, FPS)}
+    # Default values are placed in the -1 slot
     if args.device_resolutions:
         for i in range(len(args.device_resolutions)):
             colon_split = args.device_resolutions[i].split(":")
@@ -76,17 +84,36 @@ if __name__ == "__main__":
             device_id = device_id,
             device_resolution = device_resolution,
             extensions = enabled_extensions))
-        if args.logging:
+        if args.log_images or args.log_poses:
             camera_log_name = f"camera_stream_{i}"
             extension_log_name = f"extension_stream_{i}"
-            PoseVis.add_logger_connection((camera_log_name, stream_name, "OUTPUT_FRAMES"))
-            PoseVis.add_logger_connection((extension_log_name, stream_name, "OUTPUT_EXTENSIONS"))
-            print(f"PoseVis: enabling logging for stream {i} with the following paths: {camera_log_name}, {extension_log_name}")
+            if args.log_images:
+                PoseVis.add_logger_connection((camera_log_name, stream_name, "OUTPUT_FRAMES"))
+                print(f"PoseVis: enabling image logging for stream {i} with the following path: {camera_log_name}")
+            if args.log_poses:
+                PoseVis.add_logger_connection((extension_log_name, stream_name, "OUTPUT_EXTENSIONS"))
+                print(f"PoseVis: enabling pose data logging for stream {i} with the following path: {extension_log_name}")
         print(f"PoseVis: created stream {i} with device id {args.device_ids[i]} and resolution {device_resolution}")
     
     PoseVis.add_node("DISPLAY", Display, config = DisplayConfig(target_framerate = args.target_display_framerate, num_streams = num_devices))
 
+    log_path = ""
+    # Check if provided log path is a full directory or relative
+    if args.log_dir.startswith("/") or re.match(r'[a-zA-Z]:', args.log_dir):
+        log_path = args.log_dir
+    else:
+        log_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), args.log_dir)
+    log_path = log_path.removesuffix("/").removesuffix("\\")
+    Path(log_path).mkdir(parents = True, exist_ok = True)
+
+    logger_config: lg.LoggerConfig
+    if args.log_name:
+        logger_config = lg.LoggerConfig(output_directory = log_path, recording_name = args.log_name)
+    else:
+        logger_config = lg.LoggerConfig(output_directory = log_path)
+
     print("PoseVis: running graph")
     graph = PoseVis()
-    runner = lg.ParallelRunner(graph = graph)
+    runner_options = lg.RunnerOptions(logger_config = logger_config)
+    runner = lg.ParallelRunner(graph = graph, options = runner_options)
     runner.run()
