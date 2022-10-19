@@ -36,17 +36,35 @@ class TerminationHandler(lg.Node):
         `config`: `TerminationHandlerConfig`
         `state`: `TerminationHandlerState`
     """
-    INPUT = lg.Topic(FinishedMessage)
+    INPUT0 = lg.Topic(FinishedMessage)
+    INPUT1 = lg.Topic(FinishedMessage)
+    INPUT2 = lg.Topic(FinishedMessage)
+    INPUT3 = lg.Topic(FinishedMessage)
     config: TerminationHandlerConfig
     state: TerminationHandlerState
 
     def setup(self) -> None:
         self.state.lock = Lock()
 
-    @lg.subscriber(INPUT)
-    async def on_finished(self, message: FinishedMessage) -> None:
+    async def update_state(self, message: FinishedMessage) -> None:
         with self.state.lock:
             self.state.num_finished += 1
+    
+    @lg.subscriber(INPUT0)
+    async def on_finished_0(self, message: FinishedMessage) -> None:
+        await self.update_state(message)
+    
+    @lg.subscriber(INPUT1)
+    async def on_finished_1(self, message: FinishedMessage) -> None:
+        await self.update_state(message)
+    
+    @lg.subscriber(INPUT2)
+    async def on_finished_2(self, message: FinishedMessage) -> None:
+        await self.update_state(message)
+    
+    @lg.subscriber(INPUT3)
+    async def on_finished_3(self, message: FinishedMessage) -> None:
+        await self.update_state(message)
     
     @lg.main
     def on_main(self) -> None:

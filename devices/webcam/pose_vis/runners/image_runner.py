@@ -41,8 +41,9 @@ class ImageStreamRunner(PoseVisRunner):
 
         for i in range(num_streams):
             stream_name = f"STREAM{i}"
+            input_name = f"INPUT{i}"
 
-            PoseVis.add_node(stream_name, ImageStream, [stream_name, "OUTPUT_FINISHED", "TERM_HANDLER", "INPUT"],
+            PoseVis.add_node(stream_name, ImageStream, [stream_name, "OUTPUT_FINISHED", "TERM_HANDLER", input_name],
                 ImageStreamConfig(stream_id = i,
                 directory = self.runner_config.directories[i],
                 target_framerate = self.runner_config.framerate,
