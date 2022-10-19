@@ -9,10 +9,11 @@ import pose_vis.extensions
 
 from pathlib import Path
 from pose_vis.dynamic_nodes import DynamicGraph
+from pose_vis.pose_vis_config import PoseVisMode, PoseVisConfiguration
 from pose_vis.camera_stream import CameraStream, CameraStreamConfig
+from pose_vis.image_stream import ImageStream, ImageStreamConfig
 from pose_vis.display import Display, DisplayConfig
-from pose_vis.extension import PoseVisExtension, PoseVisConfiguration
-from typing import List, Tuple, DefaultDict
+from pose_vis.extension import PoseVisExtension
 
 # This is hard-coded to however many inputs the Display node has
 MAX_STREAMS = 4
@@ -26,40 +27,133 @@ parser.add_argument("--log-poses", help = "enable pose data logging (default: fa
 parser.add_argument("--log-dir", type = str, nargs = "?", const = "../logs", default = "../logs", help = "set log directory (default: ../logs)", action = "store", required = False)
 parser.add_argument("--log-name", type = str, help = "set log name (default: random)", action = "store", required = False)
 
-extensions: List[PoseVisExtension] = []
-
 class PoseVis(DynamicGraph):
+    """
+    Create an instance of DynamicGraph. It is built with `PoseVisRunner`
+    """
     pass
 
+class PoseVisRunner():
+    """
+    Builds the PoseVis graph and runs it based on the provided configuration
+
+    Attributes:
+        `config`: `PoseVisConfiguration` must be set when instantiating this class
+    """
+    config: PoseVisConfiguration
+
+    def __init__(self, config: PoseVisConfiguration):
+        self.config = config
+    
+    def run(self) -> None:
+        print("PoseVis: building graph")
+
+        for i in range(len(self.config.enabled_extensions)):
+            ext: PoseVisExtension = self.config.enabled_extensions[i]
+            print(f"PoseVis: enabling extension: {ext.__class__.__name__}")
+            ext.set_enabled(i, self.config)
+
+        # Check if provided log path is a full directory or relative
+        if not self.config.log_directory.startswith("/") or not re.match(r'[a-zA-Z]:', self.config.log_directory):
+            self.config.log_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.config.log_directory)
+        self.config.log_directory = self.config.log_directory.removesuffix("/").removesuffix("\\")
+        Path(self.config.log_directory).mkdir(parents = True, exist_ok = True)
+
+        if self.config.mode == PoseVisMode.DEVICE_STREAMING:
+            num_devices = len(self.config.device_ids)
+            print(f"PoseVis: creating {num_devices} stream(s) with device ids {self.config.device_ids} and resolutions {self.config.device_resolutions}")
+
+            for i in range(num_devices):
+                stream_name = f"STREAM{i}"
+                input_name = f"INPUT{i}"
+
+                device_id = self.config.device_ids[i]
+                device_resolution = self.config.device_resolutions[device_id] if device_id in self.config.device_resolutions else self.config.device_resolutions[-1]
+                PoseVis.add_node(stream_name, CameraStream, [stream_name, "OUTPUT_FRAMES", "DISPLAY", input_name],
+                    CameraStreamConfig(stream_id = i,
+                    device_id = device_id,
+                    device_resolution = device_resolution,
+                    extensions = self.config.enabled_extensions))
+                
+                if self.config.log_images or self.config.log_poses:
+                    camera_log_name = f"image_stream_{i}"
+                    extension_log_name = f"extension_stream_{i}"
+                    if self.config.log_images:
+                        PoseVis.add_logger_connection((camera_log_name, stream_name, "OUTPUT_FRAMES"))
+                        print(f"PoseVis: enabling image logging for stream {i} with the following path: {camera_log_name}")
+                    if self.config.log_poses:
+                        PoseVis.add_logger_connection((extension_log_name, stream_name, "OUTPUT_EXTENSIONS"))
+                        print(f"PoseVis: enabling pose data logging for stream {i} with the following path: {extension_log_name}")
+                
+                print(f"PoseVis: created stream {i} with device id {device_id} and resolution {device_resolution}")
+            
+            PoseVis.add_node("DISPLAY", Display, config = DisplayConfig(target_framerate = self.config.display_framerate, num_streams = num_devices))
+
+        elif self.config.mode == PoseVisMode.IMAGE_STREAMING:
+            if not self.config.image_streaming_directory.startswith("/") or not re.match(r'[a-zA-Z]:', self.config.image_streaming_directory):
+                self.config.image_streaming_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.config.image_streaming_directory)
+            self.config.image_streaming_directory = self.config.image_streaming_directory.removesuffix("/").removesuffix("\\")
+            
+            print("PoseVis: creating image stream")
+            PoseVis.add_node("STREAM0", ImageStream,
+                config = ImageStreamConfig(stream_id = i,
+                directory = self.config.image_streaming_directory,
+                target_framerate = self.config.image_streaming_framerate,
+                extensions = self.config.enabled_extensions))
+            
+            if self.config.log_images or self.config.log_poses:
+                camera_log_name = f"image_stream_{i}"
+                extension_log_name = f"extension_stream_{i}"
+                if self.config.log_images:
+                    PoseVis.add_logger_connection((camera_log_name, "STREAM0", "OUTPUT_FRAMES"))
+                    print(f"PoseVis: enabling image logging for stream {i} with the following path: {camera_log_name}")
+                if self.config.log_poses:
+                    PoseVis.add_logger_connection((extension_log_name, "STREAM0", "OUTPUT_EXTENSIONS"))
+                    print(f"PoseVis: enabling pose data logging for stream {i} with the following path: {extension_log_name}")
+
+        logger_config: lg.LoggerConfig
+        if self.config.log_name:
+            logger_config = lg.LoggerConfig(output_directory = self.config.log_directory, recording_name = self.config.log_name)
+        else:
+            logger_config = lg.LoggerConfig(output_directory = self.config.log_directory)
+
+        print("PoseVis: running graph")
+        graph = PoseVis()
+        runner_options = lg.RunnerOptions(logger_config = logger_config)
+        runner = lg.ParallelRunner(graph = graph, options = runner_options)
+        runner.run()
+
 if __name__ == "__main__":
+    """
+    Run the graph via command line arguments in `PoseVisMode.DEVICE_STREAMING` mode
+    """
+    enabled_extensions = []
+    device_resolutions = {}
+
+    # Get a list of every available extension
+    extensions = []
     for cls in PoseVisExtension.__subclasses__():
         extensions.append(cls())
 
-    print("PoseVis: building graph")
-
+    # Let extensions register arguments
     ext: PoseVisExtension
     for ext in extensions:
         ext.register_args(parser)
 
     args = parser.parse_args()
 
-    enabled_extensions: List[PoseVisExtension] = []
+    # Check if an extension is enabled via its argument
     for ext in extensions:
         if ext.check_enabled(args):
-            print(f"PoseVis: enabling extension: {ext.__class__.__name__}")
             enabled_extensions.append(ext)
-    num_extensions = len(enabled_extensions)
 
+    # Make sure we don't register too many streams
     num_devices = len(args.device_ids)
     if num_devices > MAX_STREAMS:
         num_devices = MAX_STREAMS
         print(f"PoseVis: warning: too many streams, initializing only the first {MAX_STREAMS} provided streams")
-    
-    config = PoseVisConfiguration(num_devices = num_devices, num_extensions = num_extensions, args = args)
-    for i in range(num_extensions):
-        ext.set_enabled(i, config)
+        args.device_ids = args.device_ids[0:4]
 
-    device_resolutions: DefaultDict[int, Tuple[int, int, int]] = {}
     # Convert 'ID:WxHxFPS' string into a dictionary with a tuple entry: {ID: (W, H, FPS)}
     # Default values are placed in the -1 slot
     if args.device_resolutions:
@@ -71,49 +165,17 @@ if __name__ == "__main__":
             device_resolutions[device_id] = device_resolution
     if -1 not in device_resolutions:
         device_resolutions[-1] = (1280, 720, 30)
-
-    print(f"PoseVis: creating {num_devices} stream(s) with device ids {args.device_ids} and resolutions {device_resolutions}")
-
-    for i in range(num_devices):
-        stream_name = f"STREAM{i}"
-        input_name = f"INPUT{i}"
-        device_id = args.device_ids[i]
-        device_resolution = device_resolutions[device_id] if device_id in device_resolutions else device_resolutions[-1]
-        PoseVis.add_node(stream_name, CameraStream, [stream_name, "OUTPUT_FRAMES", "DISPLAY", input_name],
-            CameraStreamConfig(stream_id = i,
-            device_id = device_id,
-            device_resolution = device_resolution,
-            extensions = enabled_extensions))
-        if args.log_images or args.log_poses:
-            camera_log_name = f"camera_stream_{i}"
-            extension_log_name = f"extension_stream_{i}"
-            if args.log_images:
-                PoseVis.add_logger_connection((camera_log_name, stream_name, "OUTPUT_FRAMES"))
-                print(f"PoseVis: enabling image logging for stream {i} with the following path: {camera_log_name}")
-            if args.log_poses:
-                PoseVis.add_logger_connection((extension_log_name, stream_name, "OUTPUT_EXTENSIONS"))
-                print(f"PoseVis: enabling pose data logging for stream {i} with the following path: {extension_log_name}")
-        print(f"PoseVis: created stream {i} with device id {args.device_ids[i]} and resolution {device_resolution}")
     
-    PoseVis.add_node("DISPLAY", Display, config = DisplayConfig(target_framerate = args.target_display_framerate, num_streams = num_devices))
-
-    log_path = ""
-    # Check if provided log path is a full directory or relative
-    if args.log_dir.startswith("/") or re.match(r'[a-zA-Z]:', args.log_dir):
-        log_path = args.log_dir
-    else:
-        log_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), args.log_dir)
-    log_path = log_path.removesuffix("/").removesuffix("\\")
-    Path(log_path).mkdir(parents = True, exist_ok = True)
-
-    logger_config: lg.LoggerConfig
-    if args.log_name:
-        logger_config = lg.LoggerConfig(output_directory = log_path, recording_name = args.log_name)
-    else:
-        logger_config = lg.LoggerConfig(output_directory = log_path)
-
-    print("PoseVis: running graph")
-    graph = PoseVis()
-    runner_options = lg.RunnerOptions(logger_config = logger_config)
-    runner = lg.ParallelRunner(graph = graph, options = runner_options)
-    runner.run()
+    # Build and run the graph
+    config = PoseVisConfiguration(mode = PoseVisMode.DEVICE_STREAMING,
+        enabled_extensions = enabled_extensions,
+        device_ids = args.device_ids,
+        device_resolutions = device_resolutions,
+        display_framerate = args.target_display_framerate,
+        log_directory = args.log_dir,
+        log_name = args.log_name,
+        log_images = args.log_images,
+        log_poses = args.log_images,
+        image_streaming_directory = "",
+        image_streaming_framerate = 0)
+    PoseVisRunner(config).run()

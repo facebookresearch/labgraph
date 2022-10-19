@@ -2,7 +2,6 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import cv2
-import json
 import numpy as np
 
 from typing import List, Tuple
@@ -33,7 +32,7 @@ class FrameProcessor():
             overlay, ext_result = ext.process_frame(frame, metadata)
             overlayed = cv2.addWeighted(overlay, 0.5, frame, 0.5, 0.0)
             ext_results[ext.__class__.__name__] = ext_result.data
-        return (overlayed, json.dumps(ext_results))
+        return (overlayed, ext_results)
 
     def cleanup(self) -> None:
         for ext in self.extensions:

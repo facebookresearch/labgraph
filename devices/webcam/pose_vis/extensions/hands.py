@@ -50,8 +50,7 @@ class HandsExtension(PoseVisExtension):
         if mp_results is None:
             mp_results = []
         
-        # I can't find documentation on NormalizedLandmarkList
-        # We convert this to a normal Python list below
+        # TODO: document NormalizedLandmarkList
 
         # Create a blank image for drawing as it'll be overlayed onto the video stream
         overlay = np.zeros(shape = frame.shape, dtype = np.uint8)
@@ -65,18 +64,8 @@ class HandsExtension(PoseVisExtension):
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style())
         
-        # Convert MediaPipe's results into a list so it's easier to work with down the line
-        result_length = len(mp_results)
-        results = [None] * result_length
-        for i in range(result_length):
-            landmark_list = mp_results[i].landmark
-            landmarks = [None] * len(landmark_list)
-            for id, landmark in enumerate(landmark_list):
-                landmarks[id] = [landmark.x, landmark.y, landmark.z]
-            results[i] = landmarks
-
         # Return the overlay for presentation, along with any data to be picked up by the logger
-        return (overlay, ExtensionResult(data = results))
+        return (overlay, ExtensionResult(data = mp_results))
 
     # Called when the graph shuts down
     def cleanup(self) -> None:
