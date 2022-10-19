@@ -2,6 +2,8 @@
 
 PoseVis is a multi-camera streaming and visualization framework built upon LabGraph. PoseVis was built with modularity in mind and can be extended to many downstream applications relatively easily through its extension system and logging support.
 
+![Usage preview](https://raw.githubusercontent.com/Dasfaust/labgraph/hand_tracking/devices/webcam/images/preview.gif)
+
 ## Concepts
 
 ### Overview
@@ -88,11 +90,11 @@ You can also enable extensions and logging to generate a new log with new extens
 
 ### As a Module
 
-See [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/pose_vis/devices/webcam/logging_example.ipynb) for PoseVis usage as a module.
+See [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/logging_example.ipynb) for PoseVis usage as a module.
 
 ## Reading Logs (HDF5)
 
-For an example of logging output, check [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/pose_vis/devices/webcam/logging_example.ipynb).
+For an example of logging output, check [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/logging_example.ipynb).
 
 ## To-do
 
