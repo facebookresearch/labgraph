@@ -48,11 +48,43 @@ optional arguments:
                         specify resolution/framerate per device; format is <device_id or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)
   --log-images          enable image logging (default: false)
   --log-poses           enable pose data logging (default: false)
-  --log-dir [LOG_DIR]   set log directory (default: ../logs)
+  --log-dir [LOG_DIR]   set log directory (default: webcam/logs)
   --log-name LOG_NAME   set log name (default: random)
   --hands               enable the hand tracking extension
   --face                enable the face detection extention
 ```
+
+Streaming a single device: stream device 0 with no extensions or logging
+
+`python -m pose_vis.pose_vis --device-ids 0`
+
+Streaming multiple devices: stream devices 0 and 1 with no extensions or logging
+
+`python -m pose_vis.pose_vis --device-ids 0 1`
+
+Specifying resolution and framerate:
+
+The format for specifying resolution is `<device id>:<width>x<height>x<framerate>`
+
+You can also set the default resolution and framerate by using `*` in place of `<device id>`
+
+`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30`
+
+Enabling extensions: this enables the hand tracking extension
+
+`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30 --hands`
+
+Enabling logging: this enables both image and pose data logging
+
+`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30 --hands --log-images --log-poses`
+
+Replaying logs: this will replay a log and stream the generated pose data (if present)
+
+`python -m pose_vis.pose_vis --replay webcam/logs/test_log.h5`
+
+You can also enable extensions and logging to generate a new log with new extension data based on the images in the log being replayed:
+
+`python -m pose_vis.pose_vis --replay webcam/logs/test_log.h5 --hands --log-images --log-poses`
 
 ### As a Module
 
