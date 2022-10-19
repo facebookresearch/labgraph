@@ -21,7 +21,7 @@ class TerminationHandlerState(lg.State):
     Attributes:
         `num_finished`: `int`
     """
-    num_finished: int
+    num_finished: int = 0
     lock: Optional[Lock] = None
     
 
