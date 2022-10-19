@@ -5,7 +5,6 @@ import numpy as np
 import labgraph as lg
 
 from pose_vis.streams.messages import StreamMetaData
-from pose_vis.pose_vis_config import PoseVisConfiguration
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from argparse import ArgumentParser, Namespace
@@ -81,17 +80,14 @@ class PoseVisExtension(PoseVisExtensionBase):
 
     Attributes:
         `extension_id`: `int`, a contiguous identifier for each enabled extension
-        `config`: `PoseVisConfiguration`
     
     Methods:
-        `set_enabled(self, extension_id: int, config: PoseVisConfiguration) -> None`
+        `set_enabled(self, extension_id: int) -> None`
     """
     extension_id: int
-    config: PoseVisConfiguration
 
-    def set_enabled(self, extension_id: int, config: PoseVisConfiguration) -> None:
+    def set_enabled(self, extension_id: int) -> None:
         """
         Called if this extension passes the `check_enabled` method
         """
         self.extension_id = extension_id
-        self.config = config
