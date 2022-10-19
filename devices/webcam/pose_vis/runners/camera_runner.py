@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class CameraStreamRunnerConfig():
+    """
+    Config for CameraStreamRunner
+
+    Attributes:
+        `device_ids`: `List[int]`
+        `device_resolutions`: `Dict[int, Tuple[int, int, int]]`
+        `display_framerate`: `int`
+    """
     device_ids: List[int]
     device_resolutions: Dict[int, Tuple[int, int, int]]
     display_framerate: int

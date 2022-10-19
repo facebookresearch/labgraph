@@ -16,6 +16,13 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ReplayStreamRunnerConfig():
+    """
+    Config for ReplayStreamRunner
+
+    Attributes:
+        `path`: `str`
+        `display_framerate`: `int`
+    """
     path: str
     display_framerate: int
 

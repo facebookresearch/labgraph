@@ -14,6 +14,13 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ImageStreamRunnerConfig():
+    """
+    Config for ImageStreamRunner
+
+    Atttributes:
+        `directories`: `List[str]`
+        `framerate`: `int`
+    """
     directories: List[str]
     framerate: int
 

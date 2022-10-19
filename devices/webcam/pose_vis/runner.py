@@ -16,6 +16,16 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class PoseVisConfig():
+    """
+    Config for `PoseVisRunner` parent class
+
+    Attributes:
+        `extensions`: `List[PoseVisExtension]`
+        `log_directory`: `str`
+        `log_name`: `Optional[str]`
+        `log_images`: `bool`
+        `log_poses`: `bool`
+    """
     extensions: List[PoseVisExtension]
     log_directory: str
     log_name: Optional[str]
@@ -23,18 +33,26 @@ class PoseVisConfig():
     log_poses: bool
 
 class PoseVisRunner(ABC):
-
+    """
+    Parent runner class that takes care of basic graph setup
+    """
     config: PoseVisConfig
 
     def __init__(self, config: PoseVisConfig) -> None:
         self.config = config
 
     def add_graph_metadata(self, num_streams: int) -> None:
+        """
+        Add the `GraphMetaDataProvider` node to the graph if logging is enabled
+        """
         PoseVis.add_node("METADATA", GraphMetaDataProvider, config = GraphMetaDataProviderConfig(num_streams = num_streams))
         if self.config.log_images or self.config.log_poses:
             PoseVis.add_logger_connection(("metadata", "METADATA", "OUTPUT"))
 
     def set_logger_connections(self, stream_index: int) -> None:
+        """
+        Connect the stream's output to the logger if logging is enabled
+        """
         image_log_name = f"image_stream_{stream_index}"
         extension_log_name = f"extension_stream_{stream_index}"
         stream_name = f"STREAM{stream_index}"
@@ -46,6 +64,9 @@ class PoseVisRunner(ABC):
             logger.info(f" enabled pose data logging for stream {stream_index} with the following path: {extension_log_name}")
 
     def build(self) -> None:
+        """
+        Build the `PoseVis` graph
+        """
         logger.info(" building graph")
 
         # Enable extensions
@@ -61,6 +82,9 @@ class PoseVisRunner(ABC):
         self.register_nodes()
 
     def run(self) -> None:
+        """
+        Run the `PoseVis` graph
+        """
         logger_config: lg.LoggerConfig
         if self.config.log_name:
             logger_config = lg.LoggerConfig(output_directory = self.config.log_directory, recording_name = self.config.log_name)
@@ -75,4 +99,7 @@ class PoseVisRunner(ABC):
 
     @abstractmethod
     def register_nodes(self) -> None:
+        """
+        Function called for derived classes to add their specific nodes
+        """
         raise NotImplementedError
