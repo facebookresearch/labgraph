@@ -1,9 +1,4 @@
-from distutils import extension
-from locale import normalize
-from unittest import result
 import cv2
-import time
-import labgraph as lg
 import numpy as np
 import mediapipe as mp
 # Import MediaPipe types for intellisense
@@ -16,20 +11,18 @@ from pose_vis.extension import PoseVisExtension, ExtensionResult
 from pose_vis.streams.messages import StreamMetaData
 from argparse import ArgumentParser, Namespace
 
-from typing import NamedTuple, Optional, Tuple
-
+from typing import Optional, Tuple
 
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
-# mp_hands: HandsType = mp.solutions.hands
 mp_face: FaceType = mp.solutions.face_detection
 
 class FaceExtension(PoseVisExtension):
     face : Optional[FaceType.FaceDetection]
 
-    # argument to enable or disable the face detection extention
+    # argument to enable or disable the face detection extension
     def register_args(self, parser: ArgumentParser) -> None:
-        parser.add_argument("--face", help="enable the face detection extention", action="store_true", required=False)
+        parser.add_argument("--face", help="enable the face detection extension", action="store_true", required=False)
 
     #? make sure this is correct
     def check_enabled(self, args: Namespace) -> bool:
@@ -40,22 +33,22 @@ class FaceExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         # convert from BGR to RGB
-        mp_results: NormalizedDetectionList = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).detections # make sure this is right
+        #? NormalizedDetectionList
+        mp_results = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).detections # make sure this is right
 
         # detections = mp_results.detections # a list of the detected face location data
 
-        # check if a face is null
+        # check if a face detection list is null
         if mp_results is None:
             mp_results = []
 
-        # blank image
+        # blank image for creating the overlay on
         overlay = np.zeros(shape=frame.shape, dtype=np.uint8)
 
         for detection in mp_results:
             mp_drawing.draw_detection(
                 overlay,
                 detection,  
-                #! these two below might not be the correct styles 
                 #? switch order maybe?
                 mp_drawing_styles.get_default_face_mesh_contours_style(), 
                 mp_drawing_styles.get_default_face_mesh_tesselation_style(),
@@ -63,6 +56,7 @@ class FaceExtension(PoseVisExtension):
         
         results = mp_results
 
+        #! no longer using 
         # result_len = len(mp_results)
         # results = [None] * result_len
 
@@ -78,7 +72,6 @@ class FaceExtension(PoseVisExtension):
         return (overlay, ExtensionResult(data=results)) 
 
 
-    # clean up
+    # clean up called when the graph is shutdown
     def cleanup(self) -> None:
-        #? maybe add something
         pass
