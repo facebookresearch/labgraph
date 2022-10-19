@@ -5,6 +5,7 @@ import labgraph as lg
 import numpy as np
 
 from dataclasses import dataclass
+from typing import Dict, Any
 
 @dataclass
 class StreamMetaData:
@@ -41,5 +42,17 @@ class ProcessedVideoFrame(lg.Message):
 class GraphMetaData(lg.Message):
     """
     Utility message for log playback
+
+    Attributes:
+        `num_streams`: `int`
     """
     num_streams: int
+
+class CombinedExtensionResult(lg.Message):
+    """
+    All extension results combined into a dictionary
+    
+    Attributes:
+    `results`: `Dict[str, Any]`
+    """
+    results: Dict[str, Any]

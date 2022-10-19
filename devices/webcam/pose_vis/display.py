@@ -10,7 +10,7 @@ from typing import List, Optional
 from dataclasses import field
 from threading import Lock
 from pose_vis.performance_utility import PerfUtility
-from pose_vis.video_stream import ProcessedVideoFrame, StreamMetaData
+from pose_vis.streams.messages import ProcessedVideoFrame, StreamMetaData
 
 class DisplayState(lg.State):
     """

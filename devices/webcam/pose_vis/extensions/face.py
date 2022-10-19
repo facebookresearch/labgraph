@@ -13,7 +13,7 @@ import mediapipe.python.solutions.drawing_styles as DrawingStylesType
 
 # Every extension will probably need these imports
 from pose_vis.extension import PoseVisExtension, ExtensionResult
-from pose_vis.video_stream import StreamMetaData
+from pose_vis.streams.messages import StreamMetaData
 from argparse import ArgumentParser, Namespace
 
 from typing import NamedTuple, Optional, Tuple

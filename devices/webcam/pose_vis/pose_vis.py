@@ -7,13 +7,13 @@ import labgraph as lg
 import argparse as ap
 import pose_vis.extensions
 
-from pose_vis.dynamic_nodes import DynamicGraph
+from pose_vis.dynamic_graph import DynamicGraph
 from pose_vis.pose_vis_config import PoseVisMode, PoseVisConfiguration
-from pose_vis.camera_stream import CameraStream, CameraStreamConfig
-from pose_vis.graph_metadata import GraphMetaDataProvider, GraphMetaDataProviderConfig
-from pose_vis.image_stream import ImageStream, ImageStreamConfig
-from pose_vis.video_stream import GraphMetaData
-from pose_vis.replay_stream import ReplayStream, ReplayStreamConfig
+from pose_vis.streams.camera_stream import CameraStream, CameraStreamConfig
+from pose_vis.streams.graph_metadata import GraphMetaDataProvider, GraphMetaDataProviderConfig
+from pose_vis.streams.image_stream import ImageStream, ImageStreamConfig
+from pose_vis.streams.messages import GraphMetaData
+from pose_vis.streams.replay_stream import ReplayStream, ReplayStreamConfig
 from pose_vis.display import Display, DisplayConfig
 from pose_vis.extension import PoseVisExtension
 from pathlib import Path

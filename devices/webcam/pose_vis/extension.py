@@ -4,12 +4,12 @@
 import numpy as np
 import labgraph as lg
 
-from pose_vis.video_stream import StreamMetaData
+from pose_vis.streams.messages import StreamMetaData
 from pose_vis.pose_vis_config import PoseVisConfiguration
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from argparse import ArgumentParser, Namespace
-from typing import Tuple, Dict, Any
+from typing import Tuple, Any
 
 @dataclass
 class ExtensionResult():
@@ -20,15 +20,6 @@ class ExtensionResult():
         `data`: `Any`
     """
     data: Any
-
-class CombinedExtensionResult(lg.Message):
-    """
-    All extension results combined into a dictionary
-    
-    Attributes:
-    `results`: `Dict[str, Any]`
-    """
-    results: Dict[str, Any]
 
 class PoseVisExtensionBase(ABC):
     """

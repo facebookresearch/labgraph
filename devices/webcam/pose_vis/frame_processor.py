@@ -6,7 +6,7 @@ import numpy as np
 
 from typing import List, Tuple
 from dataclasses import dataclass, field
-from pose_vis.video_stream import StreamMetaData
+from pose_vis.streams.messages import StreamMetaData
 from pose_vis.extension import PoseVisExtension
 
 @dataclass

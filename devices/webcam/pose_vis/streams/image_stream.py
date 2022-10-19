@@ -7,9 +7,9 @@ import cv2
 import labgraph as lg
 import numpy as np
 
-from pose_vis.video_stream import ProcessedVideoFrame, StreamMetaData
+from pose_vis.streams.messages import ProcessedVideoFrame, StreamMetaData, CombinedExtensionResult
 from pose_vis.frame_processor import FrameProcessor
-from pose_vis.extension import PoseVisExtension, CombinedExtensionResult
+from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
 from dataclasses import field
 from typing import Optional, List

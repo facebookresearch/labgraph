@@ -1,6 +1,6 @@
 import labgraph as lg
 
-from pose_vis.video_stream import GraphMetaData
+from pose_vis.streams.messages import GraphMetaData
 
 class GraphMetaDataProviderConfig(lg.Config):
     num_streams: int
