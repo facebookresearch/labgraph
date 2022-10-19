@@ -9,7 +9,7 @@ import numpy as np
 from typing import List, Optional
 from dataclasses import field
 from threading import Lock
-from pose_vis.performance_tracking import PerfUtility
+from pose_vis.performance_utility import PerfUtility
 from pose_vis.video_stream import ProcessedVideoFrame, StreamMetaData
 
 class DisplayState(lg.State):
@@ -106,9 +106,9 @@ class Display(lg.Node):
             if cv2.waitKey(1) & 0xFF == 27:
                 break
 
-            wait_time = self.state.perf.get_sleep_time_ns(self.state.perf.last_update_start_ns, self.config.target_framerate)
-            wait_start = time.time_ns()
-            while time.time_ns() - wait_start < wait_time:
+            wait_time = self.state.perf.get_remaining_sleep_time(self.config.target_framerate)
+            wait_start = time.perf_counter()
+            while time.perf_counter() - wait_start < wait_time:
                 continue
 
             self.state.perf.update_end()

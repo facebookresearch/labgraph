@@ -7,7 +7,7 @@ import labgraph as lg
 from pose_vis.video_stream import ProcessedVideoFrame, StreamMetaData
 from pose_vis.frame_processor import FrameProcessor
 from pose_vis.extension import PoseVisExtension, CombinedExtensionResult
-from pose_vis.performance_tracking import PerfUtility
+from pose_vis.performance_utility import PerfUtility
 from typing import Optional, List
 from labgraph.loggers.hdf5.reader import HDF5Reader
 
@@ -71,7 +71,7 @@ class ReplayStream(lg.Node):
 
             message: ProcessedVideoFrame = self.state.reader.logs[image_log_name][i]
             if len(self.config.extensions) > 0:
-                overlayed, ext_results = self.state.frame_processor.process_frame(message.original.copy().reshape(message.resolution[1], message.resolution[0], 3), self.state.metadata)
+                overlayed, ext_results = self.state.frame_processor.process_frame(message.original.reshape(message.resolution[1], message.resolution[0], 3), self.state.metadata)
                 yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = message.original,
                     overlayed = overlayed,
                     resolution = message.resolution,
@@ -85,7 +85,7 @@ class ReplayStream(lg.Node):
 
             self.state.metadata.actual_framerate = self.state.perf.updates_per_second
             self.state.frame_index += 1
-            await asyncio.sleep(PerfUtility.ns_to_s(PerfUtility.get_sleep_time_ns(self.state.perf.last_update_start_ns, message.metadata.actual_framerate if message.metadata.actual_framerate > 0 else message.resolution[2])))
+            await asyncio.sleep(self.state.perf.get_remaining_sleep_time(message.metadata.actual_framerate if message.metadata.actual_framerate > 0 else message.resolution[2]))
             self.state.perf.update_end()
         print("ReplayStream: log replay finished")
 

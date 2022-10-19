@@ -9,7 +9,7 @@ import numpy as np
 from pose_vis.video_stream import ProcessedVideoFrame, StreamMetaData
 from pose_vis.frame_processor import FrameProcessor
 from pose_vis.extension import PoseVisExtension, CombinedExtensionResult
-from pose_vis.performance_tracking import PerfUtility
+from pose_vis.performance_utility import PerfUtility
 from typing import Optional, Tuple, List
 
 class CameraStreamConfig(lg.Config):
@@ -90,7 +90,7 @@ class CameraStream(lg.Node):
                 # CV2 uses H x W
                 frame = np.zeros(shape = (self.config.device_resolution[1], self.config.device_resolution[0], 3), dtype = np.uint8)
             
-            overlayed, ext_results = self.state.frame_processor.process_frame(frame.copy(), self.state.metadata)
+            overlayed, ext_results = self.state.frame_processor.process_frame(frame, self.state.metadata)
             # Flatten the images since we don't know their sizes until runtime or data will be stripped when logging
             # https://github.com/facebookresearch/labgraph/issues/20
             yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = frame.reshape(-1),
@@ -102,7 +102,7 @@ class CameraStream(lg.Node):
 
             self.state.metadata.actual_framerate = self.state.perf.updates_per_second
             self.state.frame_index += 1
-            await asyncio.sleep(PerfUtility.ns_to_s(PerfUtility.get_sleep_time_ns(self.state.perf.last_update_start_ns, self.config.device_resolution[2])))
+            await asyncio.sleep(self.state.perf.get_remaining_sleep_time(self.config.device_resolution[2]))
             self.state.perf.update_end()
 
     def setup(self) -> None:

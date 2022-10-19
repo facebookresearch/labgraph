@@ -28,6 +28,7 @@ class FrameProcessor():
 
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, str]:
         ext_results = {}
+        overlayed = frame.copy()
         for ext in self.extensions:
             overlay, ext_result = ext.process_frame(frame, metadata)
             # TODO: addWeighted() leads to a darker image overall, I'm guessing due to lack of transparency support

@@ -10,7 +10,7 @@ import numpy as np
 from pose_vis.video_stream import ProcessedVideoFrame, StreamMetaData
 from pose_vis.frame_processor import FrameProcessor
 from pose_vis.extension import PoseVisExtension, CombinedExtensionResult
-from pose_vis.performance_tracking import PerfUtility
+from pose_vis.performance_utility import PerfUtility
 from dataclasses import field
 from typing import Optional, List
 
@@ -90,7 +90,7 @@ class ImageStream(lg.Node):
 
             self.state.metadata.actual_framerate = self.state.perf.updates_per_second
             self.state.frame_index += 1
-            await asyncio.sleep(PerfUtility.ns_to_s(PerfUtility.get_sleep_time_ns(self.state.perf.last_update_start_ns, self.config.target_framerate)))
+            await asyncio.sleep(self.state.perf.get_remaining_sleep_time(self.config.target_framerate))
             self.state.perf.update_end()
         raise lg.NormalTermination()
 
