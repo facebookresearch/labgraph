@@ -16,6 +16,8 @@ The logger will log either `ProcessedVideoFrame` or `CombinedExtensionResult` me
 
 ## Reading Logs (HDF5)
 
+For an example of logging output, check [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/pose_vis/devices/webcam/logging_example.ipynb).
+
 ## To-do
 
 ### Testing
