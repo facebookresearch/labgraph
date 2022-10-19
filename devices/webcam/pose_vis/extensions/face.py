@@ -39,19 +39,18 @@ class FaceExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         # convert from BGR to RGB
-        results: NamedTuple = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        
-        detections = results.detections # a list of the detected face location data
+        mp_results: NamedTuple = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).detections
 
-        # check if a face is detected
-        if detections is None:
-            detections = []
+        # detections = mp_results.detections # a list of the detected face location data
+
+        # check if a face is null
+        if mp_results is None:
+            mp_results = []
 
         # blank image
         overlay = np.zeros(shape=frame.shape, dtype=np.uint8)
 
-        #todo THIS NEEDS TO BE REWRITTEN 
-        for detection in detections:
+        for detection in mp_results:
             mp_drawing.draw_detection(
                 overlay,
                 detection,  
@@ -61,7 +60,21 @@ class FaceExtension(PoseVisExtension):
                 mp_drawing_styles.get_default_face_mesh_tesselation_style(),
             )
         
-        return (overlay, ExtensionResult(data=detections)) 
+        results = mp_results
+
+        # result_len = len(mp_results)
+        # results = [None] * result_len
+
+        # for i in range(result_len):
+        #     detection_list = mp_results[i].detection #! maybe wrong
+        #     detections = [None]*len(detection_list)
+
+        #     for id in enumerate(detection_list):
+        #         detections[id] = [detection.x, detection.y, detection.z]
+        #     result[i] = detections
+
+
+        return (overlay, ExtensionResult(data=results)) 
 
 
     # clean up
