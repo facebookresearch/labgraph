@@ -19,7 +19,10 @@ from pose_vis.extension import PoseVisExtension
 MAX_STREAMS = 4
 
 parser = ap.ArgumentParser()
-parser.add_argument("--device-ids", type = int, nargs = "*", help = "which device ids to stream", action = "store", required = True)
+parser.add_argument("--device-ids", type = int, nargs = "*", help = "which device ids to stream", action = "store", required = False)
+parser.add_argument("--replay", type = str, help = "replay a log file (default: none)", action = "store", required = False)
+parser.add_argument("--replay-overlays", help = "show previously generated overlays during replay (default: false)", action = "store_true", required = False)
+parser.add_argument("--replay-extensions", help = "stream previously generated extension data during replay (default: false)", action = "store_true", required = False)
 parser.add_argument("--target-display-framerate", type = int, nargs = "?", const = 60, default = 60, help = "specify update rate for video stream presentation; seperate from stream framerate (default: 60)", action = "store", required = False)
 parser.add_argument("--device-resolutions", type = str, nargs = "*", help = "specify resolution/framerate per device; format is <device_id or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)", action = "store", required = False)
 parser.add_argument("--log-images", help = "enable image logging (default: false)", action = "store_true", required = False)
@@ -141,6 +144,9 @@ if __name__ == "__main__":
         ext.register_args(parser)
 
     args = parser.parse_args()
+
+    if args.device_ids is None and args.replay is None:
+        raise ValueError("Please specify either device IDs or a log to replay")
 
     # Check if an extension is enabled via its argument
     for ext in extensions:

@@ -14,6 +14,47 @@ The logger will log either `ProcessedVideoFrame` or `CombinedExtensionResult` me
 
 ## Usage
 
+Requires Python 3.8 or later
+
+Make sure to install:
+
+```
+cd devices/webcam
+python setup.py install
+```
+
+### Command Line
+
+Check usage details:
+
+```
+(.venv) python -m pose_vis.pose_vis --help               
+usage: pose_vis.py [-h] [--device-ids [DEVICE_IDS ...]] [--replay REPLAY] [--replay-overlays] [--target-display-framerate [TARGET_DISPLAY_FRAMERATE]] [--device-resolutions [DEVICE_RESOLUTIONS ...]]
+                   [--log-images] [--log-poses] [--log-dir [LOG_DIR]] [--log-name LOG_NAME] [--hands] [--face]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --device-ids [DEVICE_IDS ...]
+                        which device ids to stream
+  --replay REPLAY       replay a log file (default: none)
+  --replay-overlays     show previously generated overlays during replay (default: false)
+  --replay-extensions   stream previously generated extension data during replay (default: false)
+  --target-display-framerate [TARGET_DISPLAY_FRAMERATE]
+                        specify update rate for video stream presentation; seperate from stream framerate (default: 60)
+  --device-resolutions [DEVICE_RESOLUTIONS ...]
+                        specify resolution/framerate per device; format is <device_id or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)
+  --log-images          enable image logging (default: false)
+  --log-poses           enable pose data logging (default: false)
+  --log-dir [LOG_DIR]   set log directory (default: ../logs)
+  --log-name LOG_NAME   set log name (default: random)
+  --hands               enable the hand tracking extension
+  --face                enable the face detection extention
+```
+
+### As a Module
+
+See [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/pose_vis/devices/webcam/logging_example.ipynb) for PoseVis usage as a module.
+
 ## Reading Logs (HDF5)
 
 For an example of logging output, check [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/pose_vis/devices/webcam/logging_example.ipynb).

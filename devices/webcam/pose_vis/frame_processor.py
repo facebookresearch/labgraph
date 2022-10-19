@@ -30,6 +30,8 @@ class FrameProcessor():
         ext_results = {}
         for ext in self.extensions:
             overlay, ext_result = ext.process_frame(frame, metadata)
+            # TODO: addWeighted() leads to a darker image overall, I'm guessing due to lack of transparency support
+            # It is, however extremely fast, faster than other methods I've experimented with
             overlayed = cv2.addWeighted(overlay, 0.5, frame, 0.5, 0.0)
             ext_results[ext.__class__.__name__] = ext_result.data
         return (overlayed, ext_results)
