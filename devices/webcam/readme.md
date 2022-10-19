@@ -1,117 +1,125 @@
-# Webcam Node and Real-time Hand Tracking Utility
+# PoseVis
 
-## Webcam Stream Node
-Provides stream of VideoFrame messages which contain a numpy array of an image from any connected webcam device. Uses CV2 to capture the video feed.
+PoseVis is a multi-camera streaming and visualization framework built upon LabGraph. PoseVis was built with modularity in mind and can be extended to many downstream applications relatively easily through its extension system and logging support.
 
-### Usage
-Configuration:
+## Concepts
 
-    WebcamStreamConfig
-        sample_rate: int
-How many times per second to sample the device
+### Overview
 
-        device_number: int
+PoseVis supports up to 4 video streams producing the `ProcessedVideoFrame` message. There are a few differnt stream providers: `CameraStream` for device streaming, `ReplayStream` for log replaying, and `ImageStream` which reads images from a given directory.
 
-CV2 configuration, see [the documentation](https://docs.opencv.org/3.4/d8/dfe/classcv_1_1VideoCapture.html#a5d5f5dacb77bbebdcbfb341e3d4355c1) for more details
+These streams are initialized by a corresponding `PoseVisRunner` class that takes care of graph initialization. The `PoseVis` graph is based off of the `DynamicGraph` class, which allows us to build a graph based on run-time parameters.
 
-        device_resolution: np.ndarray
+Each stream provider enables and runs `PoseVisExtension` objects on their respective outputs and steams a `CombinedExtensionResult` message, which is a dictionary containing each extension's name, and the data it produced. Extensions can be enabled or disabled by the user. `ProcessedVideoFrame` has the original image, and an overlayed image containing any processing done by extensions (i.e a pose overlay).
 
-Expects a (2) shaped numpy array containing the dimensions of the desired output image
+`CameraStreamRunner` and `ReplayStreamRunner` initialize a `Display` node that aggregates all streams and displays the overlayed image for real-time feedback. `ImageStreamRunner` initializes a `TerminationHandler` node that shuts the graph down when processing is finished.
 
-Topics:
+If logging is enabled, a `GraphMetaData` message is logged containing the stream count. Each stream's `ProcessedVideoFrame` and `CombinedExtensionResult` messages are logged under seperate groups.
 
-    VideoFrame
-        frame: np.ndarray
+## Usage
 
-A (W, H, 3) shaped numpy array of the current video frame
+Requires Python 3.8 or later
 
-        timestamp: float
-
-The unix timestamp at which the frame was captured
-
-## Hand Tracking Utility
-Creates a graph that utilizes a [MediaPipe](https://google.github.io/mediapipe/) node to provide real-time hand pose estimation. It captures video data from a webcam using the included node, or optionally a log file, and presents a visual representation of the estimated hand poses, optionally logging the image data. Hand pose data may be optionally logged as well.
-
-### Structure
-The nodes of the graph are organized in this structure:
-
-    WebcamStream -> PoseEstimation -> [Logging, Display]
-
-### Usage
-
-Run setup.py
-
-    cd devices/webcam
-    python setup.py install
-
-Run Hand Tracking Utility
-
-    python hand_tracking_utility.py
-
-Press Esc to exit.
-
-#### Testing
-
-    python hand_tracking_utility.py --test
-
-will run a series of tests to ensure that everything works. Does not require a camera device.
-
-Hand Tracking Utility's functionality is flexible, see the command line arguments for details:
+Make sure to install:
 
 ```
-> python hand_tracking_utility.py --help
+cd devices/webcam
+python setup.py install
+```
 
-usage: hand_tracking_utility.py [-h] [-li] [-lp] [-lf {hdf5}] [-ld LOG_DIR] [-ln LOG_NAME] [-rp] [-dn DEVICE_NUMBER] [-sr SAMPLE_RATE] [-dr DEVICE_RESOLUTION DEVICE_RESOLUTION] [-ri] [-rr RESCALE_RESOLUTION RESCALE_RESOLUTION]
+### Command Line
+
+Check usage details:
+
+```
+(.venv) python -m pose_vis.pose_vis --help               
+usage: pose_vis.py [-h] [--device-ids [DEVICE_IDS ...]] [--replay REPLAY] [--replay-overlays] [--target-display-framerate [TARGET_DISPLAY_FRAMERATE]] [--device-resolutions [DEVICE_RESOLUTIONS ...]]
+                   [--log-images] [--log-poses] [--log-dir [LOG_DIR]] [--log-name LOG_NAME] [--hands] [--face]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -te, --test           enable test mode
-  -li, --log-images     add image data to logs
-  -lp, --log-poses      add pose estimation data to logs
-  -lf {hdf5}, --log-format {hdf5}
-                        sepcify logging format. Supports hdf5, default is hdf5
-  -ld LOG_DIR, --log-dir LOG_DIR
-                        sepcify log directory, default is ./logs
-  -ln LOG_NAME, --log-name LOG_NAME
-                        sepcify log filename, default is hand_tracking_utility
-  -rp, --replay         replay a log file
-  -dn DEVICE_NUMBER, --device-number DEVICE_NUMBER
-                        specify device number to capture from, default is 0
-  -sr SAMPLE_RATE, --sample-rate SAMPLE_RATE
-                        specify sample rate from device in Hz, default is 30
-  -dr DEVICE_RESOLUTION DEVICE_RESOLUTION, --device-resolution DEVICE_RESOLUTION DEVICE_RESOLUTION
-                        specify resolution for capture device, default is 854x480
-  -ri, --rescale-image  enable rescaling display window from input size
-  -rr RESCALE_RESOLUTION RESCALE_RESOLUTION, --rescale_resolution RESCALE_RESOLUTION RESCALE_RESOLUTION
-                        specify resolution to rescale display stream to, default is 1280x720
+  --device-ids [DEVICE_IDS ...]
+                        which device ids to stream
+  --replay REPLAY       replay a log file (default: none)
+  --replay-overlays     show previously generated overlays during replay (default: false)
+  --target-display-framerate [TARGET_DISPLAY_FRAMERATE]
+                        specify update rate for video stream presentation; seperate from stream framerate (default: 60)
+  --device-resolutions [DEVICE_RESOLUTIONS ...]
+                        specify resolution/framerate per device; format is <device_id or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)
+  --log-images          enable image logging (default: false)
+  --log-poses           enable pose data logging (default: false)
+  --log-dir [LOG_DIR]   set log directory (default: webcam/logs)
+  --log-name LOG_NAME   set log name (default: random)
+  --hands               enable the hand tracking extension
+  --face                enable the face detection extention
 ```
 
-### HDF5 Logging and Replaying
-#### Logging
-For example,
+Streaming a single device: stream device 0 with no extensions or logging
 
-    python hand_tracking_utility.py -li
+`python -m pose_vis.pose_vis --device-ids 0`
 
-enables image logging in the HDF5 format. Images are laid out by their sequence number (n) like so:
+Streaming multiple devices: stream devices 0 and 1 with no extensions or logging
 
-    images/n/image
+`python -m pose_vis.pose_vis --device-ids 0 1`
 
-Images are numpy (W, H, 3) shaped arrays.
+Specifying resolution and framerate:
 
-    python hand_tracking_utility.py -li -lp
+The format for specifying resolution is `<device id>:<width>x<height>x<framerate>`
 
-Will log the pose estimation along with the image. You can log pose data by itself, if you wish. Pose data is laid out like this:
+You can also set the default resolution and framerate by using `*` in place of `<device id>`
 
-    images/n/hand_landmarks/h
+`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30`
 
-where h is the hand index. The data is a (21, 3) shaped numpy array. See [MediaPipe's documentation](https://google.github.io/mediapipe/solutions/hands.html) for details on landmark identification. Each index in the array, the landmark id, has a set of normalized coordinates in the X, Y, and Z plane as an array, in that order.
+Enabling extensions: this enables the hand tracking extension
 
-Logs use the specified file name (or default) and are given an index "_n" based on how many files are in the log directory.
+`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30 --hands`
 
-#### Replaying
+Enabling logging: this enables both image and pose data logging
 
-An example of replaying a log file using the default arguments:
+`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30 --hands --log-images --log-poses`
 
-    python hand_tracking_utility.py -rp -ln hand_tracking_utility_0
+Replaying logs: this will replay a log and stream the generated pose data (if present)
 
-Use the other arguments to specify the log directory, sample rate, etc. You could also optionally log the generated pose data to the same file with the -lp argument.
+`python -m pose_vis.pose_vis --replay webcam/logs/test_log.h5`
+
+You can also enable extensions and logging to generate a new log with new extension data based on the images in the log being replayed:
+
+`python -m pose_vis.pose_vis --replay webcam/logs/test_log.h5 --hands --log-images --log-poses`
+
+### As a Module
+
+See [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/pose_vis/devices/webcam/logging_example.ipynb) for PoseVis usage as a module.
+
+## Reading Logs (HDF5)
+
+For an example of logging output, check [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/pose_vis/devices/webcam/logging_example.ipynb).
+
+## To-do
+
+### Testing
+
+A testing solution needs to be implemented, this is a regression from the previous proposal for this pull request.
+
+### VRS Support
+
+VRS support for logging needs to be added.
+
+### Other MediaPipe Solutions
+
+Hand tracking is currently included, with other solutions on the way. MediaPipe Python supports hand tracking, pose tracking, and face mesh tracking. These solutions can be combined into the [holistic](https://google.github.io/mediapipe/solutions/holistic.html) graph. The plan is to implement them seperately along with the holistic solution for modularity.
+
+Other MediaPipe solutions will require C++ interop.
+
+## Other Thoughts
+
+### MediaPipe Performance
+
+Currently, the hand tracking (and subsequent other) MediaPipe extensions run their neural networks on the CPU. A significant performance uplift could be achieved by running GPU-enabled MediaPipe graphs. It seems that MediaPipe's Python wrapper does not have GPU capabilities: see [this issue](https://github.com/google/mediapipe/issues/3106). We could use C++ interop to achieve this.
+
+### n-Stream Support
+
+Pose Vis is hard coded to support 4 streams simultaneously. This limitation could be avoided with a method to change node metadata (inputs and outputs) before graph startup. This idea has proven tricky to implement due to the multi-process nature of LabGraph, but it should be possible.
+
+### Multi-media Support
+
+CV2 can be used to import a wide variety of media including videos and gifs. We could create more stream types to support this.
