@@ -12,7 +12,7 @@ These streams are initialized by a corresponding `PoseVisRunner` class that take
 
 Each stream provider enables and runs `PoseVisExtension` objects on their respective outputs and steams a `CombinedExtensionResult` message, which is a dictionary containing each extension's name, and the data it produced. Extensions can be enabled or disabled by the user. `ProcessedVideoFrame` has the original image, and an overlayed image containing any processing done by extensions (i.e a pose overlay).
 
-`CameraStreamRunner` and `ReplayStreamRunner` initialize a `Display` node that aggregates all streams and displays the overlayed image for real-time feedback.
+`CameraStreamRunner` and `ReplayStreamRunner` initialize a `Display` node that aggregates all streams and displays the overlayed image for real-time feedback. `ImageStreamRunner` initializes a `TerminationHandler` node that shuts the graph down when processing is finished.
 
 If logging is enabled, a `GraphMetaData` message is logged containing the stream count. Each stream's `ProcessedVideoFrame` and `CombinedExtensionResult` messages are logged under seperate groups.
 
@@ -90,4 +90,4 @@ Pose Vis is hard coded to support 4 streams simultaneously. This limitation coul
 
 ### Multi-media Support
 
-CV2 can be used to import a wide variety of media: videos, gifs, and image collections. We could create more stream types to support this.
+CV2 can be used to import a wide variety of media including videos and gifs. We could create more stream types to support this.

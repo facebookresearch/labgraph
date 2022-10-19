@@ -8,7 +8,7 @@ import cv2
 import labgraph as lg
 import numpy as np
 
-from pose_vis.streams.messages import ProcessedVideoFrame, StreamMetaData, CombinedExtensionResult
+from pose_vis.streams.messages import ProcessedVideoFrame, StreamMetaData, CombinedExtensionResult, FinishedMessage
 from pose_vis.frame_processor import FrameProcessor
 from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
@@ -61,6 +61,7 @@ class ImageStream(lg.Node):
     Topics:
         `OUTPUT_FRAMES`: `ProcessedVideoFrame`
         `OUTPUT_EXTENSIONS`: `CombinedExtensionResult`
+        `OUTPUT_FINISHED`: `FinishedMessage`
     
     Attributes:
         `config`: `ImageStreamConfig`
@@ -68,11 +69,13 @@ class ImageStream(lg.Node):
     """
     OUTPUT_FRAMES = lg.Topic(ProcessedVideoFrame)
     OUTPUT_EXTENSIONS = lg.Topic(CombinedExtensionResult)
+    OUTPUT_FINISHED = lg.Topic(FinishedMessage)
     config: ImageStreamConfig
     state: ImageStreamState
 
     @lg.publisher(OUTPUT_FRAMES)
     @lg.publisher(OUTPUT_EXTENSIONS)
+    @lg.publisher(OUTPUT_FINISHED)
     async def read_camera(self) -> lg.AsyncPublisher:
         while self.state.frame_index < len(self.state.images):
             self.state.perf.update_start()
@@ -95,7 +98,8 @@ class ImageStream(lg.Node):
             self.state.frame_index += 1
             await asyncio.sleep(self.state.perf.get_remaining_sleep_time(self.config.target_framerate))
             self.state.perf.update_end()
-        raise lg.NormalTermination()
+        
+        yield self.OUTPUT_FINISHED, FinishedMessage(self.config.stream_id)
 
     def setup(self) -> None:
         logger.info(f" opening directory: {self.config.directory}")

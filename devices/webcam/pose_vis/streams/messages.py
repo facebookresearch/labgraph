@@ -56,3 +56,11 @@ class CombinedExtensionResult(lg.Message):
     `results`: `Dict[str, Any]`
     """
     results: Dict[str, Any]
+
+class FinishedMessage(lg.Message):
+    """
+    Message for nodes to produce when they've finished processing
+
+    Picked up by the `TerminationHandler` node for graph shutdown when not using the `Display` node
+    """
+    stream_id: int

@@ -6,6 +6,7 @@ import logging
 from pose_vis.utils import absolute_path
 from pose_vis.runner import PoseVisRunner, PoseVisConfig
 from pose_vis.streams.image_stream import ImageStream, ImageStreamConfig
+from pose_vis.streams.termination_handler import TerminationHandler, TerminationHandlerConfig
 from pose_vis.pose_vis_graph import PoseVis
 from dataclasses import dataclass
 from typing import List
@@ -40,9 +41,8 @@ class ImageStreamRunner(PoseVisRunner):
 
         for i in range(num_streams):
             stream_name = f"STREAM{i}"
-            input_name = f"INPUT{i}"
 
-            PoseVis.add_node(stream_name, ImageStream, [stream_name, "OUTPUT_FRAMES", "DISPLAY", input_name],
+            PoseVis.add_node(stream_name, ImageStream, [stream_name, "OUTPUT_FINISHED", "TERM_HANDLER", "INPUT"],
                 ImageStreamConfig(stream_id = i,
                 directory = self.runner_config.directories[i],
                 target_framerate = self.runner_config.framerate,
@@ -52,3 +52,5 @@ class ImageStreamRunner(PoseVisRunner):
             logger.info(f" created ImageStream {i} with directory: {self.runner_config.directories[i]}")
         
         self.add_graph_metadata(num_streams)
+
+        PoseVis.add_node("TERM_HANDLER", TerminationHandler, config = TerminationHandlerConfig(num_streams = num_streams))
