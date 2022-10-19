@@ -22,7 +22,7 @@ from typing import NamedTuple, Optional, Tuple
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
 # mp_hands: HandsType = mp.solutions.hands
-mp_face: FaceType = mp.solutions.face_mesh
+mp_face: FaceType = mp.solutions.face_detection
 
 class FaceExtension(PoseVisExtension):
     face : Optional[FaceType.FaceDetection]
