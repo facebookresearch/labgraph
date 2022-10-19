@@ -31,7 +31,7 @@ class FaceExtension(PoseVisExtension):
     def register_args(self, parser: ArgumentParser) -> None:
         parser.add_argument("--face", help="enable the face detection extention", action="store_true", required=False)
 
-    #? ake sure this is correct
+    #? make sure this is correct
     def check_enabled(self, args: Namespace) -> bool:
         return args.face 
 
