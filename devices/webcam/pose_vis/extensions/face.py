@@ -1,4 +1,5 @@
 from distutils import extension
+from locale import normalize
 from unittest import result
 import cv2
 import time
@@ -39,7 +40,7 @@ class FaceExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         # convert from BGR to RGB
-        mp_results: NamedTuple = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).detections
+        mp_results: NormalizedDetectionList = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).detections # make sure this is right
 
         # detections = mp_results.detections # a list of the detected face location data
 
