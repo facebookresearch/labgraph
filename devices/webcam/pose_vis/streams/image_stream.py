@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import logging
 import os
 import asyncio
 import cv2
@@ -13,6 +14,8 @@ from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
 from dataclasses import field
 from typing import Optional, List
+
+logger = logging.getLogger(__name__)
 
 # https://docs.opencv.org/4.2.0/d4/da8/group__imgcodecs.html#ga288b8b3da0892bd651fce07b3bbd3a56
 SUPPORTED_EXTENSIONS = [".bmp", ".jpeg", ".jpg", ".png", ".webp"]
@@ -95,12 +98,12 @@ class ImageStream(lg.Node):
         raise lg.NormalTermination()
 
     def setup(self) -> None:
-        print(f"ImageStream: opening directory: {self.config.directory}")
+        logger.info(f" opening directory: {self.config.directory}")
         for _file in os.listdir(self.config.directory):
             ext = os.path.splitext(_file)[1]
             if ext.lower() in SUPPORTED_EXTENSIONS:
                 self.state.images.append(os.path.join(self.config.directory, _file))
-        print(f"ImageStream: found {len(self.state.images)} image(s)")
+        logger.info(f" found {len(self.state.images)} image(s)")
 
         self.state.metadata = StreamMetaData(
             device_id = -1,
@@ -113,5 +116,5 @@ class ImageStream(lg.Node):
         self.state.frame_processor.setup()
 
     def cleanup(self) -> None:
-        print("ImageStream: all images processed")
+        logger.info(" all images processed")
         self.state.frame_processor.cleanup()

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import logging
 import asyncio
 import labgraph as lg
 
@@ -10,6 +11,8 @@ from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
 from typing import Optional, List
 from labgraph.loggers.hdf5.reader import HDF5Reader
+
+logger = logging.getLogger(__name__)
 
 class ReplayStreamConfig(lg.Config):
     """
@@ -87,10 +90,10 @@ class ReplayStream(lg.Node):
             self.state.frame_index += 1
             await asyncio.sleep(self.state.perf.get_remaining_sleep_time(message.metadata.actual_framerate if message.metadata.actual_framerate > 0 else message.resolution[2]))
             self.state.perf.update_end()
-        print("ReplayStream: log replay finished")
+        logger.info(" log replay finished")
 
     def setup(self) -> None:
-        print(f"ReplayStream: stream {self.config.stream_id}: reading log")
+        logger.info(f" stream {self.config.stream_id}: reading log")
         image_log_name = f"image_stream_{self.config.stream_id}"
         extension_log_name = f"extension_stream_{self.config.stream_id}"
         self.state.reader = HDF5Reader(self.config.log_path, {image_log_name: ProcessedVideoFrame, extension_log_name: CombinedExtensionResult})

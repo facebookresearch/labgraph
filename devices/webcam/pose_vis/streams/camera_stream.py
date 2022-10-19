@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import logging
 import asyncio
 import cv2
 import labgraph as lg
@@ -11,6 +12,8 @@ from pose_vis.frame_processor import FrameProcessor
 from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
 from typing import Optional, Tuple, List
+
+logger = logging.getLogger(__name__)
 
 class CameraStreamConfig(lg.Config):
     """
@@ -83,7 +86,7 @@ class CameraStream(lg.Node):
 
                 if error:
                     self.state.cap.release()
-                    print("CameraStream: warning: device {} capture has encountered an error and has been closed".format(self.config.device_id))
+                    logger.warning(" device {} capture has encountered an error and has been closed".format(self.config.device_id))
             
             if not cap_state or error:
                 # Give a blank image if there's an issue with the device, instead of crashing
@@ -106,15 +109,15 @@ class CameraStream(lg.Node):
             self.state.perf.update_end()
 
     def setup(self) -> None:
-        print(f"CameraStream: opening device id: {self.config.device_id}")
+        logger.info(f" opening device id: {self.config.device_id}")
         self.state.cap = cv2.VideoCapture(self.config.device_id)
         if self.state.cap and self.state.cap.isOpened():
             self.state.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.config.device_resolution[0])
             self.state.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.config.device_resolution[1])
             self.state.cap.set(cv2.CAP_PROP_FPS, self.config.device_resolution[2])
-            print(f"CameraStream: device {self.config.device_id} opened and configured")
+            logger.info(f" device {self.config.device_id} opened and configured")
         else:
-            print("CameraStream: warning: device id {} does not exist".format(self.config.device_id))
+            logger.warning(" device id {} does not exist".format(self.config.device_id))
         self.state.metadata = StreamMetaData(
             device_id = self.config.device_id,
             stream_id = self.config.stream_id,
@@ -127,5 +130,5 @@ class CameraStream(lg.Node):
     def cleanup(self) -> None:
         self.state.frame_processor.cleanup()
         if self.state.cap and self.state.cap.isOpened():
-            print(f"CameraStream: closing device id: {self.config.device_id}")
+            logger.info(f" closing device id: {self.config.device_id}")
             self.state.cap.release()

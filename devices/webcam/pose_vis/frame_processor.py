@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import logging
 import cv2
 import numpy as np
 
@@ -8,6 +9,8 @@ from typing import List, Tuple
 from dataclasses import dataclass, field
 from pose_vis.streams.messages import StreamMetaData
 from pose_vis.extension import PoseVisExtension
+
+logger = logging.getLogger(__name__)
 
 @dataclass
 class FrameProcessor():
@@ -23,7 +26,7 @@ class FrameProcessor():
 
     def setup(self) -> None:
         for ext in self.extensions:
-            print(f"FrameProcessor: stream {self.stream_id}: setting up extension {ext.__class__.__name__}")
+            logger.info(f" stream {self.stream_id}: setting up extension {ext.__class__.__name__}")
             ext.setup()
 
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, str]:

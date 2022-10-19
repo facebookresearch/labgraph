@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import logging
 import re
 import os
 import labgraph as lg
@@ -18,6 +19,8 @@ from pose_vis.display import Display, DisplayConfig
 from pose_vis.extension import PoseVisExtension
 from pathlib import Path
 from labgraph.loggers.hdf5.reader import HDF5Reader
+
+logger = logging.getLogger(__name__)
 
 # This is hard-coded to however many inputs the Display node has
 MAX_STREAMS = 4
@@ -53,11 +56,11 @@ class PoseVisRunner():
         self.config = config
     
     def run(self) -> None:
-        print("PoseVis: building graph")
+        logger.info(" building graph")
 
         for i in range(len(self.config.enabled_extensions)):
             ext: PoseVisExtension = self.config.enabled_extensions[i]
-            print(f"PoseVis: enabling extension: {ext.__class__.__name__}")
+            logger.info(f" enabling extension: {ext.__class__.__name__}")
             ext.set_enabled(i, self.config)
 
         # Check if provided log path is a full directory or relative
@@ -68,7 +71,7 @@ class PoseVisRunner():
 
         if self.config.mode == PoseVisMode.DEVICE_STREAMING:
             num_devices = len(self.config.device_ids)
-            print(f"PoseVis: creating {num_devices} stream(s) with device ids {self.config.device_ids} and resolutions {self.config.device_resolutions}")
+            logger.info(f" creating {num_devices} stream(s) with device ids {self.config.device_ids} and resolutions {self.config.device_resolutions}")
 
             PoseVis.add_node("METADATA", GraphMetaDataProvider, config = GraphMetaDataProviderConfig(num_streams = num_devices))
 
@@ -91,12 +94,12 @@ class PoseVisRunner():
                     extension_log_name = f"extension_stream_{i}"
                     if self.config.log_images:
                         PoseVis.add_logger_connection((camera_log_name, stream_name, "OUTPUT_FRAMES"))
-                        print(f"PoseVis: enabling image logging for stream {i} with the following path: {camera_log_name}")
+                        logger.info(f" enabling image logging for stream {i} with the following path: {camera_log_name}")
                     if self.config.log_poses:
                         PoseVis.add_logger_connection((extension_log_name, stream_name, "OUTPUT_EXTENSIONS"))
-                        print(f"PoseVis: enabling pose data logging for stream {i} with the following path: {extension_log_name}")
+                        logger.info(f" enabling pose data logging for stream {i} with the following path: {extension_log_name}")
                 
-                print(f"PoseVis: created stream {i} with device id {device_id} and resolution {device_resolution}")
+                logger.info(f" created stream {i} with device id {device_id} and resolution {device_resolution}")
             
             PoseVis.add_node("DISPLAY", Display, config = DisplayConfig(target_framerate = self.config.display_framerate, num_streams = num_devices))
 
@@ -107,7 +110,7 @@ class PoseVisRunner():
             
             PoseVis.add_node("METADATA", GraphMetaDataProvider, config = GraphMetaDataProviderConfig(num_streams = 1))
 
-            print("PoseVis: creating image stream")
+            logger.info(" creating image stream")
             PoseVis.add_node("STREAM0", ImageStream,
                 config = ImageStreamConfig(stream_id = i,
                 directory = self.config.image_streaming_directory,
@@ -121,14 +124,14 @@ class PoseVisRunner():
                 extension_log_name = f"extension_stream_{i}"
                 if self.config.log_images:
                     PoseVis.add_logger_connection((camera_log_name, "STREAM0", "OUTPUT_FRAMES"))
-                    print(f"PoseVis: enabling image logging for stream {i} with the following path: {camera_log_name}")
+                    logger.info(f" enabling image logging for stream {i} with the following path: {camera_log_name}")
                 if self.config.log_poses:
                     PoseVis.add_logger_connection((extension_log_name, "STREAM0", "OUTPUT_EXTENSIONS"))
-                    print(f"PoseVis: enabling pose data logging for stream {i} with the following path: {extension_log_name}")
+                    logger.info(f" enabling pose data logging for stream {i} with the following path: {extension_log_name}")
         elif self.config.mode == PoseVisMode.LOG_REPLAY:
             log_types = {"metadata": GraphMetaData}
             reader = HDF5Reader(self.config.replay_path, log_types)
-            print(f"PoseVis: reading log metadata: {self.config.replay_path}")
+            logger.info(f" reading log metadata: {self.config.replay_path}")
             num_streams = reader.logs["metadata"][0].num_streams
             
             for i in range(num_streams):
@@ -139,17 +142,17 @@ class PoseVisRunner():
                 ReplayStreamConfig(stream_id = i,
                     extensions = self.config.enabled_extensions,
                     log_path = self.config.replay_path))
-                print(f"PoseVis: created log replay stream {i}")
+                logger.info(f" created log replay stream {i}")
                 
                 if self.config.log_images or self.config.log_poses:
                     camera_log_name = f"image_stream_{i}"
                     extension_log_name = f"extension_stream_{i}"
                     if self.config.log_images:
                         PoseVis.add_logger_connection((camera_log_name, stream_name, "OUTPUT_FRAMES"))
-                        print(f"PoseVis: enabling image logging for stream {i} with the following path: {camera_log_name}")
+                        logger.info(f" enabling image logging for stream {i} with the following path: {camera_log_name}")
                     if self.config.log_poses:
                         PoseVis.add_logger_connection((extension_log_name, stream_name, "OUTPUT_EXTENSIONS"))
-                        print(f"PoseVis: enabling pose data logging for stream {i} with the following path: {extension_log_name}")
+                        logger.info(f" enabling pose data logging for stream {i} with the following path: {extension_log_name}")
             
             PoseVis.add_node("DISPLAY", Display, config = DisplayConfig(target_framerate = self.config.display_framerate, num_streams = num_streams))
 
@@ -159,7 +162,7 @@ class PoseVisRunner():
         else:
             logger_config = lg.LoggerConfig(output_directory = self.config.log_directory)
 
-        print("PoseVis: running graph")
+        logger.info(" running graph")
         graph = PoseVis()
         runner_options = lg.RunnerOptions(logger_config = logger_config)
         runner = lg.ParallelRunner(graph = graph, options = runner_options)
@@ -198,7 +201,7 @@ if __name__ == "__main__":
         num_devices = len(args.device_ids)
         if num_devices > MAX_STREAMS:
             num_devices = MAX_STREAMS
-            print(f"PoseVis: warning: too many streams, initializing only the first {MAX_STREAMS} provided streams")
+            logger.warning(f" too many streams, initializing only the first {MAX_STREAMS} provided streams")
             args.device_ids = args.device_ids[0:4]
 
         # Convert 'ID:WxHxFPS' string into a dictionary with a tuple entry: {ID: (W, H, FPS)}
