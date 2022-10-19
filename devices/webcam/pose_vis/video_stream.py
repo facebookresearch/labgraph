@@ -5,7 +5,6 @@ import labgraph as lg
 import numpy as np
 
 from dataclasses import dataclass
-from typing import Tuple
 
 @dataclass
 class StreamMetaData:
@@ -38,3 +37,9 @@ class ProcessedVideoFrame(lg.Message):
     resolution: np.ndarray
     frame_index: int
     metadata: StreamMetaData
+
+class GraphMetaData(lg.Message):
+    """
+    Utility message for log playback
+    """
+    num_streams: int

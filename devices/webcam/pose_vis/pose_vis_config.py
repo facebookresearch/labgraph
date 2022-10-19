@@ -42,6 +42,7 @@ class PoseVisConfiguration():
     display_framerate: int
     image_streaming_directory: str
     image_streaming_framerate: int
+    replay_path: str
     log_directory: str
     log_name: Optional[str]
     log_images: bool
