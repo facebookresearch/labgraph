@@ -2,7 +2,7 @@
 
 PoseVis is a multi-camera streaming and visualization framework built upon LabGraph. PoseVis was built with modularity in mind and can be extended to many downstream applications relatively easily through its extension system and logging support.
 
-![Usage preview](https://i.imgur.com/FMYIy9r.mp4)
+[Usage preview](https://i.imgur.com/FMYIy9r.mp4)
 
 ## Concepts
 

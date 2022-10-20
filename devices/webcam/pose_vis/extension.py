@@ -2,7 +2,6 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import numpy as np
-import labgraph as lg
 
 from pose_vis.streams.messages import StreamMetaData
 from abc import ABC, abstractmethod
@@ -34,6 +33,8 @@ class PoseVisExtensionBase(ABC):
         `process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]`
         
         `cleanup(self) -> None`
+
+        `check_output(cls, result: ExtensionResult) -> bool`
     """
     @abstractmethod
     def register_args(self, parser: ArgumentParser) -> None:
@@ -42,14 +43,14 @@ class PoseVisExtensionBase(ABC):
         
         Use this to register an argument that will allow this extension to be enabled or disabled
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def check_enabled(self, args: Namespace) -> bool:
         """
         Check the `ArgumentParser.parse_args()` result to determine if this extension should be enabled
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def setup(self) -> None:
@@ -65,7 +66,7 @@ class PoseVisExtensionBase(ABC):
 
         Output should be a `Tuple` with an overlay image and the data used to produce that overlay
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def cleanup(self) -> None:
@@ -73,6 +74,16 @@ class PoseVisExtensionBase(ABC):
         Called on graph shutdown
         """
         pass
+
+    @abstractmethod
+    @classmethod
+    def check_output(cls, result: ExtensionResult) -> bool:
+        """
+        Method for extensions to check their output via assertions
+        
+        Called during test execution
+        """
+        raise NotImplementedError
 
 class PoseVisExtension(PoseVisExtensionBase):
     """
