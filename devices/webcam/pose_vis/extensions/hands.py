@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import logging
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -16,6 +17,8 @@ from pose_vis.streams.messages import StreamMetaData
 from argparse import ArgumentParser, Namespace
 
 from typing import Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 # MediaPipe setup: https://google.github.io/mediapipe/solutions/hands.html
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
@@ -66,6 +69,21 @@ class HandsExtension(PoseVisExtension):
         
         # Return the overlay for presentation, along with any data to be picked up by the logger
         return (overlay, ExtensionResult(data = mp_results))
+
+    @classmethod
+    def check_output(cls, result: ExtensionResult) -> bool:
+        """
+        Checks the results of `hands.process()`, assuming that at least one hand is fully visible in the frame
+        """
+        if len(result.data) > 0:
+            for i in range(result.data):
+                if len(result.data[i]) != 21:
+                    logger.warning(f" index {i} in result.data is not proper length")
+                    return False
+            return True
+        else:
+            logger.warning(" result is empty")
+        return False
 
     # Called when the graph shuts down
     def cleanup(self) -> None:

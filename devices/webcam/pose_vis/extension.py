@@ -75,8 +75,8 @@ class PoseVisExtensionBase(ABC):
         """
         pass
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def check_output(cls, result: ExtensionResult) -> bool:
         """
         Method for extensions to check their output via assertions
