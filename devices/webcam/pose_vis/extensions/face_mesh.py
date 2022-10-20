@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import logging
+from unittest import result
 import cv2
 import numpy as np
 import mediapipe as mp
 # Import MediaPipe types for intellisense
-import mediapipe.python.solutions.hands as HandsType
+import mediapipe.python.solutions.face_mesh as FaceType
 import mediapipe.python.solutions.drawing_utils as DrawingUtilsType
 import mediapipe.python.solutions.drawing_styles as DrawingStylesType
 from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
@@ -17,13 +19,15 @@ from argparse import ArgumentParser, Namespace
 
 from typing import Optional, Tuple
 
+logger = logging.getLogger(__name__)
+
 # MediaPipe setup: https://google.github.io/mediapipe/solutions/hands.html
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
-mp_face_mesh: Facetype = mp.solutions.face_mesh #! make sure this is right
+mp_face_mesh: FaceType = mp.solutions.face_mesh #! make sure this is right
 
 class FaceExtension(PoseVisExtension):
-    face_mesh: Optional[FaceType.Face] #! <---------
+    face_mesh: Optional[FaceType.FaceMesh] 
     
     def register_args(self, parser: ArgumentParser) -> None:
         parser.add_argument("--face_mesh", help="enable face mesh extension", action="store_true", required=False)
@@ -36,9 +40,7 @@ class FaceExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
         
-        mp_results = self.face_mesh.proccess(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        
-        mp_results = mp_results.multi_face_landmarks
+        mp_results: NormalizedLandmarkList = self.face_mesh.proccess(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).multi_face_landmarks
 
         if mp_results is None:
             mp_results = []
@@ -55,11 +57,32 @@ class FaceExtension(PoseVisExtension):
             mp_drawing.draw_landmarks(
                 overlay, 
                 landmark_list,
-                mp_face_mesh.FACEMESH_CONTOURS,
+                mp_face_mesh.FACEMESH_IRISES,
                 mp_drawing_styles.get_default_face_mesh_contours_style()
+            )
+            mp_drawing.draw_landmarks(
+                overlay, 
+                landmark_list,
+                mp_face_mesh.FACEMESH_CONTOURS,
+                mp_drawing_styles.get_default_face_mesh_iris_connections_style()
             )
         
         return (overlay, ExtensionResult(data=mp_results))
+
+
+    @classmethod
+    def check_output(cls, result:ExtensionResult) -> bool:
+        # check the result of 'face_mesh.process' 
+        if len(result.data) > 0:
+            for i in range(result.data):
+                if len(result.data[i]) != 468:  
+                    logger.warning(f"index {i} in result.data is not proper length")
+                    return False
+            return True
+        else:
+            logger.warning("result is empty")
+        return False
+
 
     def cleanup(self) -> None:
         pass
