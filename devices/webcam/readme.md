@@ -2,7 +2,7 @@
 
 PoseVis is a multi-camera streaming and visualization framework built upon LabGraph. PoseVis was built with modularity in mind and can be extended to many downstream applications relatively easily through its extension system and logging support.
 
-![Usage preview](https://raw.githubusercontent.com/Dasfaust/labgraph/hand_tracking/devices/webcam/images/preview.gif)
+![Usage preview](https://i.imgur.com/FMYIy9r.gif)
 
 ## Concepts
 
@@ -43,7 +43,6 @@ optional arguments:
   --device-ids [DEVICE_IDS ...]
                         which device ids to stream
   --replay REPLAY       replay a log file (default: none)
-  --replay-overlays     show previously generated overlays during replay (default: false)
   --target-display-framerate [TARGET_DISPLAY_FRAMERATE]
                         specify update rate for video stream presentation; seperate from stream framerate (default: 60)
   --device-resolutions [DEVICE_RESOLUTIONS ...]
@@ -96,32 +95,4 @@ See [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/ha
 
 For an example of logging output, check [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/logging_example.ipynb).
 
-## To-do
-
-### Testing
-
-A testing solution needs to be implemented, this is a regression from the previous proposal for this pull request.
-
-### VRS Support
-
-VRS support for logging needs to be added.
-
-### Other MediaPipe Solutions
-
-Hand tracking is currently included, with other solutions on the way. MediaPipe Python supports hand tracking, pose tracking, and face mesh tracking. These solutions can be combined into the [holistic](https://google.github.io/mediapipe/solutions/holistic.html) graph. The plan is to implement them seperately along with the holistic solution for modularity.
-
-Other MediaPipe solutions will require C++ interop.
-
-## Other Thoughts
-
-### MediaPipe Performance
-
-Currently, the hand tracking (and subsequent other) MediaPipe extensions run their neural networks on the CPU. A significant performance uplift could be achieved by running GPU-enabled MediaPipe graphs. It seems that MediaPipe's Python wrapper does not have GPU capabilities: see [this issue](https://github.com/google/mediapipe/issues/3106). We could use C++ interop to achieve this.
-
-### n-Stream Support
-
-Pose Vis is hard coded to support 4 streams simultaneously. This limitation could be avoided with a method to change node metadata (inputs and outputs) before graph startup. This idea has proven tricky to implement due to the multi-process nature of LabGraph, but it should be possible.
-
-### Multi-media Support
-
-CV2 can be used to import a wide variety of media including videos and gifs. We could create more stream types to support this.
+You can download the log generated in this example [here](https://drive.google.com/file/d/1cHRDBZ4MHOtYnL5K4VNRLouZmu9Ux0s4/view?usp=sharing).
