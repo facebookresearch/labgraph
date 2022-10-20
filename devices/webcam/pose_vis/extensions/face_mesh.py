@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
-from ast import arg
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -51,13 +50,13 @@ class FaceExtension(PoseVisExtension):
                 overlay, 
                 landmark_list,
                 mp_face_mesh.FACEMESH_TESSELATION,
-                mp_drawing_styles.#tesselation
+                mp_drawing_styles.get_default_face_mesh_tesselation_style()
             )
             mp_drawing.draw_landmarks(
                 overlay, 
                 landmark_list,
                 mp_face_mesh.FACEMESH_CONTOURS,
-                mp_drawing_styles.#contours
+                mp_drawing_styles.get_default_face_mesh_contours_style()
             )
         
         return (overlay, ExtensionResult(data=mp_results))
