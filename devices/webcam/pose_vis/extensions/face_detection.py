@@ -22,11 +22,11 @@ class FaceExtension(PoseVisExtension):
 
     # argument to enable or disable the face detection extension
     def register_args(self, parser: ArgumentParser) -> None:
-        parser.add_argument("--face", help="enable the face detection extension", action="store_true", required=False)
+        parser.add_argument("--face_detection", help="enable the face detection extension", action="store_true", required=False)
 
     #? make sure this is correct
     def check_enabled(self, args: Namespace) -> bool:
-        return args.face 
+        return args.face_detection 
 
     def setup(self) -> None:
         self.face = mp_face.FaceDetection()
@@ -48,10 +48,7 @@ class FaceExtension(PoseVisExtension):
         for detection in mp_results:
             mp_drawing.draw_detection(
                 overlay,
-                detection,  
-                #? switch order maybe?
-                mp_drawing_styles.get_default_face_mesh_contours_style(), 
-                mp_drawing_styles.get_default_face_mesh_tesselation_style(),
+                detection
             )
         
         return (overlay, ExtensionResult(data=mp_results)) 
