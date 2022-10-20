@@ -54,22 +54,7 @@ class FaceExtension(PoseVisExtension):
                 mp_drawing_styles.get_default_face_mesh_tesselation_style(),
             )
         
-        results = mp_results
-
-        #! no longer using 
-        # result_len = len(mp_results)
-        # results = [None] * result_len
-
-        # for i in range(result_len):
-        #     detection_list = mp_results[i].detection #! maybe wrong
-        #     detections = [None]*len(detection_list)
-
-        #     for id in enumerate(detection_list):
-        #         detections[id] = [detection.x, detection.y, detection.z]
-        #     result[i] = detections
-
-
-        return (overlay, ExtensionResult(data=results)) 
+        return (overlay, ExtensionResult(data=mp_results)) 
 
 
     # clean up called when the graph is shutdown
