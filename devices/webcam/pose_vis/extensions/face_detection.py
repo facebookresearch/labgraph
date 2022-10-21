@@ -51,8 +51,10 @@ class FaceExtension(PoseVisExtension):
         if mp_results is None:
             mp_results = []
 
-        if mp_obj_results in None:
-            mp_obj_results = []
+
+        #! Potential cause of error
+        # if mp_obj_results in None:
+        #     mp_obj_results = []
 
         # blank image for creating the overlay on
         overlay = np.zeros(shape=frame.shape, dtype=np.uint8)
@@ -64,6 +66,7 @@ class FaceExtension(PoseVisExtension):
             )
         
         #! ERROR here - cant iterate nonetype
+        #? potentially not needed - do more testing 
         # for detected_objects in mp_obj_results:
         #     mp_drawing.draw_landmarks(
         #         overlay,
