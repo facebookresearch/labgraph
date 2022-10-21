@@ -53,6 +53,9 @@ class FaceExtension(PoseVisExtension):
         
         return (overlay, ExtensionResult(data=mp_results)) 
 
+    @classmethod
+    def check_output(cls, result: ExtensionResult)-> bool:
+        return False
 
     # clean up called when the graph is shutdown
     def cleanup(self) -> None:
