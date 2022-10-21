@@ -1,3 +1,5 @@
+from asyncio.log import logger
+from operator import truediv
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -69,15 +71,17 @@ class FaceExtension(PoseVisExtension):
         #         mp_object.BOX_CONNECTIONS                
         #     )
 
-        #todo implement box tracking 
-        
-
-
 
         return (overlay, ExtensionResult(data=mp_results)) 
 
     @classmethod
     def check_output(cls, result: ExtensionResult)-> bool:
+        if len(result.data) > 0:
+            for i in range(result.data):
+                if len(result.data[i]) != 6: #! <- make sure this num is right
+                    logger.warning(f'index {i} in result.data is not proper length')
+                    return False
+            return True
         return False
 
     # clean up called when the graph is shutdown
