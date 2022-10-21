@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import mediapipe as mp
 # Import MediaPipe types for intellisense
-import mediapipe.python.solutions.hands as HandsType
+import mediapipe.python.solutions.face_mesh as FaceType
 import mediapipe.python.solutions.drawing_utils as DrawingUtilsType
 import mediapipe.python.solutions.drawing_styles as DrawingStylesType
 from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
@@ -20,4 +20,4 @@ from typing import Optional, Tuple
 # MediaPipe setup: https://google.github.io/mediapipe/solutions/hands.html
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
-mp_iris: IrisType = mp.solutions.iris
+# mp_iris: IrisType = mp.solutions.iris
