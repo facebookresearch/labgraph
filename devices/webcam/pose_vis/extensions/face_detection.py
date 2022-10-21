@@ -3,6 +3,7 @@ import numpy as np
 import mediapipe as mp
 # Import MediaPipe types for intellisense
 import mediapipe.python.solutions.face_detection as FaceType
+import mediapipe.python.solutions.objectron as ObjectType
 import mediapipe.python.solutions.drawing_utils as DrawingUtilsType
 import mediapipe.python.solutions.drawing_styles as DrawingStylesType
 
@@ -16,9 +17,11 @@ from typing import Optional, Tuple
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
 mp_face: FaceType = mp.solutions.face_detection
+mp_object: ObjectType = mp.solutions.objectron #! <--- for object tracking - testing
 
 class FaceExtension(PoseVisExtension):
     face : Optional[FaceType.FaceDetection]
+    object_tracking : Optional[ObjectType.Objectron] #! <---- object tracking - testing
 
     # argument to enable or disable the face detection extension
     def register_args(self, parser: ArgumentParser) -> None:
@@ -50,7 +53,12 @@ class FaceExtension(PoseVisExtension):
                 overlay,
                 detection
             )
+
+        #todo implement box tracking 
         
+
+
+
         return (overlay, ExtensionResult(data=mp_results)) 
 
     @classmethod
