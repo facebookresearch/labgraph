@@ -6,7 +6,7 @@ import logging
 from pose_vis.utils import absolute_path
 from pose_vis.runner import PoseVisRunner, PoseVisConfig
 from pose_vis.streams.image_stream import ImageStream, ImageStreamConfig
-from pose_vis.streams.termination_handler import TerminationHandler, TerminationHandlerConfig
+from pose_vis.termination_handler import TerminationHandler, TerminationHandlerConfig
 from pose_vis.pose_vis_graph import PoseVis
 from dataclasses import dataclass
 from typing import List
