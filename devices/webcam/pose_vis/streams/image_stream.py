@@ -2,13 +2,14 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import logging
+import time
 import os
 import asyncio
 import cv2
 import labgraph as lg
 import numpy as np
 
-from pose_vis.streams.messages import ProcessedVideoFrame, StreamMetaData, CombinedExtensionResult, FinishedMessage
+from pose_vis.streams.messages import VideoFrame, StreamMetaData, ExtensionResults, FinishedMessage
 from pose_vis.frame_processor import FrameProcessor
 from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
@@ -59,16 +60,16 @@ class ImageStream(lg.Node):
     Loads all images in a directory, runs the image through each configured extension, and outputs the results
 
     Topics:
-        `OUTPUT_FRAMES`: `ProcessedVideoFrame`
-        `OUTPUT_EXTENSIONS`: `CombinedExtensionResult`
+        `OUTPUT_FRAMES`: `VideoFrame`
+        `OUTPUT_EXTENSIONS`: `ExtensionResults`
         `OUTPUT_FINISHED`: `FinishedMessage`
     
     Attributes:
         `config`: `ImageStreamConfig`
         `state`: `ImageStreamState`
     """
-    OUTPUT_FRAMES = lg.Topic(ProcessedVideoFrame)
-    OUTPUT_EXTENSIONS = lg.Topic(CombinedExtensionResult)
+    OUTPUT_FRAMES = lg.Topic(VideoFrame)
+    OUTPUT_EXTENSIONS = lg.Topic(ExtensionResults)
     OUTPUT_FINISHED = lg.Topic(FinishedMessage)
     config: ImageStreamConfig
     state: ImageStreamState
@@ -84,15 +85,19 @@ class ImageStream(lg.Node):
             # CV2 uses H x W
             resolution = [frame.shape[1], frame.shape[0], self.config.target_framerate]
             
-            overlayed, ext_results = self.state.frame_processor.process_frame(frame.copy(), self.state.metadata)
             # Flatten the images since we don't know their sizes until runtime or data will be stripped when logging
             # https://github.com/facebookresearch/labgraph/issues/20
-            yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = frame.reshape(-1),
-                overlayed = overlayed.reshape(-1),
+            yield self.OUTPUT_FRAMES, VideoFrame(frame = frame.reshape(-1),
+                timestamp = time.time(),
                 resolution = np.asarray(resolution, dtype = np.int32),
                 frame_index = self.state.frame_index,
                 metadata = self.state.metadata)
-            yield self.OUTPUT_EXTENSIONS, CombinedExtensionResult(results = ext_results)
+
+            ext_results = self.state.frame_processor.process_frame(frame, self.state.metadata)
+            yield self.OUTPUT_EXTENSIONS, ExtensionResults(results = ext_results,
+                timestamp = time.time(),
+                frame_index = self.state.frame_index,
+                metadata = self.state.metadata)
 
             self.state.metadata.actual_framerate = self.state.perf.updates_per_second
             self.state.frame_index += 1

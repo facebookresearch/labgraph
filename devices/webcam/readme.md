@@ -8,15 +8,15 @@ PoseVis is a multi-camera streaming and visualization framework built upon LabGr
 
 ### Overview
 
-PoseVis supports up to 4 video streams producing the `ProcessedVideoFrame` message. There are a few differnt stream providers: `CameraStream` for device streaming, `ReplayStream` for log replaying, and `ImageStream` which reads images from a given directory.
+PoseVis supports up to 4 video streams producing the `VideoFrame` message. There are a few differnt stream providers: `CameraStream` for device streaming, `ReplayStream` for log replaying, and `ImageStream` which reads images from a given directory.
 
 These streams are initialized by a corresponding `PoseVisRunner` class that takes care of graph initialization. The `PoseVis` graph is based off of the `DynamicGraph` class, which allows us to build a graph based on run-time parameters.
 
-Each stream provider enables and runs `PoseVisExtension` objects on their respective outputs and steams a `CombinedExtensionResult` message, which is a dictionary containing each extension's name, and the data it produced. Extensions can be enabled or disabled by the user. `ProcessedVideoFrame` has the original image, and an overlayed image containing any processing done by extensions (i.e a pose overlay).
+Each stream provider enables and runs `PoseVisExtension` objects on their respective outputs and steams a `ExtensionResults` message, which is a dictionary containing each extension's name, and the data it produced. Extensions can be enabled or disabled by the user.
 
-`CameraStreamRunner` and `ReplayStreamRunner` initialize a `Display` node that aggregates all streams and displays the overlayed image for real-time feedback. `ImageStreamRunner` initializes a `TerminationHandler` node that shuts the graph down when processing is finished.
+`CameraStreamRunner` and `ReplayStreamRunner` initialize a `Display` node that aggregates all streams and displays the overlayed frames for real-time feedback. `ImageStreamRunner` initializes a `TerminationHandler` node that shuts the graph down when processing is finished.
 
-If logging is enabled, a `GraphMetaData` message is logged containing the stream count. Each stream's `ProcessedVideoFrame` and `CombinedExtensionResult` messages are logged under seperate groups.
+If logging is enabled, a `GraphMetaData` message is logged containing the stream count. Each stream's `VideoFrame` and `ExtensionResults` messages are logged under seperate groups.
 
 ## Usage
 

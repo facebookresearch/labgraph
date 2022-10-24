@@ -7,7 +7,7 @@ from pose_vis.streams.messages import StreamMetaData
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from argparse import ArgumentParser, Namespace
-from typing import Tuple, Any
+from typing import Any
 
 @dataclass
 class ExtensionResult():
@@ -30,9 +30,11 @@ class PoseVisExtensionBase(ABC):
 
         `setup(self) -> None`
 
-        `process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]`
+        `process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> ExtensionResult`
         
         `cleanup(self) -> None`
+
+        `draw_overlay(cls, result: ExtensionResult) -> None`
 
         `check_output(cls, result: ExtensionResult) -> bool`
     """
@@ -60,11 +62,9 @@ class PoseVisExtensionBase(ABC):
         pass
 
     @abstractmethod
-    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
+    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> ExtensionResult:
         """
         Called once per frame inside of a video stream node
-
-        Output should be a `Tuple` with an overlay image and the data used to produce that overlay
         """
         raise NotImplementedError
 
@@ -74,6 +74,14 @@ class PoseVisExtensionBase(ABC):
         Called on graph shutdown
         """
         pass
+
+    @classmethod
+    @abstractmethod
+    def draw_overlay(cls, frame: np.ndarray, metadata: StreamMetaData, result: ExtensionResult) -> None:
+        """
+        Called upon displaying extension results
+        """
+        raise NotImplementedError
 
     @classmethod
     @abstractmethod

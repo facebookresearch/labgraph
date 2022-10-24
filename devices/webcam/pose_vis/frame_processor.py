@@ -5,7 +5,7 @@ import logging
 import cv2
 import numpy as np
 
-from typing import List, Tuple
+from typing import List, Dict, Any
 from dataclasses import dataclass, field
 from pose_vis.streams.messages import StreamMetaData
 from pose_vis.extension import PoseVisExtension
@@ -29,16 +29,11 @@ class FrameProcessor():
             logger.info(f" stream {self.stream_id}: setting up extension {ext.__class__.__name__}")
             ext.setup()
 
-    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, str]:
+    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Dict[str, Any]:
         ext_results = {}
-        overlayed = frame.copy()
         for ext in self.extensions:
-            overlay, ext_result = ext.process_frame(frame, metadata)
-            # TODO: addWeighted() leads to a darker image overall, I'm guessing due to lack of transparency support
-            # It is, however extremely fast, faster than other methods I've experimented with
-            overlayed = cv2.addWeighted(overlay, 0.5, overlayed, 0.5, 0.0)
-            ext_results[ext.__class__.__name__] = ext_result.data
-        return (overlayed, ext_results)
+            ext_results[ext.__class__.__name__] = ext.process_frame(frame, metadata).data
+        return ext_results
 
     def cleanup(self) -> None:
         for ext in self.extensions:

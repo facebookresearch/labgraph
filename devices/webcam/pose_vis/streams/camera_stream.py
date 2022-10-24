@@ -6,8 +6,9 @@ import asyncio
 import cv2
 import labgraph as lg
 import numpy as np
+import time
 
-from pose_vis.streams.messages import ProcessedVideoFrame, StreamMetaData, CombinedExtensionResult
+from pose_vis.streams.messages import VideoFrame, StreamMetaData, ExtensionResults
 from pose_vis.frame_processor import FrameProcessor
 from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
@@ -37,6 +38,7 @@ class CameraStreamState(lg.State):
     Attributes:
         `cap`: `cv2.VideoCapture` interfaces with camera devices
         `metadata`: `StreamMetaData` utility class sent with ProcessedVideoFrame messages
+        `device_resolution`: `np.ndarray` array generated from config value of the same name
         `perf`: `PerfUtility` utility to track frames per second
         `frame_index`: `int` current frame index since startup
         `frame_processor`: `FrameProcessor` handles extension execution
@@ -45,6 +47,7 @@ class CameraStreamState(lg.State):
     # We create and assign these objects during setup
     cap: Optional[cv2.VideoCapture] = None
     metadata: Optional[StreamMetaData] = None
+    device_resolution: Optional[np.ndarray] = None
     perf: PerfUtility = PerfUtility()
     frame_index: int = 0
     frame_processor: Optional[FrameProcessor] = None
@@ -54,15 +57,15 @@ class CameraStream(lg.Node):
     CameraStream node, captures an image from configured device on a loop, runs the image through each configured extension, and outputs the results
 
     Topics:
-        `OUTPUT_FRAMES`: `ProcessedVideoFrame`
-        `OUTPUT_EXTENSIONS`: `CombinedExtensionResult`
+        `OUTPUT_FRAMES`: `VideoFrame`
+        `OUTPUT_EXTENSIONS`: `ExtensionResults`
     
     Attributes:
         `config`: `CameraStreamConfig`
         `state`: `CameraStreamState`
     """
-    OUTPUT_FRAMES = lg.Topic(ProcessedVideoFrame)
-    OUTPUT_EXTENSIONS = lg.Topic(CombinedExtensionResult)
+    OUTPUT_FRAMES = lg.Topic(VideoFrame)
+    OUTPUT_EXTENSIONS = lg.Topic(ExtensionResults)
     config: CameraStreamConfig
     state: CameraStreamState
 
@@ -76,9 +79,11 @@ class CameraStream(lg.Node):
             cap_state = self.state.cap.isOpened() if self.state.cap else False
 
             frame: np.ndarray
+            timestamp: float
             if cap_state:
                 try:
                     success, frame = self.state.cap.read()
+                    timestamp = time.time()
                     if not success:
                         error = True
                 except cv2.error:
@@ -92,16 +97,21 @@ class CameraStream(lg.Node):
                 # Give a blank image if there's an issue with the device, instead of crashing
                 # CV2 uses H x W
                 frame = np.zeros(shape = (self.config.device_resolution[1], self.config.device_resolution[0], 3), dtype = np.uint8)
+                timestamp = time.time()
             
-            overlayed, ext_results = self.state.frame_processor.process_frame(frame, self.state.metadata)
             # Flatten the images since we don't know their sizes until runtime or data will be stripped when logging
             # https://github.com/facebookresearch/labgraph/issues/20
-            yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = frame.reshape(-1),
-                overlayed = overlayed.reshape(-1),
-                resolution = np.asarray(self.config.device_resolution),
+            yield self.OUTPUT_FRAMES, VideoFrame(frame = frame.reshape(-1),
+                timestamp = timestamp,
+                resolution = self.state.device_resolution,
                 frame_index = self.state.frame_index,
                 metadata = self.state.metadata)
-            yield self.OUTPUT_EXTENSIONS, CombinedExtensionResult(results = ext_results)
+
+            ext_results = self.state.frame_processor.process_frame(frame, self.state.metadata)
+            yield self.OUTPUT_EXTENSIONS, ExtensionResults(results = ext_results,
+                timestamp = time.time(),
+                frame_index = self.state.frame_index,
+                metadata = self.state.metadata)
 
             self.state.metadata.actual_framerate = self.state.perf.updates_per_second
             self.state.frame_index += 1
@@ -118,10 +128,14 @@ class CameraStream(lg.Node):
             logger.info(f" device {self.config.device_id} opened and configured")
         else:
             logger.warning(" device id {} does not exist".format(self.config.device_id))
+
+        self.state.device_resolution = np.asarray(self.config.device_resolution)
+
         self.state.metadata = StreamMetaData(
             device_id = self.config.device_id,
             stream_id = self.config.stream_id,
             actual_framerate = 0)
+        
         self.state.frame_processor = FrameProcessor()
         self.state.frame_processor.extensions = self.config.extensions
         self.state.frame_processor.stream_id = self.config.stream_id

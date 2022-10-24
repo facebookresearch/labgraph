@@ -21,21 +21,33 @@ class StreamMetaData:
     device_id: int
     stream_id: int
 
-class ProcessedVideoFrame(lg.Message):
+class VideoFrame(lg.Message):
     """
-    Each `original` and `overlayed` instance is a flat (W * H * 3) shaped array containing `np.uint8` datatype that represents an image
-    Image formats are in the Blue Green Red color space
-
     Attributes:
-        `original`: `np.ndarray` the original input frame
-        `overlayed`: `np.ndarray` the original frame combined with overlays produced by each extension
+        `frame`: `np.ndarray` flat (W * H * 3) shaped array containing `np.uint8` datatype that represents an image, BGR color space
+        `timestamp`: `float` OS time of capture
         `resolution`: `np.ndarray` the resolution of the images (W, H, framerate)
         `frame_index`: `int`, frame counter since startup
         `metadata`: `StreamMetaData`
     """
-    original: np.ndarray
-    overlayed: np.ndarray
+    frame: np.ndarray
+    timestamp: float
     resolution: np.ndarray
+    frame_index: int
+    metadata: StreamMetaData
+
+class ExtensionResults(lg.Message):
+    """
+    All extension results combined into a dictionary
+    
+    Attributes:
+    `results`: `Dict[str, Any]`
+    `timestamp`: `float` OS time of completing processing
+    `frame_index`: `int`, frame counter since startup
+    `metadata`: `StreamMetaData`
+    """
+    results: Dict[str, Any]
+    timestamp: float
     frame_index: int
     metadata: StreamMetaData
 
@@ -47,15 +59,6 @@ class GraphMetaData(lg.Message):
         `num_streams`: `int`
     """
     num_streams: int
-
-class CombinedExtensionResult(lg.Message):
-    """
-    All extension results combined into a dictionary
-    
-    Attributes:
-    `results`: `Dict[str, Any]`
-    """
-    results: Dict[str, Any]
 
 class FinishedMessage(lg.Message):
     """

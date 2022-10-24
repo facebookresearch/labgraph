@@ -54,21 +54,19 @@ class HandsExtension(PoseVisExtension):
             mp_results = []
         
         # TODO: document NormalizedLandmarkList
+        
+        return ExtensionResult(data = mp_results)
 
-        # Create a blank image for drawing as it'll be overlayed onto the video stream
-        overlay = np.zeros(shape = frame.shape, dtype = np.uint8)
-
-        # Draw the detected hand landmarks onto the overlay image
-        for landmark_list in mp_results:
+    @classmethod
+    def draw_overlay(cls, frame: np.ndarray, metadata: StreamMetaData, result: ExtensionResult) -> None:
+        # Draw the detected hand landmarks onto the image
+        for landmark_list in result.data:
             mp_drawing.draw_landmarks(
-                overlay,
+                frame,
                 landmark_list,
                 mp_hands.HAND_CONNECTIONS,
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style())
-        
-        # Return the overlay for presentation, along with any data to be picked up by the logger
-        return (overlay, ExtensionResult(data = mp_results))
 
     @classmethod
     def check_output(cls, result: ExtensionResult) -> bool:

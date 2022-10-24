@@ -2,10 +2,11 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import logging
+import time
 import asyncio
 import labgraph as lg
 
-from pose_vis.streams.messages import ProcessedVideoFrame, StreamMetaData, CombinedExtensionResult
+from pose_vis.streams.messages import VideoFrame, StreamMetaData, ExtensionResults
 from pose_vis.frame_processor import FrameProcessor
 from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
@@ -51,44 +52,50 @@ class ReplayStream(lg.Node):
     Replays log files
 
     Topics:
-        `OUTPUT_FRAMES`: `ProcessedVideoFrame`
-        `OUTPUT_EXTENSIONS`: `CombinedExtensionResult`
+        `OUTPUT_FRAMES`: `VideoFrame`
+        `OUTPUT_EXTENSIONS`: `ExtensionResults`
     
     Attributes:
         `config`: `LogStreamConfig`
         `state`: `LogStreamState`
     """
-    OUTPUT_FRAMES = lg.Topic(ProcessedVideoFrame)
-    OUTPUT_EXTENSIONS = lg.Topic(CombinedExtensionResult)
+    OUTPUT_FRAMES = lg.Topic(VideoFrame)
+    OUTPUT_EXTENSIONS = lg.Topic(ExtensionResults)
     config: ReplayStreamConfig
     state: ReplayStreamState
 
     @lg.publisher(OUTPUT_FRAMES)
     @lg.publisher(OUTPUT_EXTENSIONS)
-    async def read_camera(self) -> lg.AsyncPublisher:
+    async def read_log(self) -> lg.AsyncPublisher:
         image_log_name = f"image_stream_{self.config.stream_id}"
         extension_log_name = f"extension_stream_{self.config.stream_id}"
         num_images = len(self.state.reader.logs[image_log_name])
         for i in range(num_images):
             self.state.perf.update_start()
 
-            message: ProcessedVideoFrame = self.state.reader.logs[image_log_name][i]
-            if len(self.config.extensions) > 0:
-                overlayed, ext_results = self.state.frame_processor.process_frame(message.original.reshape(message.resolution[1], message.resolution[0], 3), self.state.metadata)
-                yield self.OUTPUT_FRAMES, ProcessedVideoFrame(original = message.original,
-                    overlayed = overlayed,
-                    resolution = message.resolution,
+            frame_message: VideoFrame = self.state.reader.logs[image_log_name][i]
+            yield self.OUTPUT_FRAMES, frame_message
+            
+            ext_message: ExtensionResults
+            # Due to extension results being yielded seperately, it may be possible the last message gets dropped,
+            # depending on how the graph was terminated
+            if extension_log_name in self.state.reader.logs and len(self.state.reader.logs[extension_log_name]) > i:
+                ext_message = self.state.reader.logs[extension_log_name][i]
+            
+            if len(self.config.extensions) > 0:                
+                ext_results = {} if ext_message is None else ext_message.results
+                ext_results.update(self.state.frame_processor.process_frame(frame_message.frame.reshape(frame_message.resolution[1], frame_message.resolution[0], 3), self.state.metadata))
+                yield self.OUTPUT_EXTENSIONS, ExtensionResults(results = ext_results,
+                    timestamp = time.time(),
                     frame_index = self.state.frame_index,
                     metadata = self.state.metadata)
-                yield self.OUTPUT_EXTENSIONS, CombinedExtensionResult(results = ext_results)
             else:
-                yield self.OUTPUT_FRAMES, message
-                if extension_log_name in self.state.reader.logs:
-                    yield self.OUTPUT_EXTENSIONS, self.state.reader.logs[extension_log_name][i]
+                yield self.OUTPUT_EXTENSIONS, ext_message
+                
 
             self.state.metadata.actual_framerate = self.state.perf.updates_per_second
             self.state.frame_index += 1
-            await asyncio.sleep(self.state.perf.get_remaining_sleep_time(message.metadata.actual_framerate if message.metadata.actual_framerate > 0 else message.resolution[2]))
+            await asyncio.sleep(self.state.perf.get_remaining_sleep_time(frame_message.metadata.actual_framerate if frame_message.metadata.actual_framerate > 0 else frame_message.resolution[2]))
             self.state.perf.update_end()
         logger.info(" log replay finished")
 
@@ -96,7 +103,7 @@ class ReplayStream(lg.Node):
         logger.info(f" stream {self.config.stream_id}: reading log")
         image_log_name = f"image_stream_{self.config.stream_id}"
         extension_log_name = f"extension_stream_{self.config.stream_id}"
-        self.state.reader = HDF5Reader(self.config.log_path, {image_log_name: ProcessedVideoFrame, extension_log_name: CombinedExtensionResult})
+        self.state.reader = HDF5Reader(self.config.log_path, {image_log_name: VideoFrame, extension_log_name: ExtensionResults})
 
         self.state.metadata = StreamMetaData(
             device_id = self.state.reader.logs[image_log_name][0].metadata.device_id,
