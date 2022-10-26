@@ -13,7 +13,6 @@ from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
 
 # Every extension will probably need these imports
 from pose_vis.extension import PoseVisExtension, ExtensionResult
-from pose_vis.streams.messages import StreamMetaData
 from argparse import ArgumentParser, Namespace
 
 from typing import Optional, Tuple
@@ -45,7 +44,7 @@ class HandsExtension(PoseVisExtension):
         self.hands = mp_hands.Hands()
 
     # Called from `FrameProcessor` on each new frame from the stream
-    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
+    def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
         # MediaPipe likes RGB images, not BGR
         # Convert and grab the results we're looking for
         mp_results: NormalizedLandmarkList = self.hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).multi_hand_landmarks
@@ -58,7 +57,7 @@ class HandsExtension(PoseVisExtension):
         return ExtensionResult(data = mp_results)
 
     @classmethod
-    def draw_overlay(cls, frame: np.ndarray, metadata: StreamMetaData, result: ExtensionResult) -> None:
+    def draw_overlay(cls, frame: np.ndarray, result: ExtensionResult) -> None:
         # Draw the detected hand landmarks onto the image
         for landmark_list in result.data:
             mp_drawing.draw_landmarks(

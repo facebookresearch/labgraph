@@ -3,7 +3,6 @@
 
 import numpy as np
 
-from pose_vis.streams.messages import StreamMetaData
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from argparse import ArgumentParser, Namespace
@@ -30,7 +29,7 @@ class PoseVisExtensionBase(ABC):
 
         `setup(self) -> None`
 
-        `process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> ExtensionResult`
+        `process_frame(self, frame: np.ndarray) -> ExtensionResult`
         
         `cleanup(self) -> None`
 
@@ -62,7 +61,7 @@ class PoseVisExtensionBase(ABC):
         pass
 
     @abstractmethod
-    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> ExtensionResult:
+    def process_frame(self, frame: np.ndarray) -> ExtensionResult:
         """
         Called once per frame inside of a video stream node
         """
@@ -77,7 +76,7 @@ class PoseVisExtensionBase(ABC):
 
     @classmethod
     @abstractmethod
-    def draw_overlay(cls, frame: np.ndarray, metadata: StreamMetaData, result: ExtensionResult) -> None:
+    def draw_overlay(cls, frame: np.ndarray, result: ExtensionResult) -> None:
         """
         Called upon displaying extension results
         """
