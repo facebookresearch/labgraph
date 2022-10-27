@@ -2,7 +2,6 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import logging
-from unittest import result
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -14,12 +13,11 @@ from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
 
 # Every extension will probably need these imports
 from pose_vis.extension import PoseVisExtension, ExtensionResult
-from pose_vis.streams.messages import StreamMetaData
 from argparse import ArgumentParser, Namespace
 
 from typing import Optional, Tuple
 
-logger = legging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # medaiapipe setup
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
@@ -38,7 +36,7 @@ class HolisticExtension(PoseVisExtension):
     def setup(self) -> None:
         self.holistic = mp_holistic.Holistic() #! <-- test
 
-    def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Tuple[np.ndarray, ExtensionResult]:
+    def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
         
         result = self.holistic.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
         
@@ -50,33 +48,40 @@ class HolisticExtension(PoseVisExtension):
         if pose_landmarks is None:
             pose_landmarks = []
 
-        # overalay to draw holistic on
-        overlay = np.zeros(shape=frame.shape, dtype=np.uint8)
-        
+        return ExtensionResult(data=result)
+
+    @classmethod
+    def draw_overlay(cls, frame:np.ndarray, result: ExtensionResult):
+
         # draw holistic
         #! test these two 
         mp_drawing.draw_landmarks(
-            overlay,
-            face_landmarks,
+            frame,
+            result.face_landmarks,
             mp_holistic.FACEMESH_CONTOURS,
             None, #! <-- make sure this is correct 
             mp_drawing_styles.get_default_face_mesh_contours_style()
         )
 
         mp_drawing.draw_landmarks(
-            overlay, 
-            pose_landmarks,
+            frame, 
+            result.pose_landmarks,
             mp_holistic.POSE_CONNECTIONS,
             mp_drawing_styles.get_default_pose_landmarks_style()
         )
-        
-        return (overlay, ExtensionResult(data=result))
+
 
     @classmethod
     def check_output(cls, result:ExtensionResult) -> bool:
         # recheck this function
         if len(result.data)>0:
-            pass
+            for i in range(result.data):
+                if len(result.data[i] != 510): #! <-- this number might not be correct
+                    logger.warning(f'index {i} in result.data is not proper length')
+                    return False
+            return True
+        else:
+            logger.warning('result is empty')
         return False
 
     def cleanup(self) -> None:
