@@ -21,7 +21,7 @@ mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
 mp_face: FaceType = mp.solutions.face_detection
 mp_object: ObjectType = mp.solutions.objectron #! <--- for object tracking - testing
 
-class FaceExtension(PoseVisExtension):
+class FaceDetectionExtension(PoseVisExtension):
     face : Optional[FaceType.FaceDetection]
     object_tracking : Optional[ObjectType.Objectron] #! <---- object tracking - testing
 

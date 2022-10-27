@@ -24,7 +24,7 @@ mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
 mp_face_mesh: FaceType = mp.solutions.face_mesh 
 
-class FaceExtension(PoseVisExtension):
+class FaceMeshExtension(PoseVisExtension):
     face_mesh: Optional[FaceType.FaceMesh] 
     
     def register_args(self, parser: ArgumentParser) -> None:
