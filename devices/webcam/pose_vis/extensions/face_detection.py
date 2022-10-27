@@ -47,6 +47,7 @@ class FaceExtension(PoseVisExtension):
 
         return ExtensionResult(data=mp_results)
 
+    @classmethod
     def draw_overlay(cls, frame: np_ndarray, result: ExtensionResult):
 
         for detection in result.data:
@@ -59,7 +60,7 @@ class FaceExtension(PoseVisExtension):
     def check_output(cls, result: ExtensionResult)-> bool:
         if len(result.data) > 0:
             for i in range(result.data):
-                if len(result.data[i]) != 6: #! <- make sure this num is right
+                if len(result.data[i]) != 6: 
                     logger.warning(f'index {i} in result.data is not proper length')
                     return False
             return True
