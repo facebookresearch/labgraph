@@ -48,7 +48,7 @@ class FaceExtension(PoseVisExtension):
         return ExtensionResult(data=mp_results)
 
     @classmethod
-    def draw_overlay(cls, frame: np_ndarray, result: ExtensionResult):
+    def draw_overlay(cls, frame: np.ndarray, result: ExtensionResult):
 
         for detection in result.data:
             mp_drawing.draw_detection(
