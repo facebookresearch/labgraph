@@ -34,11 +34,11 @@ class FaceMeshExtension(PoseVisExtension):
         return args.face_mesh
 
     def setup(self) -> None:
-        self.face_mesh = mp_face_mesh.Face_mesh()
+        self.face_mesh = mp_face_mesh.FaceMesh()
 
     def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
         
-        mp_results: NormalizedLandmarkList = self.face_mesh.proccess(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).multi_face_landmarks
+        mp_results = self.face_mesh.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).multi_face_landmarks
 
         if mp_results is None:
             mp_results = []
@@ -53,17 +53,20 @@ class FaceMeshExtension(PoseVisExtension):
                 frame, 
                 landmark_list,
                 mp_face_mesh.FACEMESH_TESSELATION,
+                None,
                 mp_drawing_styles.get_default_face_mesh_tesselation_style()
             )
             mp_drawing.draw_landmarks(
                 frame, 
                 landmark_list,
                 mp_face_mesh.FACEMESH_IRISES,
+                None,
                 mp_drawing_styles.get_default_face_mesh_contours_style()
             )
             mp_drawing.draw_landmarks(
                 frame, 
                 landmark_list,
+                None,
                 mp_face_mesh.FACEMESH_CONTOURS,
                 mp_drawing_styles.get_default_face_mesh_iris_connections_style()
             )
