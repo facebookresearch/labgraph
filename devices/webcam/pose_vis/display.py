@@ -139,7 +139,8 @@ class Display(lg.Node):
                         if ext_results is not None:
                             for key in ext_results:
                                 _type: PoseVisExtension = self.config.extension_types[key]
-                                _type.draw_overlay(frame, self.state.metadatas[i], ExtensionResult(data = ext_results[key]))
+                                # _type.draw_overlay(frame, self.state.metadatas[i], ExtensionResult(data = ext_results[key]))
+                                _type.draw_overlay(frame, ExtensionResult(data = ext_results[key]))
                         cv2.imshow(title, frame)
                         cv2.setWindowTitle(title, f"{title} stream: {self.state.metadatas[i].actual_framerate}fps, display: {self.state.perf.updates_per_second}fps")
 

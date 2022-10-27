@@ -32,7 +32,8 @@ class FrameProcessor():
     def process_frame(self, frame: np.ndarray, metadata: StreamMetaData) -> Dict[str, Any]:
         ext_results = {}
         for ext in self.extensions:
-            ext_results[ext.__class__.__name__] = ext.process_frame(frame, metadata).data #? should metadata be sent as a parameter
+            # ext_results[ext.__class__.__name__] = ext.process_frame(frame, metadata).data #? should metadata be sent as a parameter
+            ext_results[ext.__class__.__name__] = ext.process_frame(frame).data 
         return ext_results
 
     def cleanup(self) -> None:
