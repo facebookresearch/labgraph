@@ -34,7 +34,7 @@ class FaceMeshExtension(PoseVisExtension):
         return args.face_mesh
 
     def setup(self) -> None:
-        self.face_mesh = mp_face_mesh.FaceMesh()
+        self.face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True)
 
     def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
         
