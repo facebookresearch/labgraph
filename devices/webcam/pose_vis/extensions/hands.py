@@ -8,7 +8,6 @@ import mediapipe as mp
 import mediapipe.python.solutions.hands as HandsType
 import mediapipe.python.solutions.drawing_utils as DrawingUtilsType
 import mediapipe.python.solutions.drawing_styles as DrawingStylesType
-from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
 
 # Every extension will probably need these imports
 from pose_vis.extension import PoseVisExtension, ExtensionResult
