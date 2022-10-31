@@ -8,15 +8,15 @@ PoseVis is a multi-camera streaming and visualization framework built upon LabGr
 
 ### Overview
 
-PoseVis supports up to 4 video streams producing the `VideoFrame` message. There are a few differnt stream providers: `CameraStream` for device streaming, `ReplayStream` for log replaying, and `ImageStream` which reads images from a given directory.
+PoseVis 
 
-These streams are initialized by a corresponding `PoseVisRunner` class that takes care of graph initialization. The `PoseVis` graph is based off of the `DynamicGraph` class, which allows us to build a graph based on run-time parameters.
+PoseVis streams any number of webcams, video files, or image directories and their generated extension data via the `CaptureResult` message (`pose_vis/streams/messages.py`). Included extensions are MediaPipe hand pose, face mesh, body pose, and holistic solutions for real-time pose tracking within LabGraph.
 
-Each stream provider enables and runs `PoseVisExtension` objects on their respective outputs and steams a `ExtensionResults` message, which is a dictionary containing each extension's name, and the data it produced. Extensions can be enabled or disabled by the user.
+The stream is initialized by a corresponding `PoseVisRunner` class that takes care of graph initialization. The `PoseVis` graph is based off of the `DynamicGraph` class, which allows us to build a graph based on run-time parameters. You can connect `CaptureResult` subscribers to the `STREAM/OUTPUT` producer in the `PoseVis` graph (`pose_vis/pose_vis_graph.py`)
 
-`CameraStreamRunner` and `ReplayStreamRunner` initialize a `Display` node that aggregates all streams and displays the overlayed frames for real-time feedback. `ImageStreamRunner` initializes a `TerminationHandler` node that shuts the graph down when processing is finished.
+Each video source is handled in its own process within the `CaptureHandler` class. When a frame needs to be requested, the source processes are notified, grab a new frame, perform processing provided by enabled extensions, and put the result into a shared memory buffer. Once each source is finished, `CaptureHandler` compiles the `CaptureResult` message and publishes it. This keeps performance reasonable, and streams synchronized in time.
 
-If logging is enabled, a `GraphMetaData` message is logged containing the stream count. Each stream's `VideoFrame` and `ExtensionResults` messages are logged under seperate groups.
+You may optionally enable a `Display` node that displays overlayed frames and performance statistics for real-time feedback.
 
 ## Usage
 
@@ -34,58 +34,56 @@ python setup.py install
 Check usage details:
 
 ```
-(.venv) python -m pose_vis.pose_vis --help               
-usage: pose_vis.py [-h] [--device-ids [DEVICE_IDS ...]] [--replay REPLAY] [--replay-overlays] [--target-display-framerate [TARGET_DISPLAY_FRAMERATE]] [--device-resolutions [DEVICE_RESOLUTIONS ...]]
-                   [--log-images] [--log-poses] [--log-dir [LOG_DIR]] [--log-name LOG_NAME] [--hands] [--face]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --device-ids [DEVICE_IDS ...]
-                        which device ids to stream
-  --replay REPLAY       replay a log file (default: none)
-  --target-display-framerate [TARGET_DISPLAY_FRAMERATE]
-                        specify update rate for video stream presentation; seperate from stream framerate (default: 60)
-  --device-resolutions [DEVICE_RESOLUTIONS ...]
-                        specify resolution/framerate per device; format is <device_id or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)
-  --log-images          enable image logging (default: false)
-  --log-poses           enable pose data logging (default: false)
-  --log-dir [LOG_DIR]   set log directory (default: webcam/logs)
-  --log-name LOG_NAME   set log name (default: random)
-  --hands               enable the hand tracking extension
-  --face                enable the face detection extention
+python -m pose_vis.pose_vis --help
 ```
 
-Streaming a single device: stream device 0 with no extensions or logging
+<details>
+  <summary>Help Output</summary>
+    
+    usage: pose_vis.py [-h] [--sources [SOURCES ...]] [--resolutions [RESOLUTIONS ...]] [--replay REPLAY] [--display-framerate [DISPLAY_FRAMERATE]] [--stats-history-size [STATS_HISTORY_SIZE]] [--logging] [--log-dir [LOG_DIR]]
+                    [--log-name LOG_NAME] [--profile] [--hands] [--face_detection] [--face_mesh]
 
-`python -m pose_vis.pose_vis --device-ids 0`
+    options:
+    -h, --help            show this help message and exit
+    --sources [SOURCES ...]
+                            which sources to stream (url, device id, video, or image directory)
+    --resolutions [RESOLUTIONS ...]
+                            specify resolution/framerate per stream; format is <stream index or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)
+    --replay REPLAY       replay a log file (default: none)
+    --display-framerate [DISPLAY_FRAMERATE]
+                            specify update rate for video stream presentation; seperate from stream framerate (default: 60)
+    --stats-history-size [STATS_HISTORY_SIZE]
+                            how many frames to base performance metrics on, 0 to disable (default: 50)
+    --logging             enable logging (default: false)
+    --log-dir [LOG_DIR]   set log directory (default: webcam\logs)
+    --log-name LOG_NAME   set log name (default: random)
+    --profile             enable profiling with cProfile *source streaming only (default: false)
+    --hands               enable the hand tracking extension
+    --face_detection      enable the face detection extension
+    --face_mesh           enable face mesh extension
+    
+</details>
 
-Streaming multiple devices: stream devices 0 and 1 with no extensions or logging
+<details>
+  <summary>Console Usage Examples</summary>
 
-`python -m pose_vis.pose_vis --device-ids 0 1`
+Run device 0 with hand tracking:
 
-Specifying resolution and framerate:
+    python -m pose_vis.pose_vis --sources 0 --hands
 
-The format for specifying resolution is `<device id>:<width>x<height>x<framerate>`
+Enable HDF5 logging:
 
-You can also set the default resolution and framerate by using `*` in place of `<device id>`
+    python -m pose_vis.pose_vis --sources 0 --hands --logging --log-name example
 
-`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30`
+Replay the log:
 
-Enabling extensions: this enables the hand tracking extension
+    python -m pose_vis.pose_vis --replay example
 
-`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30 --hands`
+Specify resolutions:
 
-Enabling logging: this enables both image and pose data logging
+    python -m pose_vis.pose_vis --sources 0 1 --resolutions 0:1280x720x30 1:1920x1080x30 --hands
 
-`python -m pose_vis.pose_vis --device-ids 0 1 --device-resolutions 1:640x480x30 --hands --log-images --log-poses`
-
-Replaying logs: this will replay a log and stream the generated pose data (if present)
-
-`python -m pose_vis.pose_vis --replay webcam/logs/test_log.h5`
-
-You can also enable extensions and logging to generate a new log with new extension data based on the images in the log being replayed:
-
-`python -m pose_vis.pose_vis --replay webcam/logs/test_log.h5 --hands --log-images --log-poses`
+</details>
 
 ### As a Module
 
@@ -93,6 +91,16 @@ See [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/ha
 
 ## Reading Logs (HDF5)
 
-For an example of logging output, check [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/logging_example.ipynb).
+For an example of logging output, check `logging_example.ipynb` [(link)](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/logging_example.ipynb).
 
 You can download the log generated in this example [here](https://drive.google.com/file/d/1cHRDBZ4MHOtYnL5K4VNRLouZmu9Ux0s4/view?usp=sharing).
+
+## Data Quality
+
+PoseVis performance can be tracked via the example in `benchmark.ipynb` [(link)](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/benchmark.ipynb). This example runs a headless graph, captures process timings into a JSON file, and examines the output to produce metrics such as dropped frames, latency, desync between sources, and jitter.
+
+Data quality may also be observed in real time by running PoseVis on the command line:
+
+```
+python -m pose_vis.pose_vis --sources 0 --display-framrate 60 --stats-history-size 50
+```

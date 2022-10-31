@@ -2,7 +2,6 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import logging
-import cv2
 import numpy as np
 import mediapipe as mp
 # Import MediaPipe types for intellisense
@@ -41,13 +40,12 @@ class HandsExtension(PoseVisExtension):
     
     # Called when the stream is initialized
     def setup(self) -> None:
-        self.hands = mp_hands.Hands()
+        # TODO: a way to expose MediaPipe configs
+        self.hands = mp_hands.Hands(model_complexity = 0)
 
     # Called from `FrameProcessor` on each new frame from the stream
     def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
-        # MediaPipe likes RGB images, not BGR
-        # Convert and grab the results we're looking for
-        mp_results: NormalizedLandmarkList = self.hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).multi_hand_landmarks
+        mp_results: NormalizedLandmarkList = self.hands.process(frame).multi_hand_landmarks
         # `multi_hand_landmarks` can be null, so if it is make sure we're working on an empty list
         if mp_results is None:
             mp_results = []

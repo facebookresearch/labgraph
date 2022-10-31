@@ -13,6 +13,11 @@ def absolute_path(path: str) -> str:
     _path = path
     if not _path.startswith("/") or not re.match(r'[a-zA-Z]:', _path):
         _path = os.path.join(os.path.dirname(os.getcwd()), _path)
-    _path = _path.removesuffix("/").removesuffix("\\")
     Path(os.path.dirname(_path)).mkdir(parents = True, exist_ok = True)
     return _path
+
+def relative_latency(cur_device_time: float, cur_receive_time: float, first_device_time: float, first_receive_time: float) -> float:
+    """
+    Calcuate relative latency value for current set of times
+    """
+    return (cur_receive_time - first_receive_time) - (cur_device_time - first_device_time)

@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
+import os
 from setuptools import find_packages, setup
+
+# Use LabGraph 2.0.0 on Windows due to a package installation error
+install_requires = ["labgraph==2.0.0"] if os.name == "nt" else ["labgraph>=2.0.1"]
+install_requires.extend(["opencv-python>=4.6.0", "mediapipe>=0.8.11"])
 
 setup(
     name = "pose_vis",
@@ -9,10 +14,4 @@ setup(
     description = "Pose visualization with LabGraph and MediaPipe",
     packages = find_packages(),
     python_requires = ">=3.8",
-    install_requires = [
-        # On Windows, LabGraph 2.0.1 gives a ModuleNotFound error relating to 'buck_ext'
-        # However, on Linux, LabGraph 2.0.0 gives this error
-        # If installing on Linux change LabGraph's version to 2.0.1
-        "labgraph==2.0.0",
-        "opencv-python>=4.6.0",
-        "mediapipe>=0.8.11"])
+    install_requires = install_requires)

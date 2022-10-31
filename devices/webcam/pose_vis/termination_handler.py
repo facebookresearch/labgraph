@@ -1,76 +1,43 @@
 import time
 import labgraph as lg
 
-from pose_vis.streams.messages import FinishedMessage
-from typing import Optional
-from threading import Lock
-
-class TerminationHandlerConfig(lg.Config):
-    """
-    Config for TerminationHandler
-
-    Attributes:
-        `num_streams`: `int`
-    """
-    num_streams: int
+from pose_vis.streams.messages import ExitSignal
 
 class TerminationHandlerState(lg.State):
     """
     State for TerminationHandler
 
     Attributes:
-        `num_finished`: `int`
+        `signal_received`: `bool`
     """
-    num_finished: int = 0
-    lock: Optional[Lock] = None
-    
+    signal_received: bool = False
 
 class TerminationHandler(lg.Node):
     """
-    Waits until number of `FinishedMessage`s received matches `num_streams` and then terminates the graph
+    Terminates the graph cleanly upon receiving `ExitSignal`
 
     Topics:
-        `INPUT`: `FinishedMessage`
+        `INPUT`: `ExitSignal`
     
     Attributes:
-        `config`: `TerminationHandlerConfig`
         `state`: `TerminationHandlerState`
     """
-    INPUT0 = lg.Topic(FinishedMessage)
-    INPUT1 = lg.Topic(FinishedMessage)
-    INPUT2 = lg.Topic(FinishedMessage)
-    INPUT3 = lg.Topic(FinishedMessage)
-    config: TerminationHandlerConfig
+    INPUT_EXIT_STREAM = lg.Topic(ExitSignal)
+    INPUT_EXIT_USER = lg.Topic(ExitSignal)
     state: TerminationHandlerState
 
-    def setup(self) -> None:
-        self.state.lock = Lock()
-
-    async def update_state(self, message: FinishedMessage) -> None:
-        with self.state.lock:
-            self.state.num_finished += 1
+    @lg.subscriber(INPUT_EXIT_STREAM)
+    async def on_exit_stream(self, _: ExitSignal) -> None:
+        self.state.signal_received = True
     
-    @lg.subscriber(INPUT0)
-    async def on_finished_0(self, message: FinishedMessage) -> None:
-        await self.update_state(message)
-    
-    @lg.subscriber(INPUT1)
-    async def on_finished_1(self, message: FinishedMessage) -> None:
-        await self.update_state(message)
-    
-    @lg.subscriber(INPUT2)
-    async def on_finished_2(self, message: FinishedMessage) -> None:
-        await self.update_state(message)
-    
-    @lg.subscriber(INPUT3)
-    async def on_finished_3(self, message: FinishedMessage) -> None:
-        await self.update_state(message)
+    @lg.subscriber(INPUT_EXIT_USER)
+    async def on_exit_user(self, _: ExitSignal) -> None:
+        self.state.signal_received = True
     
     @lg.main
     def on_main(self) -> None:
         while True:
-            with self.state.lock:
-                if self.state.num_finished == self.config.num_streams:
-                    break
-            time.sleep(0.5)
+            if self.state.signal_received:
+                break
+            time.sleep(0.1)
         raise lg.NormalTermination
