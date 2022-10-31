@@ -45,19 +45,21 @@ class HandsExtension(PoseVisExtension):
 
     # Called from `FrameProcessor` on each new frame from the stream
     def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
-        mp_results: NormalizedLandmarkList = self.hands.process(frame).multi_hand_landmarks
-        # `multi_hand_landmarks` can be null, so if it is make sure we're working on an empty list
-        if mp_results is None:
-            mp_results = []
+        mp_results = self.hands.process(frame)
         
-        # TODO: document NormalizedLandmarkList
+        # Convert different results to a dict for easier access
+        results = {"multi_hand_landmarks": [], "multi_handedness": []}
+        if mp_results.multi_hand_landmarks is not None:
+            results["multi_hand_landmarks"] = mp_results.multi_hand_landmarks
+        if mp_results.multi_handedness is not None:
+            results["multi_handedness"] = mp_results.multi_handedness
         
-        return ExtensionResult(data = mp_results)
+        return ExtensionResult(data = results)
 
     @classmethod
     def draw_overlay(cls, frame: np.ndarray, result: ExtensionResult) -> None:
         # Draw the detected hand landmarks onto the image
-        for landmark_list in result.data:
+        for landmark_list in result.data["multi_hand_landmarks"]:
             mp_drawing.draw_landmarks(
                 frame,
                 landmark_list,
