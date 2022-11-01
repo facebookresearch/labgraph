@@ -39,7 +39,7 @@ class FaceDetectionExtension(PoseVisExtension):
     def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
         # convert from BGR to RGB
         #? NormalizedDetectionList
-        mp_results = self.face.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).detections 
+        mp_results = self.face.process(frame).detections 
 
         # check if a face detection list is null
         if mp_results is None:

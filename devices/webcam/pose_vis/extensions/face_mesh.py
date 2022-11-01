@@ -38,7 +38,7 @@ class FaceMeshExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
         
-        mp_results = self.face_mesh.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).multi_face_landmarks
+        mp_results = self.face_mesh.process(frame).multi_face_landmarks
 
         if mp_results is None:
             mp_results = []

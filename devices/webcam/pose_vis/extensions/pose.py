@@ -40,7 +40,7 @@ class PoseExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray) -> ExtensionResult:
         
-        result: NormalizedLandmarkList = self.pose.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).pose_landmarks
+        result: NormalizedLandmarkList = self.pose.process(frame).pose_landmarks
 
         if result is None:
             result = []

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # medaiapipe setup
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
-mp_holistic: FaceType = mp.solutions.holisitc
+mp_holistic: HolisticType = mp.solutions.holisitc
 
 class HolisticExtension(PoseVisExtension):
     holistic: Optional[HolisticType.Holistic] #! <-- test this
@@ -38,7 +38,7 @@ class HolisticExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
         
-        result = self.holistic.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        result = self.holistic.process(frame)
         
         face_landmarks = result.face_landmarks
         pose_landmarks = result.pose_landmarks
