@@ -24,7 +24,11 @@ mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
 mp_face_mesh: FaceType = mp.solutions.face_mesh 
 
+# drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+
 class FaceMeshExtension(PoseVisExtension):
+    # drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+
     face_mesh: Optional[FaceType.FaceMesh] 
     
     def register_args(self, parser: ArgumentParser) -> None:
@@ -47,6 +51,8 @@ class FaceMeshExtension(PoseVisExtension):
 
     @classmethod
     def draw_overlay(cls, frame: np.ndarray, result: ExtensionResult):
+        drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+
 
         for landmark_list in result.data:
             mp_drawing.draw_landmarks(
@@ -59,7 +65,7 @@ class FaceMeshExtension(PoseVisExtension):
             mp_drawing.draw_landmarks(
                 frame, 
                 landmark_list,
-                mp_face_mesh.FACEMESH_IRISES,
+                mp_face_mesh.FACEMESH_CONTOURS,
                 None,
                 mp_drawing_styles.get_default_face_mesh_contours_style()
             )
@@ -67,7 +73,7 @@ class FaceMeshExtension(PoseVisExtension):
                 frame, 
                 landmark_list,
                 None,
-                mp_face_mesh.FACEMESH_CONTOURS,
+                mp_face_mesh.FACEMESH_IRISES,
                 mp_drawing_styles.get_default_face_mesh_iris_connections_style()
             )
 
