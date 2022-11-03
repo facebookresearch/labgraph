@@ -27,7 +27,7 @@ mp_face_mesh: FaceType = mp.solutions.face_mesh
 # drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 class FaceMeshExtension(PoseVisExtension):
-    # drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+    drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
     face_mesh: Optional[FaceType.FaceMesh] 
     
@@ -38,7 +38,8 @@ class FaceMeshExtension(PoseVisExtension):
         return args.face_mesh
 
     def setup(self) -> None:
-        self.face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True)
+        # drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+        self.face_mesh = mp_face_mesh.FaceMesh(max_num_faces=1,refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
     def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, ExtensionResult]:
         
@@ -51,7 +52,7 @@ class FaceMeshExtension(PoseVisExtension):
 
     @classmethod
     def draw_overlay(cls, frame: np.ndarray, result: ExtensionResult):
-        drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+        # drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 
         for landmark_list in result.data:
