@@ -1,0 +1,343 @@
+#!/usr/bin/env python3
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+
+# Windows-specific performance tuning
+import os
+
+if os.name == "nt":
+    # Improve sleep timer resolution for this process on Windows
+    # https://learn.microsoft.com/en-us/windows/win32/api/timeapi/nf-timeapi-timebeginperiod
+    import ctypes
+    winmm = ctypes.WinDLL('winmm')
+    winmm.timeBeginPeriod(1)
+
+    # Improve device capture startup time on Windows
+    # https://github.com/opencv/opencv/issues/17687
+    os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+
+import time
+import json
+import logging
+import cv2
+import collections
+import numpy as np
+import argparse as ap
+import math
+
+from pathlib import Path
+from enum import Enum
+from typing import List, Tuple, Any, Deque
+from dataclasses import dataclass
+from google.protobuf.json_format import MessageToDict
+from pose_vis.utils import parse_sources, parse_resolutions
+from pose_vis.utils import absolute_path
+from pose_vis.streams.utils.capture_handler import CaptureHandler
+from pose_vis.display import DisplayHandler
+from pose_vis.extensions.hands import HandsExtension, HandsConfig, mp_hands
+from pose_vis.performance_utility import PerfUtility
+
+logger = logging.getLogger(__name__)
+
+# https://mediapipe.dev/images/mobile/hand_landmarks.png
+# List of landmark indices to measure distances between
+LANDMARK_DTSNACES = [
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.THUMB_TIP),
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.INDEX_FINGER_TIP),
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.MIDDLE_FINGER_TIP),
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.RING_FINGER_TIP),
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.PINKY_TIP),
+    (mp_hands.HandLandmark.THUMB_TIP, mp_hands.HandLandmark.INDEX_FINGER_TIP),
+    (mp_hands.HandLandmark.INDEX_FINGER_TIP, mp_hands.HandLandmark.MIDDLE_FINGER_TIP),
+    (mp_hands.HandLandmark.MIDDLE_FINGER_TIP, mp_hands.HandLandmark.RING_FINGER_TIP),
+    (mp_hands.HandLandmark.RING_FINGER_TIP, mp_hands.HandLandmark.PINKY_TIP)]
+
+# List of landmark indices to measure palm size
+PALM_DISTANCES = [
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.INDEX_FINGER_MCP),
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.MIDDLE_FINGER_MCP),
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.RING_FINGER_MCP),
+    (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.PINKY_MCP)]
+
+# When true, distances are visualized
+DRAW_DEBUG = False
+
+# The maximum difference value to check for when looking for a known pose
+MAX_DIFFERENCE_VALUE = 2.0
+
+class GV_MODE(Enum):
+    VISUALIZATION = 0,
+    LABEL_INPUT = 1,
+    COLLECTION = 2
+
+@dataclass
+class AnnotationInfo():
+    hand_labels: List[str]
+    hand_bounds: List[List[int]]
+    gesture_data: List[np.ndarray]
+    draw: bool
+
+class GestureVis():
+    """
+    Runs hand tracking and gesture recognition for provided sources
+    """
+    sources: List[str | int]
+    resolutions: List[Tuple[int, int, int]]
+    cap_handler: CaptureHandler
+    dis_handler: DisplayHandler
+    perf: PerfUtility
+    annotation_infos: Deque[AnnotationInfo]
+    data_dir: str
+    running: bool = True
+    mode: GV_MODE = GV_MODE.VISUALIZATION
+    label_name: str = ""
+    label_names: List[str] = []
+    label_data: List[np.ndarray] = []
+
+    def __init__(self, sources: List[str | int], resolutions: List[Tuple[int, int, int]], data_dir: str) -> None:
+        self.sources = sources
+        self.resolutions = resolutions
+        self.data_dir = data_dir
+        self.load_data()
+
+    def load_data(self) -> None:
+        """
+        Loads saved pose data
+        """
+        label_names = os.path.join(self.data_dir, "labels.json")
+        if os.path.exists(label_names):
+            with open(label_names, "r") as _file:
+                self.label_names = json.load(_file)
+            
+            np_files = [_file for _file in os.listdir(self.data_dir) if _file.endswith(".npy")]
+            self.label_data = [None] * len(np_files)
+            for _file in np_files:
+                index = int(Path(_file).stem)
+                self.label_data[index] = np.load(os.path.join(self.data_dir, _file))
+    
+    def on_key(self, key: int) -> None:
+        """
+        Input handling, connected to `DisplayHandler->register_key_callback`
+
+        Switches states based on `GV_MODE`
+        """
+        if self.mode == GV_MODE.VISUALIZATION and key == 13:
+            self.mode = GV_MODE.LABEL_INPUT
+        elif self.mode == GV_MODE.LABEL_INPUT:
+            if key == 27:
+                self.mode = GV_MODE.VISUALIZATION
+                self.label_name = ""
+            elif key == 8:
+                self.label_name = self.label_name[:-1]
+            elif key == 13:
+                if len(self.label_name) == 0:
+                    logger.warning(" label is empty")
+                else:
+                    if self.label_name not in self.label_names:
+                        self.label_names.append(self.label_name)
+                        self.label_data.append(np.ndarray(shape = (0, len(LANDMARK_DTSNACES)), dtype = np.float32))
+                    self.mode = GV_MODE.COLLECTION
+            else:
+                character = chr(key)
+                self.label_name += character
+        elif self.mode == GV_MODE.COLLECTION:
+            if key == 27:
+                self.mode = GV_MODE.VISUALIZATION
+                self.label_name = ""
+            elif key == 32:
+                self.save_gesture_keypoints()
+        elif key == 27:
+            self.running = False
+
+    def get_handedness_labels(self, mp_handedness: Any) -> List[str]:
+        """
+        Puts MediaPipe "handedness" labels into a simple list
+        https://google.github.io/mediapipe/solutions/hands.html#multi_handedness
+        """
+        hand_labels: List[str] = [None] * len(mp_handedness)
+        for label_index, classification in enumerate(mp_handedness):
+            _dict = MessageToDict(classification)["classification"][0]
+            hand_labels[label_index] = _dict["label"]
+        return hand_labels
+
+    def get_bounds_data(self, mp_screen_keypoints: Any, mp_world_keypoints: Any, frame: np.ndarray) -> Tuple[List[List[int]], List[np.array]]:
+        """
+        Gets the screen bounds and gesture data for each hand
+        """
+        im_width, im_height = frame.shape[1], frame.shape[0]
+        num_hands = len(mp_screen_keypoints)
+        hand_bounds: List[List[int]] = [None] * num_hands
+        gesture_data: List[np.array] = [np.empty(shape = (len(LANDMARK_DTSNACES)), dtype = np.float32)] * num_hands
+        for hand_index, landmark_list_screen in enumerate(mp_screen_keypoints):
+            landmark_list_screen = landmark_list_screen.landmark
+            landmark_list_world = mp_world_keypoints[hand_index].landmark
+            bounds_array = np.empty((0, 2), int)
+            gesture_distances = np.empty(shape = (len(LANDMARK_DTSNACES)), dtype = np.float32)
+            for landmark in landmark_list_screen:
+                lx = landmark.x
+                ly = landmark.y
+                
+                bx = min(int(lx * im_width), im_width - 1)
+                by = min(int(ly * im_height), im_height - 1)
+                point = [np.array((bx, by))]
+                bounds_array = np.append(bounds_array, point, axis = 0)
+            
+            palm_size = 0.0
+            for landmark_ids in PALM_DISTANCES:
+                lid1 = landmark_ids[0]
+                lid2 = landmark_ids[1]
+                landmark1 = landmark_list_world[lid1]
+                landmark2 = landmark_list_world[lid2]
+                palm_size += math.dist((landmark1.x, landmark1.y), (landmark2.x, landmark2.y))
+            palm_size = palm_size / len(PALM_DISTANCES)
+
+            for ddx, landmark_ids in enumerate(LANDMARK_DTSNACES):
+                lid1 = landmark_ids[0]
+                lid2 = landmark_ids[1]
+                landmark1 = landmark_list_world[lid1]
+                landmark2 = landmark_list_world[lid2]
+
+                dist = math.dist((landmark1.x, landmark1.y), (landmark2.x, landmark2.y)) / palm_size
+                gesture_distances[ddx] = dist
+
+            if DRAW_DEBUG:
+                for ddx, landmark_ids in enumerate(LANDMARK_DTSNACES):
+                    lid1 = landmark_ids[0]
+                    lid2 = landmark_ids[1]
+                    landmark1 = landmark_list_screen[lid1]
+                    landmark2 = landmark_list_screen[lid2]
+
+                    sx1 = min(int(landmark1.x * im_width), im_width - 1)
+                    sy1 = min(int(landmark1.y * im_height), im_height - 1)
+                    cv2.putText(frame, f"({lid1})", (sx1, sy1), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 1, cv2.LINE_AA)
+                    sx2 = min(int(landmark2.x * im_width), im_width - 1)
+                    sy2 = min(int(landmark2.y * im_height), im_height - 1)
+                    cv2.putText(frame, f"({lid2})", (sx2, sy2), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 1, cv2.LINE_AA)
+
+                    cv2.putText(frame, f"({gesture_distances[ddx]:.4f})", ((sx1 + sx2) // 2, (sy1 + sy2) // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1, cv2.LINE_AA)
+                    cv2.line(frame, (sx1, sy1), (sx2, sy2), (192, 192, 192), 1)
+
+            gesture_data[hand_index] = gesture_distances
+
+            x, y, w, h = cv2.boundingRect(bounds_array)
+            hand_bounds[hand_index] = [x, y, x + w, y + h]
+        return (hand_bounds, gesture_data)
+
+    def guess_gesture(self, source_index: int, hand_index: int) -> List[Tuple[int, float]]:
+        """
+        Compares the current pose data to known pose data and ranks the result by the lowest `difference` value
+        """
+        differences: List[Tuple[int, float]] = []
+        for label_id, gesture in enumerate(self.label_data):
+            for i in range(np.ma.size(gesture, axis = 0)):
+                difference = 0.0
+                for j in range(len(gesture[i])):
+                    difference += abs(self.annotation_infos[source_index].gesture_data[hand_index][j] - gesture[i][j])
+                differences.append((label_id, difference))
+        differences.sort(key = lambda x: x[1])
+        return differences
+
+    def draw_hand_annotations(self, source_index: int, frame: np.ndarray) -> None:
+        """
+        Draws the pose label with the lowest `difference` value, if enabled in `AnnotationInfo`
+        """
+        ann_info = self.annotation_infos[source_index]
+        if not ann_info.draw:
+            return
+        for hand_index, bounds in enumerate(ann_info.hand_bounds):
+            label = "?" if len(ann_info.hand_labels) <= hand_index else ann_info.hand_labels[hand_index]
+            classification = "?"
+
+            differences = self.guess_gesture(source_index, hand_index)
+            num_guesses = len(differences)
+            if num_guesses > 0 and differences[0][1] <= MAX_DIFFERENCE_VALUE:
+                classification = self.label_names[differences[0][0]]
+
+            diff_str = f" {differences[0][1]:.2f}" if num_guesses > 0 else ""
+            annotation = f"{label}: {classification}{diff_str}"
+            text_size = cv2.getTextSize(annotation, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)
+            cv2.rectangle(frame, (bounds[0], bounds[1]), (bounds[0] + text_size[0][0] + 2, bounds[1] - text_size[0][1] - 2), (0, 0, 0), -1)
+            cv2.putText(frame, annotation, (bounds[0] + 1, bounds[1] - 1), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
+
+    def save_gesture_keypoints(self) -> None:
+        """
+        Saves labels and gesture data to disk
+        """
+        label_index = self.label_names.index(self.label_name)
+        for ann_info in self.annotation_infos:
+            for gesture_keypoint in ann_info.gesture_data:
+                self.label_data[label_index] = np.append(self.label_data[label_index], [gesture_keypoint], axis = 0)
+        with open(os.path.join(self.data_dir, "labels.json"), "w") as output:
+            output.write(json.dumps(self.label_names))
+        np.save(os.path.join(self.data_dir, f"{label_index}"), self.label_data[label_index])
+
+    def run(self) -> None:
+        """
+        Run GestureVis
+        """
+        # MediaPipe Hands parameters can be found here
+        # https://google.github.io/mediapipe/solutions/hands.html#static_image_mode
+        hands_config = HandsConfig(model_complexity = 1)
+
+        self.cap_handler = CaptureHandler(self.sources, self.resolutions, [HandsExtension(hands_config)])
+        self.dis_handler = DisplayHandler(50, {"HandsExtension": HandsExtension})
+        self.perf = PerfUtility()
+
+        self.dis_handler.register_key_callback(self.on_key)
+        self.dis_handler.register_post_render_callback(self.draw_hand_annotations)
+        self.cap_handler.start_workers()
+        num_sources = len(self.sources)
+        self.annotation_infos = collections.deque(maxlen = num_sources)
+
+        while self.running:
+            self.perf.update_start()
+            results = self.cap_handler.get_captures()
+            captures = [results[i][0] for i in range(num_sources)]
+            extensions = [results[i][1] for i in range(num_sources)]
+
+            for i in range(num_sources):
+                mp_screen_keypoints = extensions[i]["HandsExtension"]["multi_hand_landmarks"]
+                mp_world_keypoints = extensions[i]["HandsExtension"]["multi_hand_world_landmarks"]
+                mp_handedness = extensions[i]["HandsExtension"]["multi_handedness"]
+                
+                hand_labels = self.get_handedness_labels(mp_handedness)
+                
+                capture = captures[i]
+                hand_bounds, gesture_data = self.get_bounds_data(mp_screen_keypoints, mp_world_keypoints, capture.frame)
+
+                self.annotation_infos.append(AnnotationInfo(hand_labels, hand_bounds, gesture_data, self.mode == GV_MODE.VISUALIZATION))
+
+                if self.mode == GV_MODE.LABEL_INPUT:
+                    cv2.putText(capture.frame, "Define or select label: press <esc> to exit", (10, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(capture.frame, f"Specify label name: {self.label_name}_", (10, 24 + (18 * 1)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(capture.frame, f"Defined labels: {self.label_names}", (10, 24 + (18 * 2)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(capture.frame, "Press <Enter> to confirm", (10, 24 + (18 * 3)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                elif self.mode == GV_MODE.COLLECTION:
+                    cv2.putText(capture.frame, "Collect data points: press <esc> to exit", (10, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    label_index = self.label_names.index(self.label_name)
+                    cv2.putText(capture.frame, f"Label: {self.label_name}, index: {label_index}", (10, 24 + (18 * 1)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    num_points = np.ma.size(self.label_data[label_index], axis = 0)
+                    cv2.putText(capture.frame, f"Data points: {num_points}", (10, 24 + (18 * 2)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(capture.frame, "Press <space> to collect data point", (10, 24 + (18 * 3)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+     
+            self.dis_handler.update_frames(captures, extensions)
+            self.dis_handler.update_windows(0)
+            time.sleep(self.perf.get_remaining_sleep_time(self.resolutions[0][2]))
+            self.perf.update_end()
+        self.cleanup()
+
+    def cleanup(self) -> None:
+        self.cap_handler.cleanup()
+        self.dis_handler.cleanup()
+
+parser = ap.ArgumentParser()
+parser.add_argument("--sources", type = str, nargs = "*", help = "which sources to stream (url, device id, video, or image directory)", action = "store", required = False)
+parser.add_argument("--resolutions", type = str, nargs = "*", help = "specify resolution/framerate per stream; format is <stream index or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)", action = "store", required = False)
+default_dir = f"webcam{os.sep}pose_vis{os.sep}gesture{os.sep}hand{os.sep}data"
+parser.add_argument("--data-dir", type = str, nargs = "?", const = default_dir, default = default_dir, help = f"set data directory (default: {default_dir})", action = "store", required = False)
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+
+    sources = parse_sources(args.sources)
+    resolutions = parse_resolutions(len(sources), args.resolutions if args.resolutions is not None else [])
+    GestureVis(sources, resolutions, absolute_path(args.data_dir)).run()

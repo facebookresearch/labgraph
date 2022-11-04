@@ -16,7 +16,7 @@ import argparse as ap
 import pose_vis.extensions
 
 from pose_vis.extension import PoseVisExtension
-from pose_vis.utils import absolute_path
+from pose_vis.utils import parse_sources, parse_resolutions
 from pose_vis.runner import PoseVisConfig
 from pose_vis.runners.source_runner import SourceStreamRunner, SourceStreamRunnerConfig
 from pose_vis.runners.replay_runner import ReplayStreamRunner, ReplayStreamRunnerConfig
@@ -70,31 +70,8 @@ if __name__ == "__main__":
 
     if args.replay is None:
         # Initiate camera streaming
-        sources = []
-        for arg in args.sources:
-            if arg.isdigit():
-                sources.append(int(arg))
-            else:
-                sources.append(absolute_path(arg))
-
-        # Convert 'ID:WxHxFPS' strings into List[Tuple[int, int, int]]
-        default_res = None
-        resolutions = [None] * len(sources)
-        if args.resolutions:
-            for i in range(len(args.resolutions)):
-                colon_split = args.resolutions[i].split(":")
-                x_split = colon_split[1].split("x")
-                stream_id = -1 if colon_split[0] == "*" else int(colon_split[0])
-                resolution = (int(x_split[0]), int(x_split[1]), int(x_split[2]))
-                if stream_id > -1:
-                    resolutions[stream_id] = resolution
-                else:
-                    default_res = resolution
-        if default_res is None:
-            default_res = (1280, 720, 30)
-        for i in range(len(resolutions)):
-            if resolutions[i] is None:
-                resolutions[i] = default_res
+        sources = parse_sources(args.sources)
+        resolutions = parse_resolutions(len(sources), args.resolutions if args.resolutions is not None else [])
 
         # Build and run the graph
         runner_config = SourceStreamRunnerConfig(

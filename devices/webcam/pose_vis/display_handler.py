@@ -5,6 +5,7 @@ import multiprocessing
 import cv2
 import time
 import collections
+import numpy as np
 
 from typing import Callable, List, Dict, Deque, Any
 from pose_vis.extension import PoseVisExtension, ExtensionResult
@@ -18,6 +19,7 @@ class DisplayHandler():
     history_size: int
     extension_types: Dict[str, type]
     key_callbacks: List[Callable[[int], None]]
+    post_render_callbacks: List[Callable[[int, np.ndarray], None]]
     tasks: multiprocessing.JoinableQueue
     results: multiprocessing.Queue
     worker: StatsWorker
@@ -29,6 +31,7 @@ class DisplayHandler():
         self.history_size = history_size
         self.extension_types = extension_types
         self.key_callbacks = []
+        self.post_render_callbacks = []
         if self.history_size > 0:
             self.tasks = multiprocessing.JoinableQueue()
             self.results = multiprocessing.Queue()
@@ -40,6 +43,12 @@ class DisplayHandler():
         Registers a callback to be called on successful `cv2.waitKey()`
         """
         self.key_callbacks.append(method)
+
+    def register_post_render_callback(self, method: Callable[[int, np.ndarray], None]) -> None:
+        """
+        Registers a callback to be called after rendering extension data
+        """
+        self.post_render_callbacks.append(method)
 
     def update_frames(self, captures: List[Capture], extensions: List[Dict[str, Any]]) -> None:
         """
@@ -67,7 +76,7 @@ class DisplayHandler():
         """
         Update CV2 windows and process key presses
 
-        `framerate` is for displaying the current framerate in the window title
+        `framerate` is for displaying the current framerate in the window title. Set to 0 to disable
         """
         if self.history_size > 0:
             res = None
@@ -87,17 +96,18 @@ class DisplayHandler():
                     for key in ext:
                         _type: PoseVisExtension = self.extension_types[key]
                         _type.draw_overlay(frame, ExtensionResult(data = ext[key]))
+                for callback in self.post_render_callbacks:
+                    callback(i, frame)
                 cv2.imshow(title, frame)
 
+                display_info = f"| display: {framerate}fps" if framerate > 0 else ""
                 if self.history_size > 0 and self.stats != None:
                     desync_string = f" desync: {(self.stats.desync[i - 1] * 1000):05.2f}ms," if i > 0 and len(self.stats.desync) > 0 else ""
                     source_info = f": {cap.proc_fps}fps, latency: {(self.stats.latency * 1000):05.2f}ms, jitter: {(self.stats.jitter * 1000):05.2f}ms,{desync_string} dropped: {(100 - self.stats.framedrop):05.2f}%"
-                    display_info = f"display: {framerate}fps"
-                    cv2.setWindowTitle(title, f"{title} {source_info} | {display_info}")
+                    cv2.setWindowTitle(title, f"{title} {source_info} {display_info}")
                 else:
                     source_info = f": {cap.proc_fps}fps"
-                    display_info = f"display: {framerate}fps"
-                    cv2.setWindowTitle(title, f"{title} {source_info} | {display_info}")
+                    cv2.setWindowTitle(title, f"{title} {source_info} {display_info}")
 
         key = cv2.waitKey(1)
         if key != -1:
