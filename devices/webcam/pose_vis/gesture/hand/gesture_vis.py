@@ -3,7 +3,6 @@
 
 # Windows-specific performance tuning
 import os
-
 if os.name == "nt":
     # Improve sleep timer resolution for this process on Windows
     # https://learn.microsoft.com/en-us/windows/win32/api/timeapi/nf-timeapi-timebeginperiod
@@ -31,7 +30,7 @@ from dataclasses import dataclass
 from google.protobuf.json_format import MessageToDict
 from pose_vis.utils import parse_sources, parse_resolutions
 from pose_vis.utils import absolute_path
-from pose_vis.streams.utils.capture_handler import CaptureHandler
+from pose_vis.streams.utils.capture_handler import CaptureHandler, AllCapturesFinished
 from pose_vis.display import DisplayHandler
 from pose_vis.extensions.hands import HandsExtension, HandsConfig, mp_hands
 from pose_vis.performance_utility import PerfUtility
@@ -40,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 # https://mediapipe.dev/images/mobile/hand_landmarks.png
 # List of landmark indices to measure distances between
-LANDMARK_DTSNACES = [
+LANDMARK_DISTANCES = [
     (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.THUMB_TIP),
     (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.INDEX_FINGER_TIP),
     (mp_hands.HandLandmark.WRIST, mp_hands.HandLandmark.MIDDLE_FINGER_TIP),
@@ -50,6 +49,13 @@ LANDMARK_DTSNACES = [
     (mp_hands.HandLandmark.INDEX_FINGER_TIP, mp_hands.HandLandmark.MIDDLE_FINGER_TIP),
     (mp_hands.HandLandmark.MIDDLE_FINGER_TIP, mp_hands.HandLandmark.RING_FINGER_TIP),
     (mp_hands.HandLandmark.RING_FINGER_TIP, mp_hands.HandLandmark.PINKY_TIP)]
+
+LANDMARK_DIRECTIONS = [
+    (mp_hands.HandLandmark.THUMB_TIP, mp_hands.HandLandmark.WRIST),
+    (mp_hands.HandLandmark.INDEX_FINGER_TIP, mp_hands.HandLandmark.WRIST),
+    (mp_hands.HandLandmark.MIDDLE_FINGER_TIP, mp_hands.HandLandmark.WRIST),
+    (mp_hands.HandLandmark.RING_FINGER_TIP, mp_hands.HandLandmark.WRIST),
+    (mp_hands.HandLandmark.PINKY_TIP, mp_hands.HandLandmark.WRIST)]
 
 # List of landmark indices to measure palm size
 PALM_DISTANCES = [
@@ -62,7 +68,7 @@ PALM_DISTANCES = [
 DRAW_DEBUG = False
 
 # The maximum difference value to check for when looking for a known pose
-MAX_DIFFERENCE_VALUE = 2.0
+MAX_DIFFERENCE_VALUE = 3
 
 class GV_MODE(Enum):
     VISUALIZATION = 0,
@@ -87,16 +93,24 @@ class GestureVis():
     perf: PerfUtility
     annotation_infos: Deque[AnnotationInfo]
     data_dir: str
+    export_files: List[str]
+    export_format: str
     running: bool = True
     mode: GV_MODE = GV_MODE.VISUALIZATION
     label_name: str = ""
     label_names: List[str] = []
     label_data: List[np.ndarray] = []
+    video_writers: List[cv2.VideoWriter]
 
-    def __init__(self, sources: List[str | int], resolutions: List[Tuple[int, int, int]], data_dir: str) -> None:
+    def __init__(self, sources: List[str | int], resolutions: List[Tuple[int, int, int]], data_dir: str, export_files: List[str], export_format: str) -> None:
         self.sources = sources
         self.resolutions = resolutions
         self.data_dir = data_dir
+        self.export_files = export_files
+        self.export_format = export_format
+        self.video_writers = []
+        for i in range(len(export_files)):
+            self.video_writers.append(cv2.VideoWriter(self.export_files[i], cv2.VideoWriter_fourcc(*self.export_format), self.resolutions[i][2], (self.resolutions[i][0], self.resolutions[i][1])))
         self.load_data()
 
     def load_data(self) -> None:
@@ -109,7 +123,7 @@ class GestureVis():
                 self.label_names = json.load(_file)
             
             np_files = [_file for _file in os.listdir(self.data_dir) if _file.endswith(".npy")]
-            self.label_data = [None] * len(np_files)
+            self.label_data = [np.empty(shape = (0, len(LANDMARK_DISTANCES) + (len(LANDMARK_DIRECTIONS) * 3)), dtype = np.float32)] * len(label_names)
             for _file in np_files:
                 index = int(Path(_file).stem)
                 self.label_data[index] = np.load(os.path.join(self.data_dir, _file))
@@ -134,7 +148,7 @@ class GestureVis():
                 else:
                     if self.label_name not in self.label_names:
                         self.label_names.append(self.label_name)
-                        self.label_data.append(np.ndarray(shape = (0, len(LANDMARK_DTSNACES)), dtype = np.float32))
+                        self.label_data.append(np.ndarray(shape = (0, len(LANDMARK_DISTANCES) + (len(LANDMARK_DIRECTIONS) * 3)), dtype = np.float32))
                     self.mode = GV_MODE.COLLECTION
             else:
                 character = chr(key)
@@ -166,12 +180,12 @@ class GestureVis():
         im_width, im_height = frame.shape[1], frame.shape[0]
         num_hands = len(mp_screen_keypoints)
         hand_bounds: List[List[int]] = [None] * num_hands
-        gesture_data: List[np.array] = [np.empty(shape = (len(LANDMARK_DTSNACES)), dtype = np.float32)] * num_hands
+        gesture_data: List[np.array] = [np.empty(shape = (len(LANDMARK_DISTANCES) + (len(LANDMARK_DIRECTIONS) * 3)), dtype = np.float32)] * num_hands
         for hand_index, landmark_list_screen in enumerate(mp_screen_keypoints):
             landmark_list_screen = landmark_list_screen.landmark
             landmark_list_world = mp_world_keypoints[hand_index].landmark
             bounds_array = np.empty((0, 2), int)
-            gesture_distances = np.empty(shape = (len(LANDMARK_DTSNACES)), dtype = np.float32)
+            gesture_distances = np.empty(shape = (len(LANDMARK_DISTANCES) + (len(LANDMARK_DIRECTIONS) * 3)), dtype = np.float32)
             for landmark in landmark_list_screen:
                 lx = landmark.x
                 ly = landmark.y
@@ -187,20 +201,33 @@ class GestureVis():
                 lid2 = landmark_ids[1]
                 landmark1 = landmark_list_world[lid1]
                 landmark2 = landmark_list_world[lid2]
-                palm_size += math.dist((landmark1.x, landmark1.y), (landmark2.x, landmark2.y))
+                palm_size += math.dist((landmark1.x, landmark1.y, landmark1.z), (landmark2.x, landmark2.y, landmark2.z))
             palm_size = palm_size / len(PALM_DISTANCES)
 
-            for ddx, landmark_ids in enumerate(LANDMARK_DTSNACES):
+            for ddx, landmark_ids in enumerate(LANDMARK_DISTANCES):
                 lid1 = landmark_ids[0]
                 lid2 = landmark_ids[1]
                 landmark1 = landmark_list_world[lid1]
                 landmark2 = landmark_list_world[lid2]
 
-                dist = math.dist((landmark1.x, landmark1.y), (landmark2.x, landmark2.y)) / palm_size
+                dist = math.dist((landmark1.x, landmark1.y, landmark1.z), (landmark2.x, landmark2.y, landmark2.z)) / palm_size
                 gesture_distances[ddx] = dist
 
+            dir_index = 0
+            for landmark_ids in LANDMARK_DIRECTIONS:
+                lid1 = landmark_ids[0]
+                lid2 = landmark_ids[1]
+                landmark1 = landmark_list_world[lid1]
+                landmark2 = landmark_list_world[lid2]
+                direction = np.asarray((landmark1.x - landmark2.x, landmark1.y - landmark2.y, landmark1.z - landmark2.z))
+                direction = direction / np.linalg.norm(direction)
+                gesture_distances[len(LANDMARK_DISTANCES) + dir_index] = direction[0]
+                gesture_distances[len(LANDMARK_DISTANCES) + dir_index + 1] = direction[1]
+                gesture_distances[len(LANDMARK_DISTANCES) + dir_index + 2] = direction[2]
+                dir_index += 3
+
             if DRAW_DEBUG:
-                for ddx, landmark_ids in enumerate(LANDMARK_DTSNACES):
+                for ddx, landmark_ids in enumerate(LANDMARK_DISTANCES):
                     lid1 = landmark_ids[0]
                     lid2 = landmark_ids[1]
                     landmark1 = landmark_list_screen[lid1]
@@ -257,6 +284,9 @@ class GestureVis():
             text_size = cv2.getTextSize(annotation, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)
             cv2.rectangle(frame, (bounds[0], bounds[1]), (bounds[0] + text_size[0][0] + 2, bounds[1] - text_size[0][1] - 2), (0, 0, 0), -1)
             cv2.putText(frame, annotation, (bounds[0] + 1, bounds[1] - 1), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
+        
+        if len(self.video_writers) > 0:
+            self.video_writers[source_index].write(frame)
 
     def save_gesture_keypoints(self) -> None:
         """
@@ -276,7 +306,7 @@ class GestureVis():
         """
         # MediaPipe Hands parameters can be found here
         # https://google.github.io/mediapipe/solutions/hands.html#static_image_mode
-        hands_config = HandsConfig(model_complexity = 1)
+        hands_config = HandsConfig(model_complexity = 0)
 
         self.cap_handler = CaptureHandler(self.sources, self.resolutions, [HandsExtension(hands_config)])
         self.dis_handler = DisplayHandler(50, {"HandsExtension": HandsExtension})
@@ -290,7 +320,14 @@ class GestureVis():
 
         while self.running:
             self.perf.update_start()
-            results = self.cap_handler.get_captures()
+
+            results = None
+            try:
+                results = self.cap_handler.get_captures()
+            except AllCapturesFinished:
+                self.running = False
+                logger.info(" capture sources have finished playing, exiting")
+                continue
             captures = [results[i][0] for i in range(num_sources)]
             extensions = [results[i][1] for i in range(num_sources)]
 
@@ -321,6 +358,7 @@ class GestureVis():
      
             self.dis_handler.update_frames(captures, extensions)
             self.dis_handler.update_windows(0)
+
             time.sleep(self.perf.get_remaining_sleep_time(self.resolutions[0][2]))
             self.perf.update_end()
         self.cleanup()
@@ -328,16 +366,25 @@ class GestureVis():
     def cleanup(self) -> None:
         self.cap_handler.cleanup()
         self.dis_handler.cleanup()
+        for writer in self.video_writers:
+            writer.release()
 
 parser = ap.ArgumentParser()
 parser.add_argument("--sources", type = str, nargs = "*", help = "which sources to stream (url, device id, video, or image directory)", action = "store", required = False)
 parser.add_argument("--resolutions", type = str, nargs = "*", help = "specify resolution/framerate per stream; format is <stream index or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)", action = "store", required = False)
 default_dir = f"webcam{os.sep}pose_vis{os.sep}gesture{os.sep}hand{os.sep}data"
 parser.add_argument("--data-dir", type = str, nargs = "?", const = default_dir, default = default_dir, help = f"set data directory (default: {default_dir})", action = "store", required = False)
+parser.add_argument("--export", type = str, nargs = "*", help = "export annotated stream as video file", action = "store", required = False)
+parser.add_argument("--export-format", type = str, nargs = "?", const = "MP4V", default = "MP4V", help = "format to write exported video in (default: H264)", action = "store", required = False)
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
     sources = parse_sources(args.sources)
     resolutions = parse_resolutions(len(sources), args.resolutions if args.resolutions is not None else [])
-    GestureVis(sources, resolutions, absolute_path(args.data_dir)).run()
+    export_files = []
+    if args.export is not None:
+        for _file in args.export:
+            export_files.append(absolute_path(_file))
+    print(export_files)
+    GestureVis(sources, resolutions, absolute_path(args.data_dir), export_files, args.export_format).run()

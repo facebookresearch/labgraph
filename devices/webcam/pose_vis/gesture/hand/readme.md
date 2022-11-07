@@ -8,13 +8,13 @@ This script takes the the [world hand landmarks](https://google.github.io/mediap
 
 To overcome different camera properties, left or right handedness, and hand sizes, a "palm size" variable is estimated by taking the average distance from the wrist (landmark 0) and the knuckles (landmarks 5, 9, 13, and 17).
 
-A pose is created by measuring the distance between the wrist and each finger tip, plus the distances between each fingertip. Each distance is normalized with the palm size.
+A pose is created by measuring the distance between the wrist and each finger tip, plus the distances between each fingertip. Each distance is normalized with the palm size. Additionally, the direction between each finger tip and the wrist is taken.
 
 ![Debug View](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/pose_vis/gesture/hand/docs/images/debug_drawing.png)
 
 For estimation, a "difference" value is estimated by comparing each unknown pose's keypoint distance to known pose keypoints, the lowest "difference" value wins.
 
-There's a few caveats and room for improvement: hand rotation is not taken into account, and the estimation algorithm will always check every pose and rank them via sorting by the lowest "difference" value, every frame. Distances seem to change based on where the hand is in the frame, but this can be alleviated by having multiple data points for a particular pose. It also becomes difficult to distinguish between similar poses when only a few variables seperate their states: think a fist pose versus a thumps up pose.
+There's a few caveats and room for improvement: the estimation algorithm will always check every pose and rank them via sorting by the lowest "difference" value, every frame. Distances seem to change based on where the hand is in the frame, but this can be alleviated by having multiple data points for a particular pose. Some poses may benefit from finer tuned estimation, such as ignoring directional tracking.
 
 ## Running
 
@@ -29,6 +29,17 @@ Run with:
 ```
 python -m pose_vis.gesture.hand.gesture_vis --sources 0
 ```
+
+Exporting videos:
+```
+python -m pose_vis.gesture.hand.gesture_vis --sources test_video.mp4 --resolutions *:1920x1080x30 --export test_video_annotated.mp4
+```
+
+You may specify a codec with:
+```
+python -m pose_vis.gesture.hand.gesture_vis ... --export-format h264
+```
+Codec codes can be found [here](https://learn.microsoft.com/en-us/windows/win32/medfound/video-fourccs).
 
 ## Adding Poses
 
