@@ -93,4 +93,34 @@ class AnnotationInfo():
     draw: bool
 
 class PoseGestureVis():
-    pass
+    
+    sources: List[str | int]
+    resolutions: List[Tuple[int, int, int]]
+    cap_handler: CaptureHandler
+    dis_handler: DisplayHandler
+    perf: PerfUtility
+    annotation_infos: Deque[AnnotationInfo]
+    data_dir: str
+    export_files: List[str]
+    export_format: str
+    running: bool = True
+    mode: GV_MODE = GV_MODE.VISUALIZATION
+    label_name: str = ""
+    label_names: List[str] = []
+    label_data: List[np.ndarray] = []
+    video_writers: List[cv2.VideoWriter]
+
+    # ! Test this
+    def __init__(self, sources: List[str | int], resolutions: List[Tuple[int, int, int]], data_dir: str, export_files: List[str], export_format: str) -> None:
+        self.sources = sources
+        self.resolutions = resolutions
+        self.data_dir = data_dir
+        self.export_files = export_files
+        self.export_format = export_format
+        self.video_writers = []
+        for i in range(len(export_files)):
+            self.video_writers.append(cv2.VideoWriter(self.export_files[i], cv2.VideoWriter_fourcc(*self.export_format), self.resolutions[i][2], (self.resolutions[i][0], self.resolutions[i][1])))
+        self.load_data()
+
+    def load_data(self):
+        pass
