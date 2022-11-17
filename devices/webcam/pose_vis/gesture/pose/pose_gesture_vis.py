@@ -123,4 +123,19 @@ class PoseGestureVis():
         self.load_data()
 
     def load_data(self):
+        label_names = os.path.join(self.data_dir, "labels.json")
+
+        if os.path.exists(label_names):
+            with open(label_names, 'r') as _file:
+                self.label_names = json.load(_file)
+
+            np_files = [_file for _file in os.listdir(self.data_dir) if _file.endswith('.npy')]
+            self.label_data = [np.empty(shape=(0, len(LANDMARK_DISTANCE) + (len(LANDMARK_DIRECTION) * 3)), dtype=np.float32)] * len(label_names) #! Go over this
+
+            for _file in np_files:
+                index = int(path(_file).stem)
+                self.label_data[index] = np.load(os.path.join(self.data_sir, _file))
+
+
+    def on_key(self, key: int):
         pass
