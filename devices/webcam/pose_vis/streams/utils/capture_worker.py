@@ -13,6 +13,7 @@ from typing import List, Tuple, Union, Optional, Any
 from pose_vis.streams.messages import Capture
 from pose_vis.extension import PoseVisExtension
 from pose_vis.performance_utility import PerfUtility
+from pose_vis.utils import is_path
 
 # https://docs.opencv.org/4.2.0/d4/da8/group__imgcodecs.html#ga288b8b3da0892bd651fce07b3bbd3a56
 SUPPORTED_IMG_EXTENSIONS = [".bmp", ".jpeg", ".jpg", ".png", ".webp"]
@@ -49,7 +50,6 @@ class CaptureWorker(multiprocessing.Process):
         self.perf = PerfUtility()
 
         self.shared_mem = shared_memory.SharedMemory(name = f"pv_worker_{self.worker_number}")
-
         self.blank_frame = np.zeros(shape = (self.resolution[1], self.resolution[0], 3), dtype = np.uint8)
         
         self.open_capture()
@@ -60,21 +60,27 @@ class CaptureWorker(multiprocessing.Process):
         logger.info(f" worker {self.worker_number}: started")
 
     def open_capture(self) -> None:
-        if isinstance(self.cap_source, int) or os.path.isfile(self.cap_source):
-            logger.info(f" opening source {self.cap_source}")
-            self.capture = cv2.VideoCapture(self.cap_source)
+        if isinstance(self.cap_source, int) or os.path.isfile(self.cap_source) or self.cap_source.find(" ! ") > -1:
+            logger.info(f" opening source [{self.cap_source}]")
+
+            backend = cv2.CAP_MSMF if os.name == "nt" else cv2.CAP_V4L2
+            if isinstance(self.cap_source, str):
+                if not is_path(self.cap_source):
+                    backend = cv2.CAP_GSTREAMER
+
+            self.capture = cv2.VideoCapture(self.cap_source, backend)
 
             if self.capture.isOpened():
-                self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution[0])
-                self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, self.resolution[1])
-                self.capture.set(cv2.CAP_PROP_FPS, self.resolution[2])
-                self.capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
-                self.capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-                self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
-                self.capture.set(cv2.CAP_PROP_CONVERT_RGB, 1)
-                logger.info(f" source {self.cap_source} opened and configured")
+                if backend != cv2.CAP_GSTREAMER:
+                    self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution[0])
+                    self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, self.resolution[1])
+                    self.capture.set(cv2.CAP_PROP_FPS, self.resolution[2])
+                    self.capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
+                    self.capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+                    self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
+                logger.info(f" source [{self.cap_source}] opened with backend: {self.capture.getBackendName()}")
             else:
-                logger.warning(f" source {self.cap_source} does not exist")
+                logger.warning(f" source [{self.cap_source}] could not be opened")
         
         else:
             logger.info(f" opening directory: {self.cap_source}")
@@ -95,8 +101,7 @@ class CaptureWorker(multiprocessing.Process):
                 if isinstance(self.cap_source, str):
                     if frame.shape != (self.resolution[1], self.resolution[0], 3):
                         frame = cv2.resize(frame, (self.resolution[0], self.resolution[1]), interpolation = cv2.INTER_NEAREST)
-                else:
-                    frame = cv2.flip(frame, 1)
+                frame = cv2.cvtColor(cv2.flip(frame, 1), cv2.COLOR_BGR2RGB)
 
                 frame.flags.writeable = False
                 self.frame_index += 1
@@ -119,7 +124,7 @@ class CaptureWorker(multiprocessing.Process):
     def cleanup(self) -> None:
         if self.capture is not None and self.capture.isOpened():
             self.capture.release()
-            logger.info(f" source {self.cap_source} released")
+            logger.info(f" source [{self.cap_source}] released")
         logger.info(f" worker {self.worker_number}: shutting down")
         for ext in self.extensions:
             ext.cleanup()
