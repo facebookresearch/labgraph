@@ -13,7 +13,7 @@ import cProfile
 import pstats
 import logging
 import argparse as ap
-#import pose_vis.extensions
+import pose_vis.extensions
 
 from pose_vis.extension import PoseVisExtension
 from pose_vis.utils import parse_sources, parse_resolutions
