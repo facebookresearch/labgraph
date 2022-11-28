@@ -64,18 +64,18 @@ class FaceMeshExtension(PoseVisExtension):
                 mp_drawing_styles.get_default_face_mesh_tesselation_style()
             )
             mp_drawing.draw_landmarks(
-                frame, 
-                landmark_list,
-                mp_face_mesh.FACEMESH_CONTOURS,
-                None,
-                mp_drawing_styles.get_default_face_mesh_contours_style()
+                image = frame,
+                landmark_list = landmark_list,
+                connections = mp_face_mesh.FACEMESH_CONTOURS,
+                landmark_drawing_spec = None,
+                connection_drawing_spec = mp_drawing_styles.get_default_face_mesh_contours_style()
             )
             mp_drawing.draw_landmarks(
-                frame, 
-                landmark_list,
-                None,
-                mp_face_mesh.FACEMESH_IRISES,
-                mp_drawing_styles.get_default_face_mesh_iris_connections_style()
+                image = frame, 
+                landmark_list = landmark_list,
+                connections = mp_face_mesh.FACEMESH_IRISES,
+                landmark_drawing_spec = None,
+                connection_drawing_spec = mp_drawing_styles.get_default_face_mesh_iris_connections_style()
             )
 
 

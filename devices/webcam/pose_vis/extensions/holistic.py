@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # medaiapipe setup
 mp_drawing: DrawingUtilsType = mp.solutions.drawing_utils
 mp_drawing_styles: DrawingStylesType = mp.solutions.drawing_styles
-mp_holistic: HolisticType = mp.solutions.holisitc
+mp_holistic: HolisticType = mp.solutions.holistic
 
 class HolisticExtension(PoseVisExtension):
     holistic: Optional[HolisticType.Holistic] #! <-- test this

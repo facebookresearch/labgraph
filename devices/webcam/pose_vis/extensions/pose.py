@@ -62,26 +62,29 @@ class PoseExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray) -> ExtensionResult:
         
-        result = self.pose.process(frame)
+        result = self.pose.process(frame).pose_landmarks
 
-        results = {"pose_landmarks": []}
+        if result is None:
+            result = []
 
-        if result.pose_landmarks is not None:
-            results["pose_landmarks"] = result.pose_landmarks
+        # results = {"pose_landmarks": []}
+
+        # if result.pose_landmarks is not None:
+        #     results["pose_landmarks"] = result.pose_landmarks
         
-        return ExtensionResult(data=results)
+        return ExtensionResult(data=result)
 
 
     @classmethod
     def draw_overlay(cls, frame: np.ndarray, result: ExtensionResult):
 
-        for pose_landmark_list in result.data["pose_landmarks"]:
-            mp_drawing.draw_landmarks(
-                frame, 
-                pose_landmark_list,
-                mp_pose.POSE_CONNECTIONS,
-                mp_drawing_styles.get_default_pose_landmarks_style()
-            )
+        # for pose_landmark_list in result.data["pose_landmarks"]:
+        mp_drawing.draw_landmarks(
+            frame, 
+            result.data,
+            mp_pose.POSE_CONNECTIONS,
+            mp_drawing_styles.get_default_pose_landmarks_style()
+        )
 
     @classmethod
     def check_output(cls, result: ExtensionResult):
