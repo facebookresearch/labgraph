@@ -6,6 +6,7 @@ from setuptools import find_packages, setup
 
 # Use LabGraph 2.0.0 on Windows due to a package installation error
 install_requires = ["labgraph==2.0.0"] if os.name == "nt" else ["labgraph>=2.0.1"]
+# More information on MediaPipe installation can be found here: https://google.github.io/mediapipe/getting_started/install.html
 install_requires.extend(["opencv-python>=4.6.0", "mediapipe>=0.8.11"])
 
 setup(
