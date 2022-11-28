@@ -1,106 +1,73 @@
 # PoseVis
 
-PoseVis is a multi-camera streaming and visualization framework built upon LabGraph. PoseVis was built with modularity in mind and can be extended to many downstream applications relatively easily through its extension system and logging support.
+PoseVis is a LabGraph extension that streams any number of video sources and generates pose landmark data from [MediaPipe](https://google.github.io/mediapipe/) for each stream independently. MediaPipe [Hands](https://google.github.io/mediapipe/solutions/hands.html), [Face Mesh](https://google.github.io/mediapipe/solutions/face_mesh.html), [Pose](https://google.github.io/mediapipe/solutions/pose.html), and [Holistic](https://google.github.io/mediapipe/solutions/holistic.html) solutions are supported. PoseVis supports data logging and replaying via the [HDF5](https://www.hdfgroup.org/solutions/hdf5/) format. See [Using PoseVis](#using-posevis) for details.
 
 [Usage preview](https://i.imgur.com/FMYIy9r.mp4)
 
-## Concepts
+PoseVis can also support other image processing tasks through its extension system. Take a look at the [hands extension](pose_vis/extensions/hands.py) for an example.
 
-### Overview
+# Installation
 
-PoseVis 
+PoseVis uses [OpenCV](https://opencv.org/) to handle video streams. Out of the box, PoseVis streams camera, video file, and image directory sources from the `MSMF` backend in Windows, and `V4L2` backend in Linux, with the MJPEG format ([see OpenCV backends here](https://docs.opencv.org/3.4/d0/da7/videoio_overview.html)). This configuration should be supported by most [UVC](https://en.wikipedia.org/wiki/USB_video_device_class) devices. Further source stream customization can be achieved by installing [GStreamer](https://gstreamer.freedesktop.org/); steps are detailed below.
 
-PoseVis streams any number of webcams, video files, or image directories and their generated extension data via the `CaptureResult` message (`pose_vis/streams/messages.py`). Included extensions are MediaPipe hand pose, face mesh, body pose, and holistic solutions for real-time pose tracking within LabGraph.
+## PoseVis General Setup
 
-The stream is initialized by a corresponding `PoseVisRunner` class that takes care of graph initialization. The `PoseVis` graph is based off of the `DynamicGraph` class, which allows us to build a graph based on run-time parameters. You can connect `CaptureResult` subscribers to the `STREAM/OUTPUT` producer in the `PoseVis` graph (`pose_vis/pose_vis_graph.py`)
+Requires Python 3.8 or later. Run `setup.py` to install required packages from PyPi:
 
-Each video source is handled in its own process within the `CaptureHandler` class. When a frame needs to be requested, the source processes are notified, grab a new frame, perform processing provided by enabled extensions, and put the result into a shared memory buffer. Once each source is finished, `CaptureHandler` compiles the `CaptureResult` message and publishes it. This keeps performance reasonable, and streams synchronized in time.
+	python setup.py install
 
-You may optionally enable a `Display` node that displays overlayed frames and performance statistics for real-time feedback.
+See [Using PoseVis](#using-posevis) for usage details.
 
-## Usage
+## GStreamer Support (Optional)
 
-Requires Python 3.8 or later
+[GStreamer](https://gstreamer.freedesktop.org/) is a multimedia framework that allows you to create your own media pipelines with a simple string input. If you need more flexibility than a simple MJPEG stream, you can install GStreamer using the steps below.
 
-Make sure to install:
+### Example GStreamer Configurations
 
-```
-cd devices/webcam
-python setup.py install
-```
+PoseVis expects color formats from GStreamer to be in the `BGR` color space, and OpenCV requires the use of [appsink](https://gstreamer.freedesktop.org/documentation/app/appsink.html?gi-language=c).
 
-### Command Line
+Creating a test source: this configuration creates the [videotestsrc](https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c) element and configures a 720p @ 30Hz stream in BGR.
+
+    python -m pose_vis.pose_vis --sources "videotestsrc ! video/x-raw, width=1280, height=720, framerate=30/1, format=BGR ! appsink"
+
+Creating a device source in Linux: this configuration captures an MJPEG stream at 720p @ 30Hz from a [V4L2 device](https://gstreamer.freedesktop.org/documentation/video4linux2/v4l2src.html?gi-language=c) and [converts](https://gstreamer.freedesktop.org/documentation/videoconvertscale/videoconvert.html?gi-language=c) the image format into raw BGR.
+
+    python -m pose_vis.pose_vis --sources "v4l2src device=/dev/video0 ! image/jpeg, width=1280, height=720, framerate=30/1 ! jpegparse ! jpegdec ! videoconvert ! video/x-raw, format=BGR ! appsink"
+
+You can also specify [per-camera configurations](https://gstreamer.freedesktop.org/documentation/video4linux2/v4l2src.html?gi-language=c#v4l2src:extra-controls):
+
+    ... --sources "v4l2src device=/dev/video0 extra-controls='c, exposure_auto=1' ...
+
+### Windows GStreamer Support
+
+Follow the [Windows GStreamer guide](windows_gstreamer.md).
+
+### Linux GStreamer Support
+
+Follow the [Linux GStreamer guide](linux_gstreamer.md).
+
+## Performance
+
+Performance is crucial for real time applications. Check the [benchmark notebook](benchmark.ipynb) example for performance metrics, including details of the system used for benchmarking. You can also run the notebook on your system to get an idea of how PoseVis will perform.
+
+## Using PoseVis
+
+### Test PoseVis via Command Line
 
 Check usage details:
 
-```
-python -m pose_vis.pose_vis --help
-```
+	python -m pose_vis.pose_vis --help
 
-<details>
-  <summary>Help Output</summary>
-    
-    usage: pose_vis.py [-h] [--sources [SOURCES ...]] [--resolutions [RESOLUTIONS ...]] [--replay REPLAY] [--display-framerate [DISPLAY_FRAMERATE]] [--stats-history-size [STATS_HISTORY_SIZE]] [--logging] [--log-dir [LOG_DIR]]
-                    [--log-name LOG_NAME] [--profile] [--hands] [--face_detection] [--face_mesh]
+### Using PoseVis in Your Project
 
-    options:
-    -h, --help            show this help message and exit
-    --sources [SOURCES ...]
-                            which sources to stream (url, device id, video, or image directory)
-    --resolutions [RESOLUTIONS ...]
-                            specify resolution/framerate per stream; format is <stream index or * for all>:<W>x<H>x<FPS> (default *:1280x720x30)
-    --replay REPLAY       replay a log file (default: none)
-    --display-framerate [DISPLAY_FRAMERATE]
-                            specify update rate for video stream presentation; seperate from stream framerate (default: 60)
-    --stats-history-size [STATS_HISTORY_SIZE]
-                            how many frames to base performance metrics on, 0 to disable (default: 50)
-    --logging             enable logging (default: false)
-    --log-dir [LOG_DIR]   set log directory (default: webcam\logs)
-    --log-name LOG_NAME   set log name (default: random)
-    --profile             enable profiling with cProfile *source streaming only (default: false)
-    --hands               enable the hand tracking extension
-    --face_detection      enable the face detection extension
-    --face_mesh           enable face mesh extension
-    
-</details>
+Check the [usage guide](using_posevis.md) for an in-depth overview of the concepts used in PoseVis and how to hook into its LabGraph topics.
 
-<details>
-  <summary>Console Usage Examples</summary>
+### PoseVis Usage Examples
 
-Run device 0 with hand tracking:
+#### GestureVis
 
-    python -m pose_vis.pose_vis --sources 0 --hands
+GestureVis uses data from the MediaPipe hand and body pose extensions to guess the current gesture based on a list of known gestures and draws the appropriate annotations onto the video stream, both online and offline. Check out the hands version [here](pose_vis/gesture/hand/readme.md) and body pose version [here](pose_vis/gesture/pose/readme.md).
 
-Enable HDF5 logging:
+#### Logging Example
 
-    python -m pose_vis.pose_vis --sources 0 --hands --logging --log-name example
-
-Replay the log:
-
-    python -m pose_vis.pose_vis --replay example
-
-Specify resolutions:
-
-    python -m pose_vis.pose_vis --sources 0 1 --resolutions 0:1280x720x30 1:1920x1080x30 --hands
-
-</details>
-
-### As a Module
-
-See [this Jupyter Notebook example](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/logging_example.ipynb) for PoseVis usage as a module.
-
-## Reading Logs (HDF5)
-
-For an example of logging output, check `logging_example.ipynb` [(link)](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/logging_example.ipynb).
-
-You can download the log generated in this example [here](https://drive.google.com/file/d/1cHRDBZ4MHOtYnL5K4VNRLouZmu9Ux0s4/view?usp=sharing).
-
-## Data Quality
-
-PoseVis performance can be tracked via the example in `benchmark.ipynb` [(link)](https://github.com/Dasfaust/labgraph/blob/hand_tracking/devices/webcam/benchmark.ipynb). This example runs a headless graph, captures process timings into a JSON file, and examines the output to produce metrics such as dropped frames, latency, desync between sources, and jitter.
-
-Data quality may also be observed in real time by running PoseVis on the command line:
-
-```
-python -m pose_vis.pose_vis --sources 0 --display-framrate 60 --stats-history-size 50
-```
+The [logging example](logging_example.ipynb) notebook shows a simple way to use HDF5 logging with PoseVis.

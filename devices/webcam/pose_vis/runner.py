@@ -21,11 +21,12 @@ class PoseVisConfig():
     Config for `PoseVisRunner` parent class
 
     Attributes:
-        `extensions`: `List[PoseVisExtension]`
-        `log_directory`: `str`
-        `log_name`: `Optional[str]`
-        `enable_logging`: `bool`
-        `display_framerate`: `int`
+        `extensions`: `List[PoseVisExtension]` list of extensions to enable
+        `log_directory`: `str` directory to save log files
+        `log_name`: `Optional[str]` name of log file (random if None)
+        `enable_logging`: `bool` enable logging or not
+        `display_framerate`: `int` how fast to run display windows (0 to disable)
+        `stats_history_size`: `int` how many frames to keep track of for performance tracking (0 to disable) this is not enabled if `display_framerate` is 0
     """
     extensions: List[PoseVisExtension]
     log_directory: str

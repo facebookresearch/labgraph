@@ -90,7 +90,7 @@ class DisplayHandler():
             for i in range(len(self.captures)):
                 cap: Capture = self.captures[i]
                 title = f"PoseVis source {cap.stream_id}"
-                frame = cap.frame.copy()
+                frame = cv2.cvtColor(cap.frame.copy(), cv2.COLOR_RGB2BGR)
                 if len(self.extensions) > 0:
                     ext = self.extensions[i]
                     for key in ext:

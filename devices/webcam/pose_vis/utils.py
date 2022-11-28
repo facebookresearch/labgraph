@@ -4,7 +4,7 @@
 import re
 import os
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 def absolute_path(path: str) -> str:
     """
@@ -17,13 +17,16 @@ def absolute_path(path: str) -> str:
     Path(os.path.dirname(_path)).mkdir(parents = True, exist_ok = True)
     return _path
 
+def is_path(what: str):
+    return what.startswith("/") or re.match(r'[a-zA-Z]:', what)
+
 def relative_latency(cur_device_time: float, cur_receive_time: float, first_device_time: float, first_receive_time: float) -> float:
     """
     Calcuate relative latency value for current set of times
     """
     return (cur_receive_time - first_receive_time) - (cur_device_time - first_device_time)
 
-def parse_sources(input: List[str]) -> List[str | int]:
+def parse_sources(input: List[str]) -> List[Union[str, int]]:
     """
     Parse a list of string sources into ints or full paths to files or directories
     """
@@ -32,7 +35,11 @@ def parse_sources(input: List[str]) -> List[str | int]:
         if arg.isdigit():
             sources.append(int(arg))
         else:
-            sources.append(absolute_path(arg))
+            if arg.find(" ! ") > -1:
+                # This should be a GStreamer string so we'll just pass it through
+                sources.append(arg)
+            else:
+                sources.append(absolute_path(arg))
     return sources
 
 def parse_resolutions(num_sources: int, resolutions: List[str], default_resolution: Tuple[int, int, int] = (1280, 720, 30)) -> List[Tuple[int, int, int]]:
