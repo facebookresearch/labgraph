@@ -2,6 +2,7 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
 # Windows-specific performance tuning
+# from types import Union #! correct import?
 import os
 if os.name == "nt":
     # Improve sleep timer resolution for this process on Windows
@@ -102,6 +103,7 @@ class AnnotationInfo():
 
 class PoseGestureVis():
     
+    # sources: List[Union[str | int]]
     sources: List[str | int]
     resolutions: List[Tuple[int, int, int]]
     cap_handler: CaptureHandler
