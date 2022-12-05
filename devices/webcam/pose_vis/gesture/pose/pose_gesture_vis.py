@@ -38,32 +38,40 @@ from pose_vis.performance_utility import PerfUtility
 
 logger = logging.getLogger(__name__)
 
-LANDMARK_DISTANCE = [
-    (mp_pose.PoseLandmark.LEFT_SHOULDER, mp_pose.PoseLandmark.LEFT_WRIST ),
+LANDMARK_DISTANCES = [
+    (mp_pose.PoseLandmark.LEFT_SHOULDER, mp_pose.PoseLandmark.LEFT_ELBOW ),
+    (mp_pose.PoseLandmark.LEFT_WRIST, mp_pose.PoseLandmark.LEFT_WRIST ),
     # (mp_pose.PoseLandmark.LEFT_SHOULDER, mp_pose.PoseLandmark.LEFT_ELBOW ),
     # (mp_pose.PoseLandmark.LEFT_SHOULDER, mp_pose.PoseLandmark.LEFT_HIP ),
     # (mp_pose.PoseLandmark.LEFT_ELBOW, mp_pose.PoseLandmark.LEFT_WRIST ),
     # ! Maybe add from wrist to thumb/index finger
 
-    (mp_pose.PoseLandmark.RIGHT_SHOULDER, mp_pose.PoseLandmark.RIGHT_WRIST),
+    (mp_pose.PoseLandmark.RIGHT_SHOULDER, mp_pose.PoseLandmark.RIGHT_ELBOW),
+    (mp_pose.PoseLandmark.RIGHT_ELBOW, mp_pose.PoseLandmark.RIGHT_WRIST),
     # (mp_pose.PoseLandmark.RIGHT_SHOULDER, mp_pose.PoseLandmark.RIGHT_ELBOW),
     # (mp_pose.PoseLandmark.RIGHT_SHOULDER, mp_pose.PoseLandmark.RIGHT_HIP ),
     # (mp_pose.PoseLandmark.RIGHT_ELBOW, mp_pose.PoseLandmark.RIGHT_WRIST ),
 
 
 
-    (mp_pose.PoseLandmark.LEFT_HIP, mp_pose.PoseLandmark.LEFT_ANKLE ),
+    (mp_pose.PoseLandmark.LEFT_HIP, mp_pose.PoseLandmark.LEFT_KNEE ),
+    (mp_pose.PoseLandmark.LEFT_KNEE, mp_pose.PoseLandmark.LEFT_ANKLE ),
     # (mp_pose.PoseLandmark.LEFT_HIP, mp_pose.PoseLandmark.LEFT_KNEE ),
     # (mp_pose.PoseLandmark.LEFT_KNEE, mp_pose.PoseLandmark.LEFT_ANKLE ),
     # ! Maybe distance from ankle to toe
 
-    (mp_pose.PoseLandmark.RIGHT_HIP, mp_pose.PoseLandmark.RIGHT_ANKLE )
+    (mp_pose.PoseLandmark.RIGHT_HIP, mp_pose.PoseLandmark.RIGHT_KNEE),
+    (mp_pose.PoseLandmark.RIGHT_KNEE, mp_pose.PoseLandmark.RIGHT_ANKLE )
     # (mp_pose.PoseLandmark.RIGHT_HIP, mp_pose.PoseLandmark.RIGHT_KNEE ),
     # (mp_pose.PoseLandmark.RIGHT_KNEE, mp_pose.PoseLandmark.RIGHT_ANKLE )
 ]
 
-LANDMARK_DIRECTION = [
+LANDMARK_DIRECTIONS = [
     # todo --- ADD HERE ---
+    (mp_pose.PoseLandmark.RIGHT_WRIST, mp_pose.PoseLandmark.RIGHT_SHOULDER),
+    (mp_pose.PoseLandmark.LEFT_WRIST, mp_pose.PoseLandmark.LEFT_SHOULDER),
+    (mp_pose.PoseLandmark.RIGHT_ANKLE, mp_pose.PoseLandmark.RIGHT_HIP),
+    (mp_pose.PoseLandmark.LEFT_ANKLE, mp_pose.PoseLandmark.LEFT_HIP),
 ]
 
 TORSO_DISTANCE = [
@@ -130,10 +138,10 @@ class PoseGestureVis():
                 self.label_names = json.load(_file)
 
             np_files = [_file for _file in os.listdir(self.data_dir) if _file.endswith('.npy')]
-            self.label_data = [np.empty(shape=(0, len(LANDMARK_DISTANCE) + (len(LANDMARK_DIRECTION) * 3)), dtype=np.float32)] * len(label_names) #! Go over this
+            self.label_data = [np.empty(shape=(0, len(LANDMARK_DISTANCES) + (len(LANDMARK_DIRECTIONS) * 3)), dtype=np.float32)] * len(label_names) #! Go over this
 
             for _file in np_files:
-                index = int(path(_file).stem)
+                index = int(Path(_file).stem)
                 self.label_data[index] = np.load(os.path.join(self.data_sir, _file))
 
 
@@ -196,13 +204,13 @@ class PoseGestureVis():
                 bounds_array = np.append(bounds_array, point, axis = 0)
             
             palm_size = 0.0
-            for landmark_ids in PALM_DISTANCES:
+            for landmark_ids in TORSO_DISTANCE:
                 lid1 = landmark_ids[0]
                 lid2 = landmark_ids[1]
                 landmark1 = landmark_list_world[lid1]
                 landmark2 = landmark_list_world[lid2]
                 palm_size += math.dist((landmark1.x, landmark1.y, landmark1.z), (landmark2.x, landmark2.y, landmark2.z))
-            palm_size = palm_size / len(PALM_DISTANCES)
+            palm_size = palm_size / len(TORSO_DISTANCE)
 
             for ddx, landmark_ids in enumerate(LANDMARK_DISTANCES):
                 lid1 = landmark_ids[0]
@@ -247,21 +255,8 @@ class PoseGestureVis():
 
             x, y, w, h = cv2.boundingRect(bounds_array)
             pose_bounds[pose_index] = [x, y, x + w, y + h]
-        return (hand_bounds, gesture_data)
-
-
-
-
-
-
-
-
-
-
-
-
-
         return (pose_bounds, gesture_data)
+
     
     
     def guess_pose(self, source_index, pose_index):
