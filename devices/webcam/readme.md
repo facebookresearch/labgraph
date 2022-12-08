@@ -66,7 +66,7 @@ Check the [usage guide](using_posevis.md) for an in-depth overview of the concep
 
 #### GestureVis
 
-GestureVis uses data from the MediaPipe hand and body pose extensions to guess the current gesture based on a list of known gestures and draws the appropriate annotations onto the video stream, both online and offline. Check out the hands version [here](pose_vis/gesture/hand/readme.md) and body pose version [here](pose_vis/gesture/pose/readme.md).
+GestureVis uses data from the MediaPipe hand and body pose extensions to guess the current gesture based on a list of known gestures and draws the appropriate annotations onto the video stream, both online and offline. Check out the hands version [here](pose_vis/gesture/hand/readme.md).
 
 #### Logging Example
 
