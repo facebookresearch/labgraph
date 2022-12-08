@@ -91,9 +91,9 @@ class HandsExtension(PoseVisExtension):
         """
         Checks the results of `hands.process()`, assuming that at least one hand is fully visible in the frame
         """
-        if len(result.data) > 0:
-            for i in range(result.data):
-                if len(result.data[i]) != 21:
+        if "multi_hand_landmarks" in result.data:
+            for i in range(len(result.data["multi_hand_landmarks"])):
+                if len(result.data["multi_hand_landmarks"][i].landmark) != 21:
                     logger.warning(f" index {i} in result.data is not proper length")
                     return False
             return True
