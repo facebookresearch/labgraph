@@ -11,7 +11,7 @@ For estimation, a "difference" value is estimated by comparing each unknown pose
 There's a few caveats and room for improvement: the estimation algorithm will always check every pose and rank them via sorting by the lowest "difference" value, every frame. Distances seem to change based on where the hand is in the frame, but this can be alleviated by having multiple data points for a particular pose. Some poses may benefit from finer tuned estimation, such as ignoring directional tracking.
 
 ## Data Example
-An example notebook showing how the hand tracking data is used and represented can be found [here][input_example.ipynb].
+An example notebook showing how the hand tracking data is used and represented can be found [here](input_example.ipynb).
 
 ## Running
 
