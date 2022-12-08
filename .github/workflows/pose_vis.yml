@@ -1,0 +1,14 @@
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install PoseVis
+        run: |
+          cd devices/webcam
+          python setup.py install
+      - name: Run PoseVis tests
+        run: |
+          cd devices/webcam
+          python -m unittest pose_vis/test/tests.py

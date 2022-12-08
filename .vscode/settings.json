@@ -1,0 +1,8 @@
+{
+    "buck.projectConfig": {
+        "projectPath": "c:\\Users\\das\\Desktop\\labgraph\\manylinux.buckconfig",
+        "flavor": [],
+        "target": "",
+        "platform": "linux-x86_64"
+    }
+}
