@@ -73,6 +73,9 @@ class CaptureHandler():
             self.workers[i].start()
 
     def get_captures(self) -> List[Tuple[Capture, Dict[str, Any], bool]]:
+        if len(self.finished_captures) == self.num_sources:
+            raise AllCapturesFinished
+
         for i in range(self.num_sources):
             if i not in self.finished_captures:
                 self.connections[i][0].send(True)
@@ -84,9 +87,6 @@ class CaptureHandler():
         for res in result:
             if res[2]:
                 self.finished_captures.append(res[0].stream_id)
-
-        if len(self.finished_captures) == self.num_sources:
-            raise AllCapturesFinished
 
         return result
     

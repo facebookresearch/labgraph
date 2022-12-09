@@ -113,11 +113,13 @@ class CaptureWorker(multiprocessing.Process):
                 logger.warning(f" source {self.cap_source} gave unsuccessful grab()")
 
         elif num_images > 0 and self.frame_index < num_images:
-            if self.frame_index + 1 == num_images:
+            if self.frame_index + 1 >= num_images:
                 self.capture_finished = True
 
+            frame = cv2.imread(self.images[self.frame_index], cv2.IMREAD_COLOR)
+            frame = cv2.cvtColor(cv2.flip(frame, 1), cv2.COLOR_BGR2RGB)
             self.frame_index += 1
-            return (cv2.imread(self.images[self.frame_index], cv2.IMREAD_COLOR), time.perf_counter())
+            return (frame, time.perf_counter())
 
         return (self.blank_frame.copy(), time.time())
 
