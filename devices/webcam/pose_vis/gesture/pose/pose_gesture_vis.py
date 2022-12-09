@@ -316,8 +316,6 @@ class PoseGestureVis():
         """
         Run GestureVis
         """
-        # MediaPipe Hands parameters can be found here
-        # https://google.github.io/mediapipe/solutions/hands.html#static_image_mode
         hands_config = PoseConfig(model_complexity = 0)
 
         self.cap_handler = CaptureHandler(self.sources, self.resolutions, [PoseExtension(PoseConfig)])
