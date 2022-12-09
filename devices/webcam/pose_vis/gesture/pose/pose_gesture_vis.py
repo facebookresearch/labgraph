@@ -26,7 +26,7 @@ import math
 
 from pathlib import Path
 from enum import Enum
-from typing import List, Tuple, Any, Deque
+from typing import List, Tuple, Any, Deque, Union
 from dataclasses import dataclass
 from google.protobuf.json_format import MessageToDict
 from pose_vis.utils import parse_sources, parse_resolutions
@@ -34,7 +34,7 @@ from pose_vis.utils import absolute_path
 from pose_vis.streams.utils.capture_handler import CaptureHandler, AllCapturesFinished
 from pose_vis.display import DisplayHandler
 # from pose_vis.extensions.hands import HandsExtension, HandsConfig, mp_hands
-from pose_vis.extensions.pose import PoseExtension, PoseConfig ,mp_pose
+from pose_vis.extensions.pose import PoseExtension, PoseConfig, mp_pose
 from pose_vis.performance_utility import PerfUtility
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,6 @@ DRAW_DEBUG = False
 MAX_DIFFERENCE_VALUE = 3 #! play around with this value
 
 
-#! go over these
 class GV_MODE(Enum):
     VISUALIZATION = 0,
     LABEL_INPUT = 1,
@@ -103,8 +102,8 @@ class AnnotationInfo():
 
 class PoseGestureVis():
     
-    # sources: List[Union[str | int]]
-    sources: List[str | int]
+    sources: List[Union[str , int]]
+    # sources: List[str | int]
     resolutions: List[Tuple[int, int, int]]
     cap_handler: CaptureHandler
     dis_handler: DisplayHandler
@@ -121,7 +120,7 @@ class PoseGestureVis():
     video_writers: List[cv2.VideoWriter]
 
     # ! Test this
-    def __init__(self, sources: List[str | int], resolutions: List[Tuple[int, int, int]], data_dir: str, export_files: List[str], export_format: str) -> None:
+    def __init__(self, sources: List[Union[str , int]], resolutions: List[Tuple[int, int, int]], data_dir: str, export_files: List[str], export_format: str) -> None:
         self.sources = sources
         self.resolutions = resolutions
         self.data_dir = data_dir
@@ -178,16 +177,15 @@ class PoseGestureVis():
 
 
 
-    #! MAYBE A DEF HERE
+    def get_labels(self, mp_lables):
+        print(f'labels - {mp_lables}')
 
 
 
     def get_bound_data(self, mp_screen_keypoints, mp_world_keypoints, frame:np.ndarray):
         im_width, im_height = frame.shape[1], frame.shape[0]
-        # num_hands = len(mp_screen_keypoints)
-        pose_bounds: List[List[int]] = [None] * num_hands
-        gesture_data: List[np.array] = [np.empty(shape = (len(LANDMARK_DISTANCES) + (len(LANDMARK_DIRECTIONS) * 3)), dtype = np.float32)] * num_hands
-        
+        gesture_data: List[np.array] = [np.empty(shape = (len(LANDMARK_DISTANCES) + (len(LANDMARK_DIRECTIONS) * 3)), dtype = np.float32)]
+        print(f'key - {mp_screen_keypoints}')
         
 
         #! fix bugs here
@@ -315,7 +313,68 @@ class PoseGestureVis():
 
 
     def run(self) -> None:
-        pass
+        """
+        Run GestureVis
+        """
+        # MediaPipe Hands parameters can be found here
+        # https://google.github.io/mediapipe/solutions/hands.html#static_image_mode
+        hands_config = PoseConfig(model_complexity = 0)
+
+        self.cap_handler = CaptureHandler(self.sources, self.resolutions, [PoseExtension(PoseConfig)])
+        self.dis_handler = DisplayHandler(50, {"PoseExtension": PoseExtension})
+        self.perf = PerfUtility()
+
+        self.dis_handler.register_key_callback(self.on_key)
+        self.dis_handler.register_post_render_callback(self.draw_annotations)
+        self.cap_handler.start_workers()
+        num_sources = len(self.sources)
+        self.annotation_infos = collections.deque(maxlen = num_sources)
+
+        while self.running:
+            self.perf.update_start()
+
+            results = None
+            try:
+                results = self.cap_handler.get_captures()
+            except AllCapturesFinished:
+                self.running = False
+                logger.info(" capture sources have finished playing, exiting")
+                continue
+            captures = [results[i][0] for i in range(num_sources)]
+            extensions = [results[i][1] for i in range(num_sources)]
+            print(f'len - {len(extensions)}')
+
+            for i in range(num_sources):
+                mp_screen_keypoints = extensions[i]["PoseExtension"]["pose_landmarks"]
+                mp_world_keypoints = extensions[i]["PoseExtension"]["pose_world_landmarks"]
+                
+                
+                # hand_labels = self.get_handedness_labels(mp_handedness)
+                
+                capture = captures[i]
+                hand_bounds, gesture_data = self.get_bound_data(mp_screen_keypoints, mp_world_keypoints, capture.frame)
+
+                # self.annotation_infos.append(AnnotationInfo(hand_labels, hand_bounds, gesture_data, self.mode == GV_MODE.VISUALIZATION))
+
+                if self.mode == GV_MODE.LABEL_INPUT:
+                    cv2.putText(capture.frame, "Define or select label: press <esc> to exit", (10, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(capture.frame, f"Specify label name: {self.label_name}_", (10, 24 + (18 * 1)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(capture.frame, f"Defined labels: {self.label_names}", (10, 24 + (18 * 2)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(capture.frame, "Press <Enter> to confirm", (10, 24 + (18 * 3)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                elif self.mode == GV_MODE.COLLECTION:
+                    cv2.putText(capture.frame, "Collect data points: press <esc> to exit", (10, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    label_index = self.label_names.index(self.label_name)
+                    cv2.putText(capture.frame, f"Label: {self.label_name}, index: {label_index}", (10, 24 + (18 * 1)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    num_points = np.ma.size(self.label_data[label_index], axis = 0)
+                    cv2.putText(capture.frame, f"Data points: {num_points}", (10, 24 + (18 * 2)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+                    cv2.putText(capture.frame, "Press <space> to collect data point", (10, 24 + (18 * 3)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 1, cv2.LINE_AA)
+     
+            self.dis_handler.update_frames(captures, extensions)
+            self.dis_handler.update_windows(0)
+
+            time.sleep(self.perf.get_remaining_sleep_time(self.resolutions[0][2]))
+            self.perf.update_end()
+        self.cleanup()
 
 
 
@@ -353,6 +412,7 @@ if __name__ == '__main__':
     resolutions = parse_resolutions(len(sources), args.resolutions if args.resolutions is not None else [])
     export_files = []
     if args.export is not None:
+        print('export is not NONE')
         for _file in args.export:
             export_files.append(absolute_path(_file))
     print(export_files)

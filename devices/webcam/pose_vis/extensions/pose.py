@@ -62,17 +62,16 @@ class PoseExtension(PoseVisExtension):
 
     def process_frame(self, frame: np.ndarray) -> ExtensionResult:
         
-        result = self.pose.process(frame).pose_landmarks
+        mp_result = self.pose.process(frame)
 
-        if result is None:
-            result = []
+        results = {"pose_landmarks":[], "pose_world_landmarks":[]}
 
-        # results = {"pose_landmarks": []}
-
-        # if result.pose_landmarks is not None:
-        #     results["pose_landmarks"] = result.pose_landmarks
+        if (mp_result.pose_landmarks is not None):
+            results["pose_landmarks"] = mp_result.pose_landmarks
+        elif(mp_result.pose_world_landmarks is not None):
+            results["pose_world_landmarks"] = mp_result.pose_world_landmarks
         
-        return ExtensionResult(data=result)
+        return ExtensionResult(data=results)
 
 
     @classmethod
@@ -81,7 +80,7 @@ class PoseExtension(PoseVisExtension):
         # for pose_landmark_list in result.data["pose_landmarks"]:
         mp_drawing.draw_landmarks(
             frame, 
-            result.data,
+            result.data["pose_landmarks"],
             mp_pose.POSE_CONNECTIONS,
             mp_drawing_styles.get_default_pose_landmarks_style()
         )
