@@ -114,6 +114,7 @@ class PoseGestureVis():
     export_format: str
     running: bool = True
     mode: GV_MODE = GV_MODE.VISUALIZATION
+    pose_bound: list[list[int]]
     label_name: str = ""
     label_names: List[str] = []
     label_data: List[np.ndarray] = []
@@ -347,11 +348,10 @@ class PoseGestureVis():
                 mp_world_keypoints = extensions[i]["PoseExtension"]["pose_world_landmarks"]
                 
                 
-                # hand_labels = self.get_handedness_labels(mp_handedness)
                 
                 capture = captures[i]
-                hand_bounds, gesture_data = self.get_bound_data(mp_screen_keypoints, mp_world_keypoints, capture.frame)
-
+                pose_bounds  = self.get_bound_data(mp_screen_keypoints, mp_world_keypoints, capture.frame)
+                self.pose_bound = pose_bounds
                 # self.annotation_infos.append(AnnotationInfo(hand_labels, hand_bounds, gesture_data, self.mode == GV_MODE.VISUALIZATION))
 
                 if self.mode == GV_MODE.LABEL_INPUT:
