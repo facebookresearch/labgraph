@@ -21,7 +21,7 @@ Linux:
 
 Windows:
 
-    cd %HOMEPATH%\devices\labgraph\webcam
+    cd %HOMEPATH%\labgraph\devices\webcam
     python setup.py install
 
 See [Using PoseVis](#using-posevis) for usage details.
