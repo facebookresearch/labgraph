@@ -12,9 +12,17 @@ PoseVis uses [OpenCV](https://opencv.org/) to handle video streams. Out of the b
 
 ## PoseVis General Setup
 
-Requires Python 3.8 or later. Run `setup.py` to install required packages from PyPi:
+Requires Python 3.8 or later. Assuming an installation in your user directory, run `setup.py` to install required packages from PyPi:
 
-	python setup.py install
+Linux:
+
+    cd ~/labgraph/webcam
+	python3 setup.py install
+
+Windows:
+
+    cd %HOMEPATH%/labgraph/webcam
+    python setup.py install
 
 See [Using PoseVis](#using-posevis) for usage details.
 
