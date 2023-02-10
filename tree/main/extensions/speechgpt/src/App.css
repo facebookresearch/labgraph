@@ -8,15 +8,103 @@
 }
 
 .sidemenu {
-  width: 244px;
-  border: 1px solid white;
+  width: 260px;
   background-color: #202123;
+  padding: 10px;
+}
+
+.sidemenu-button {
+  padding: 10px;
+  border: 0.5px solid white;
+  border-radius: 5px;
+  text-align: left;
+  cursor: pointer;
+  transition: ease 0,25s all;
+
+}
+
+.sidemenu-button:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+
+}
+
+.sidemenu-button span {
+  padding-left: 6px;
+  padding-right: 12px;
 }
 
 .chatbox {
   flex: 1;
-  border: 1px solid white;
   background-color: #343541;
+  position: relative;
+}
+
+.chat-input-holder {
+  position: absolute;
+  padding: 24px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.chat-input-textarea {
+  width: 100%;
+  resize: none;
+  border: none;
+  border-radius: 5px;
+  background-color: #40414f;
+  color: white;
+  padding: 10px;
+  margin: 12px;
+  outline: none;
+  box-shadow: 0 0 8px 0 rgba(0,0,0, 0.5);
+  font-size: 1em;
+}
+
+.chat-log {
+  padding-top: 24px;
+  overflow-y: scroll;
+  height: 100%;
+}
+
+.chat-message {
+  color: white;
+  font-size: 1em;
+}
+
+.chat-message.speechgpt {
+  background-color: #444654;
+}
+
+.chat-message-center {
+  display: flex;
+  padding: 12px;
+
+
+  padding-left: 24px;
+  padding-right: 24px;
+
+  max-width: 640px;
+
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px; 
+}
+
+.avatar.speechgpt {
+  background-color: #0da37f;
+}
+
+.message {
+  padding: 10px;
+
 
 }
 
