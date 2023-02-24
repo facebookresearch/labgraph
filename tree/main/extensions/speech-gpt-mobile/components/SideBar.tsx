@@ -3,9 +3,13 @@
 import NewChat from "./NewChat";
 import { signOut, useSession } from "next-auth/react";
 
+
 function SideBar() {
 
+
   const {data: session} = useSession();
+
+
   return <div className="flex flex-col h-screen p-2">
     <div className="flex-1">
       <div>
