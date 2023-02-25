@@ -22,7 +22,7 @@ class KeywordGeneration:
     This function gets the html content from the predefined urls using requests library. Then use BeautifulSoup to 
     extract the needed keywords
     '''
-    
+
     def extract_keywords(self):
         
         for url in self.predefined_urls:
@@ -37,7 +37,6 @@ class KeywordGeneration:
                         for key, value in tag.attrs.items():
                             if key == 'title':
                                 self.keywords.append(value)
-        print(self.keywords)
-
+        return self.keywords
 test = KeywordGeneration()
 test.extract_keywords()
