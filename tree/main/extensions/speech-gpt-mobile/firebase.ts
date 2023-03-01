@@ -5,6 +5,7 @@ import {getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where, or
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+//console.log(process.env.FIREBASE_PROJECT_ID)
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -18,8 +19,6 @@ const firebaseConfig = {
 // this is especially for next.js
 // singleton pattern encoding
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-
-
 const db = getFirestore(app);
 // const analytics = getAnalytics(app);
 
