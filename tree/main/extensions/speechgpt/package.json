@@ -7,13 +7,15 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.16",
+    "firebase-admin": "^11.5.0",
     "heroicons": "^2.0.16",
     "next": "latest",
     "next-auth": "^4.19.2",
-    "openai": "^3.1.0",
+    "openai": "^3.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-firebase-hooks": "^5.1.1"
+    "react-firebase-hooks": "^5.1.1",
+    "react-hot-toast": "^2.4.0"
   },
   "devDependencies": {
     "@types/node": "18.11.3",
