@@ -1,0 +1,4826 @@
+Generated code for sklearn.metrics.homogeneity_score
+
+
+from sklearn.metrics import homogeneity_score
+
+def homogeneity_score(labels_true, labels_pred):
+    """Compute the homogeneity score.
+
+    The homogeneity score is a measure of how well the labels assigned to
+    the samples match the labels assigned to the clusters. A score of 1
+    indicates perfect homogeneity, while a score of 0 indicates that the
+    labels are completely independent of the clusters.
+
+    Parameters
+    ----------
+    labels_true : array, shape = [n_samples]
+        Ground truth labels for each sample.
+
+    labels_pred : array, shape = [n_samples]
+        Predicted labels for each sample.
+
+    Returns
+    -------
+    score : float
+        The homogeneity score.
+    """
+    from sklearn.utils.linear_assignment_ import linear_assignment
+    from sklearn.metrics.cluster import contingency_matrix
+
+    # Compute the contingency matrix
+    cm = contingency_matrix(labels_true, labels_pred)
+
+    # Compute the linear assignment
+    cost, _, _, _ = linear_assignment(cm)
+
+    # Compute the homogeneity score
+    score = 1.0 - cost / cm.sum()
+
+    return score
+Generated code for sklearn.metrics.mutual_info_score
+
+
+from sklearn.metrics import mutual_info_score
+
+def mutual_info_score(x, y):
+    """
+    Computes the mutual information between two variables.
+    
+    Parameters
+    ----------
+    x : array-like, shape (n_samples, )
+        The first variable.
+    y : array-like, shape (n_samples, )
+        The second variable.
+    
+    Returns
+    -------
+    mutual_info : float
+        The mutual information between x and y.
+    """
+    # Compute the joint probability distribution of x and y
+    joint_dist = np.histogram2d(x, y)[0]
+    joint_dist /= joint_dist.sum()
+    
+    # Compute the marginal probability distributions of x and y
+    marginal_x = np.sum(joint_dist, axis=1)
+    marginal_y = np.sum(joint_dist, axis=0)
+    
+    # Compute the mutual information
+    mutual_info = 0.0
+    for i in range(joint_dist.shape[0]):
+        for j in range(joint_dist.shape[1]):
+            if joint_dist[i, j] > 0.0:
+                mutual_info += joint_dist[i, j] * \
+                    np.log(joint_dist[i, j] / (marginal_x[i] * marginal_y[j]))
+    
+    return mutual_info
+Generated code for sklearn.metrics.normalized_mutual_info_score
+
+
+from sklearn.metrics import normalized_mutual_info_score
+
+def normalized_mutual_info_score(labels_true, labels_pred):
+    """
+    Compute the normalized mutual information between two clusterings.
+    
+    Parameters
+    ----------
+    labels_true : int array, shape = [n_samples]
+        A clustering of the data into disjoint subsets.
+    
+    labels_pred : array, shape = [n_samples]
+        A clustering of the data into disjoint subsets.
+    
+    Returns
+    -------
+    nmi: float
+        Normalized Mutual Information between the two clusterings.
+    """
+    # Compute contingency matrix
+    contingency = contingency_matrix(labels_true, labels_pred)
+    
+    # Compute marginal probabilities
+    pi = np.sum(contingency, axis=1)
+    pj = np.sum(contingency, axis=0)
+    n = np.sum(pi)
+    
+    # Compute the mutual information
+    mi = np.sum(contingency * np.log(contingency * n / (pi[:, None] * pj[None, :])))
+    
+    # Compute the expected value for the mutual information
+    e_mi = np.sum(pi * np.log(pi / n)) + np.sum(pj * np.log(pj / n))
+    
+    # Compute the normalized mutual information
+    nmi = mi / e_mi
+    
+    return nmi
+Generated code for sklearn.metrics.rand_score
+
+
+from sklearn.metrics import rand_score
+
+def rand_score(y_true, y_pred):
+    """
+    Computes the Rand index between two clusterings.
+    
+    Parameters
+    ----------
+    y_true : array-like, shape (n_samples,)
+        Ground truth (correct) labels.
+    y_pred : array-like, shape (n_samples,)
+        Predicted labels, as returned by a clustering algorithm.
+    
+    Returns
+    -------
+    score : float
+        The Rand index between the two clusterings.
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    
+    n_samples = y_true.shape[0]
+    
+    # Compute contingency matrix
+    # (also called confusion matrix in some contexts)
+    # Contingency matrix C has C_ij = # observations known to be in group i 
+    # and predicted to be in group j.
+    C = np.zeros((2, 2))
+    for i in range(n_samples):
+        C[y_true[i], y_pred[i]] += 1
+    
+    # Compute the Rand index
+    # The Rand Index computes a similarity measure between two clusterings
+    # by considering all pairs of samples and counting pairs that are 
+    # assigned in the same or different clusters in the predicted and 
+    # true clusterings.
+    #
+    # The raw RI score is then "adjusted for chance" into the ARI score 
+    # using the following relation:
+    #
+    # ARI = (RI - Expected_RI) / (max(RI) - Expected_RI)
+    #
+    # where Expected_RI is the expected number of agreements under the 
+    # assumption of independent clustering.
+    n_combinations = n_samples * (n_samples - 1) / 2
+    sum_combinations = sum([C[i, j] * (C[i, j] - 1) / 2 for i in range(2) for j in range(2)])
+    sum_product
+Generated code for sklearn.metrics.silhouette_score
+
+
+from sklearn.metrics import silhouette_score
+
+# example data
+X = [[0, 0], [1, 1], [2, 0], [3, 0], [4, 1]]
+
+# calculate silhouette score
+score = silhouette_score(X, labels=None)
+
+print(score)
+Generated code for sklearn.metrics.silhouette_samples
+
+
+from sklearn.metrics import silhouette_samples
+
+def silhouette_samples(X, labels, metric='euclidean'):
+    """Compute the Silhouette Coefficient for each sample.
+
+    Parameters
+    ----------
+    X : array [n_samples_a, n_features]
+        Feature matrix.
+    labels : array, shape = [n_samples]
+        label values for each sample
+    metric : string, optional
+        The distance metric to use:
+        - euclidean
+        - manhattan
+        - cosine
+
+    Returns
+    -------
+    silhouette : array, shape = [n_samples]
+        Silhouette Coefficient for each sample.
+    """
+    from sklearn.metrics.pairwise import pairwise_distances
+    from sklearn.utils import check_array
+    from sklearn.utils.validation import check_is_fitted
+    from sklearn.metrics import silhouette_score
+
+    X = check_array(X)
+    check_is_fitted(labels)
+
+    # Compute the pairwise distance matrix
+    dists = pairwise_distances(X, metric=metric)
+
+    # Compute the Silhouette Coefficient for each sample
+    silhouette_vals = silhouette_score(dists, labels, metric=metric)
+
+    return silhouette_vals
+Generated code for sklearn.metrics.v_measure_score
+
+
+from sklearn.metrics import v_measure_score
+
+def v_measure_score(y_true, y_pred):
+    """Compute the V-measure score.
+
+    The V-measure score is the harmonic mean of the homogeneity and completeness
+    scores. The homogeneity score is a measure of the amount of clustering
+    structure that is shared between the predicted and true labels. The
+    completeness score is a measure of how completely the predicted labels
+    capture the true labels.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (n_samples,)
+        Ground truth (correct) labels.
+
+    y_pred : array-like, shape (n_samples,)
+        Predicted labels, as returned by a clustering algorithm.
+
+    Returns
+    -------
+    v_measure : float
+        The V-measure score.
+
+    References
+    ----------
+    .. [1] `Rosenberg and Hirschberg, 2007. V-Measure: A conditional entropy-based
+       external cluster evaluation measure <http://www.aclweb.org/anthology/D07-1043>`_
+    """
+    from sklearn.metrics.cluster import homogeneity_score, completeness_score
+
+    homogeneity = homogeneity_score(y_true, y_pred)
+    completeness = completeness_score(y_true, y_pred)
+    v_measure = (2. * homogeneity * completeness) / (homogeneity + completeness)
+
+    return v_measure
+Generated code for sklearn.metrics.consensus_score
+
+
+def consensus_score(y_true, y_pred):
+    """
+    Computes the consensus score between two sets of labels.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) labels.
+    
+    y_pred : array-like of shape (n_samples,)
+        Predicted labels, as returned by a classifier.
+    
+    Returns
+    -------
+    score : float
+        The consensus score between y_true and y_pred.
+    """
+    from sklearn.metrics import accuracy_score
+    from sklearn.metrics import jaccard_score
+    from sklearn.metrics import f1_score
+    
+    # Compute accuracy
+    accuracy = accuracy_score(y_true, y_pred)
+    
+    # Compute Jaccard similarity
+    jaccard = jaccard_score(y_true, y_pred)
+    
+    # Compute F1 score
+    f1 = f1_score(y_true, y_pred)
+    
+    # Compute consensus score
+    score = (accuracy + jaccard + f1) / 3
+    
+    return score
+Generated code for sklearn.metrics.DistanceMetric
+
+
+from sklearn.metrics import DistanceMetric
+
+# Create a DistanceMetric object
+metric = DistanceMetric()
+
+# Calculate the Euclidean distance between two points
+dist = metric.pairwise(X=[1,2], Y=[2,3])
+
+# Print the distance
+print(dist)
+Generated code for sklearn.metrics.pairwise.additive_chi2_kernel
+
+
+def additive_chi2_kernel(X, Y=None, gamma=1.0):
+    """Compute the additive chi-squared kernel between observations in X and Y.
+    The additive chi-squared kernel is a variant of the chi-squared kernel.
+    It is defined as:
+    
+    k(x_i, y_j) = exp(-gamma * sum((x_i - y_j)**2 / (x_i + y_j + eps)))
+    
+    where eps is a small positive number to avoid division by zero.
+    
+    Parameters
+    ----------
+    X : array-like of shape (n_samples_X, n_features)
+        Input data.
+    
+    Y : array-like of shape (n_samples_Y, n_features), default=None
+        Input data. If None, the kernel between all pairs of samples in X is
+        computed.
+    
+    gamma : float, default=1.0
+        Parameter of the kernel.
+    
+    Returns
+    -------
+    K : array of shape (n_samples_X, n_samples_Y)
+        Kernel matrix.
+    """
+    X = np.atleast_2d(X)
+    if Y is None:
+        Y = X
+    else:
+        Y = np.atleast_2d(Y)
+    n_samples_X, n_features = X.shape
+    n_samples_Y, _ = Y.shape
+    K = np.empty((n_samples_X, n_samples_Y))
+    eps = 1e-10
+    for i, x_i in enumerate(X):
+        for j, y_j in enumerate(Y):
+            K[i, j] = np.exp(-gamma * np.sum((x_i - y_j)**2 / (x_i + y_j + eps)))
+    return K
+Generated code for sklearn.metrics.pairwise.chi2_kernel
+
+
+def chi2_kernel(X, Y=None, gamma=1.0):
+    """Compute the chi-squared kernel between two sets of vectors.
+    The chi-squared kernel is computed between each pair of samples
+    (row in `X` and `Y`).
+    Read more in the :ref:`User Guide <chi2_kernel>`.
+    Parameters
+    ----------
+    X : array-like of shape (n_samples_X, n_features)
+        Left argument of the returned kernel k(X, Y)
+    Y : array-like of shape (n_samples_Y, n_features), (optional, default=None)
+        Right argument of the returned kernel k(X, Y). If None, k(X, X)
+        if evaluated instead.
+    gamma : float, (optional, default=1.0)
+        Parameter of the chi2 kernel.
+    Returns
+    -------
+    kernel_matrix : array of shape (n_samples_X, n_samples_Y)
+    """
+    X = np.atleast_2d(X)
+    if Y is None:
+        Y = X
+    else:
+        Y = np.atleast_2d(Y)
+
+    kernel_matrix = np.zeros((X.shape[0], Y.shape[0]))
+    for i, x in enumerate(X):
+        for j, y in enumerate(Y):
+            kernel_matrix[i, j] = np.sum((x - y) ** 2 / (x + y + 1e-10))
+
+    return np.exp(-gamma * kernel_matrix)
+Generated code for sklearn.metrics.pairwise.cosine_similarity
+
+
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Create two vectors
+vector_a = np.array([1,2,3])
+vector_b = np.array([2,3,4])
+
+# Calculate cosine similarity
+cos_sim = cosine_similarity([vector_a], [vector_b])
+
+# Print cosine similarity
+print(cos_sim)
+Generated code for sklearn.metrics.pairwise.cosine_distances
+
+
+import numpy as np
+from sklearn.metrics.pairwise import cosine_distances
+
+# Create two vectors
+x = np.array([1, 2, 3])
+y = np.array([4, 5, 6])
+
+# Calculate the cosine distance
+cosine_distances(x, y)
+
+# Output:
+# array([[1.0]])
+Generated code for sklearn.metrics.pairwise.distance_metrics
+
+
+import numpy as np
+from sklearn.metrics.pairwise import distance_metrics
+
+# Euclidean Distance
+def euclidean_distance(x, y):
+    return np.sqrt(np.sum((x - y) ** 2))
+
+# Manhattan Distance
+def manhattan_distance(x, y):
+    return np.sum(np.abs(x - y))
+
+# Minkowski Distance
+def minkowski_distance(x, y, p):
+    return np.sum(np.abs(x - y) ** p) ** (1 / p)
+
+# Chebyshev Distance
+def chebyshev_distance(x, y):
+    return np.max(np.abs(x - y))
+
+# Cosine Distance
+def cosine_distance(x, y):
+    return 1 - np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))
+
+# Custom Distance
+def custom_distance(x, y):
+    return np.sum(np.abs(x - y) ** 2) ** 0.5
+
+# Register the distance functions
+distance_metrics.register_metric('euclidean', euclidean_distance)
+distance_metrics.register_metric('manhattan', manhattan_distance)
+distance_metrics.register_metric('minkowski', minkowski_distance)
+distance_metrics.register_metric('chebyshev', chebyshev_distance)
+distance_metrics.register_metric('cosine', cosine_distance)
+distance_metrics.register_metric('custom', custom_distance)
+Generated code for sklearn.metrics.pairwise.euclidean_distances
+
+
+import numpy as np
+from sklearn.metrics.pairwise import euclidean_distances
+
+# Create two arrays of random numbers
+x = np.random.rand(3, 4)
+y = np.random.rand(3, 4)
+
+# Calculate the Euclidean distance between the two arrays
+dist = euclidean_distances(x, y)
+
+# Print the distance
+print(dist)
+Generated code for sklearn.metrics.pairwise.haversine_distances
+
+
+import numpy as np
+from sklearn.metrics.pairwise import haversine_distances
+
+# Create two arrays of coordinates
+coord1 = np.array([[45.3, -66.2],
+                   [43.6, -70.2],
+                   [43.2, -76.4]])
+
+coord2 = np.array([[41.3, -81.4],
+                   [45.5, -63.2],
+                   [43.2, -70.2]])
+
+# Calculate the haversine distances
+distances = haversine_distances(coord1, coord2)
+
+# Print the distances
+print(distances)
+Generated code for sklearn.metrics.pairwise.kernel_metrics
+
+
+import numpy as np
+from sklearn.metrics.pairwise import kernel_metrics
+
+# Define the kernel function
+def my_kernel(x, y):
+    return np.exp(-np.linalg.norm(x-y)**2)
+
+# Compute the kernel matrix
+K = kernel_metrics(X, Y, metric=my_kernel)
+
+# Print the kernel matrix
+print(K)
+Generated code for sklearn.metrics.pairwise.laplacian_kernel
+
+
+import numpy as np
+from sklearn.metrics.pairwise import laplacian_kernel
+
+# Generate sample data
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+
+# Compute the Laplacian kernel between X and itself
+K = laplacian_kernel(X, X)
+
+# Print computed Laplacian kernel
+print(K)
+Generated code for sklearn.metrics.pairwise.linear_kernel
+
+
+def linear_kernel(x1, x2):
+    return np.dot(x1, x2)
+
+# Example
+x1 = np.array([1, 2, 3])
+x2 = np.array([4, 5, 6])
+
+linear_kernel(x1, x2) # Output: 32
+Generated code for sklearn.metrics.pairwise.manhattan_distances
+
+
+def manhattan_distances(X, Y=None, sum_over_features=True):
+    """
+    Compute the L1 distances between the vectors in X and Y.
+    Read more in the :ref:`User Guide <metrics>`.
+    Parameters
+    ----------
+    X : ndarray
+        An :math:`m_1 \\times n` array of :math:`m_1` original observations in an
+        :math:`n`-dimensional space.
+    Y : ndarray, optional
+        An :math:`m_2 \\times n` array of :math:`m_2` original observations in an
+        :math:`n`-dimensional space.
+    sum_over_features : bool, optional
+        If True, the function returns the pairwise distance matrix
+        :math:`M_{ij} = \\sum_k |x_{ik} - y_{jk}|`.
+        If False, the function returns the element-wise L1 distances
+        :math:`M_{ij} = |x_{ij} - y_{ij}|`.
+    Returns
+    -------
+    M : ndarray
+        A :math:`m_1 \\times m_2` distance matrix is returned.
+        For any :math:`i, j`, the metric ``dist(u=X[i], v=Y[j])`` is computed
+        and stored in the :math:`i, j` th entry.
+    Examples
+    --------
+    >>> from sklearn.metrics.pairwise import manhattan_distances
+    >>> manhattan_distances([[3]], [[3]])
+    array([[0.]])
+    >>> manhattan_distances([[3]], [[2]])
+    array([[1.]])
+    >>> manhattan_distances([[2], [3], [4]], [[1], [2], [3]])
+    array([[1., 2., 3.],
+           [0., 1., 2.],
+           [1., 0., 1.]])
+    """
+    X, Y = check_pairwise_arrays(X, Y)
+    if sum_over_features:
+Generated code for sklearn.metrics.pairwise.nan_euclidean_distances
+
+
+def nan_euclidean_distances(X, Y=None, Y_norm_squared=None, squared=False):
+    """
+    Compute the Euclidean distances between the vectors in X and Y.
+    Parameters
+    ----------
+    X : array-like, shape (n_samples_1, n_features)
+        Array of vectors.
+    Y : array-like, shape (n_samples_2, n_features)
+        Array of vectors.
+    Y_norm_squared : array-like, shape (n_samples_2,), optional
+        Pre-computed sum of squares of Y, to avoid redundant computation.
+    squared : boolean, optional
+        Return squared Euclidean distances.
+    Returns
+    -------
+    distances : array, shape (n_samples_1, n_samples_2)
+        Euclidean distances between the vectors in X and Y.
+    """
+    X = np.asarray(X)
+    if X.ndim == 1:
+        X = X[:, np.newaxis]
+    if Y is None:
+        Y = X
+    else:
+        Y = np.asarray(Y)
+        if Y.ndim == 1:
+            Y = Y[:, np.newaxis]
+
+    # Compute the sum of squares of X
+    XX_norm_squared = row_norms(X, squared=True)[:, np.newaxis]
+
+    # Compute the sum of squares of Y
+    if X is Y:  # shortcut in the common case euclidean_distances(X, X)
+        YY_norm_squared = XX_norm_squared.T
+    elif Y_norm_squared is not None:
+        YY_norm_squared = Y_norm_squared
+    else:
+        YY_norm_squared = row_norms(Y, squared=True)[np.newaxis, :]
+
+    # Compute the dot product
+    distances = safe_sparse_dot(X, Y.T, dense_output=True)
+    distances *= -2
+    distances += XX_norm_squared
+
+Generated code for sklearn.metrics.pairwise.pairwise_kernels
+
+
+import numpy as np
+from sklearn.metrics.pairwise import pairwise_kernels
+
+# Create two arrays of random numbers
+X = np.random.rand(10, 5)
+Y = np.random.rand(10, 5)
+
+# Compute the pairwise kernel matrix
+kernel_matrix = pairwise_kernels(X, Y, metric='rbf')
+
+# Print the kernel matrix
+print(kernel_matrix)
+Generated code for sklearn.metrics.pairwise.polynomial_kernel
+
+
+def polynomial_kernel(X, Y, degree=3, gamma=None, coef0=1):
+    """
+    Compute the polynomial kernel between two matrices X and Y::
+        K(x, y) = (gamma <x, y> + coef0)^degree
+    for each pair of rows x in X and y in Y.
+    Parameters
+    ----------
+    X : array of shape (n_samples_X, n_features)
+    Y : array of shape (n_samples_Y, n_features)
+    degree : int
+        Degree of the polynomial kernel.
+    gamma : float, default None
+        If None, defaults to 1.0 / n_features.
+    coef0 : float, default 1
+        Independent term in kernel expression.
+    Returns
+    -------
+    kernel_matrix : array of shape (n_samples_X, n_samples_Y)
+    """
+    X = np.atleast_2d(X)
+    Y = np.atleast_2d(Y)
+    n_samples_X, n_features = X.shape
+    n_samples_Y, _ = Y.shape
+    if gamma is None:
+        gamma = 1.0 / n_features
+    K = np.empty((n_samples_X, n_samples_Y), dtype=np.float64)
+    for i, x_i in enumerate(X):
+        for j, y_j in enumerate(Y):
+            K[i, j] = (gamma * np.dot(x_i, y_j) + coef0) ** degree
+    return K
+Generated code for sklearn.metrics.pairwise.rbf_kernel
+
+
+def rbf_kernel(X, Y, gamma):
+    """
+    Computes the RBF (Radial Basis Function) kernel between two sets of vectors.
+    
+    Parameters
+    ----------
+    X : array-like, shape (n_samples_X, n_features)
+        Input array.
+    Y : array-like, shape (n_samples_Y, n_features)
+        Input array.
+    gamma : float
+        Parameter of the RBF kernel.
+    
+    Returns
+    -------
+    K : array-like, shape (n_samples_X, n_samples_Y)
+        The RBF kernel between X and Y.
+    """
+    # Calculate the squared Euclidean distance between each pair of samples
+    sq_dists = cdist(X, Y, 'sqeuclidean')
+    
+    # Compute the RBF kernel
+    K = np.exp(-gamma * sq_dists)
+    
+    return K
+Generated code for sklearn.metrics.pairwise.sigmoid_kernel
+
+
+def sigmoid_kernel(X, Y, gamma=None, coef0=1):
+    """
+    Compute the sigmoid kernel between two matrices of observations.
+    
+    Parameters
+    ----------
+    X : array-like, shape = [n_samples_a, n_features]
+        Left matrix of observations.
+        
+    Y : array-like, shape = [n_samples_b, n_features]
+        Right matrix of observations.
+        
+    gamma : float, default=None
+        Gamma parameter for the sigmoid kernel.
+        If None, defaults to 1.0 / n_features.
+        
+    coef0 : float, default=1
+        Coefficient for the sigmoid kernel.
+        
+    Returns
+    -------
+    K : array-like, shape = [n_samples_a, n_samples_b]
+        Sigmoid kernel matrix.
+    """
+    if gamma is None:
+        gamma = 1.0 / X.shape[1]
+    K = np.tanh(gamma * np.dot(X, Y.T) + coef0)
+    return K
+Generated code for sklearn.metrics.pairwise.paired_euclidean_distances
+
+
+import numpy as np
+from sklearn.metrics.pairwise import paired_euclidean_distances
+
+# Create two arrays of random numbers
+x = np.random.rand(10, 3)
+y = np.random.rand(10, 3)
+
+# Calculate the pairwise Euclidean distances
+distances = paired_euclidean_distances(x, y)
+
+# Print the distances
+print(distances)
+Generated code for sklearn.metrics.pairwise.paired_manhattan_distances
+
+
+import numpy as np
+from sklearn.metrics.pairwise import paired_manhattan_distances
+
+# Create two arrays of random numbers
+x = np.random.rand(10, 3)
+y = np.random.rand(10, 3)
+
+# Calculate the paired Manhattan distances
+distances = paired_manhattan_distances(x, y)
+
+# Print the distances
+print(distances)
+Generated code for sklearn.metrics.pairwise.paired_cosine_distances
+
+
+import numpy as np
+from sklearn.metrics.pairwise import paired_cosine_distances
+
+# Create two arrays of random numbers
+x = np.random.rand(10, 5)
+y = np.random.rand(10, 5)
+
+# Calculate the paired cosine distances
+distances = paired_cosine_distances(x, y)
+
+# Print the distances
+print(distances)
+Generated code for sklearn.metrics.pairwise.paired_distances
+
+
+import numpy as np
+from sklearn.metrics.pairwise import paired_distances
+
+# Create two arrays of random numbers
+x = np.random.rand(10)
+y = np.random.rand(10)
+
+# Calculate the pairwise distances
+distances = paired_distances(x, y)
+
+# Print the distances
+print(distances)
+Generated code for sklearn.metrics.pairwise_distances
+
+
+import numpy as np
+from sklearn.metrics.pairwise import pairwise_distances
+
+def pairwise_distances(X, Y=None, metric='euclidean', n_jobs=None):
+    """
+    Computes the pairwise distances between samples in X and Y.
+    
+    Parameters
+    ----------
+    X : array-like, shape (n_samples_X, n_features)
+        Input data.
+        
+    Y : array-like, shape (n_samples_Y, n_features), optional
+        Input data. If not provided, the distances between each sample of X are
+        computed.
+        
+    metric : string or callable, default 'euclidean'
+        The metric to use when calculating distance between instances in a
+        feature array. If metric is a string, it must be one of the options
+        allowed by scipy.spatial.distance.pdist for its metric parameter, or
+        a metric listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS.
+        If metric is "precomputed", X is assumed to be a distance matrix and
+        must be square.
+        
+    n_jobs : int or None, optional (default=None)
+        The number of jobs to use for the computation. This works by computing
+        each of the n_init runs in parallel.
+        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
+        for more details.
+        
+    Returns
+    -------
+    distances : array, shape (n_samples_X, n_samples_Y)
+        The pairwise distances between all samples in X and Y.
+    """
+    X, Y = check_pairwise_arrays(X, Y)
+    if metric == "precomputed":
+        X, Y = check_precomputed(X, Y)
+    if n_jobs is None:
+        n_jobs = 1
+    if n_jobs == -1:
+        n_jobs = np.max([np.min([X
+Generated code for sklearn.metrics.pairwise_distances_argmin
+
+
+def pairwise_distances_argmin(X, Y, metric='euclidean', axis=1):
+    """
+    Compute minimum distances between one point and a set of points.
+    
+    Parameters
+    ----------
+    X : array-like, shape (n_samples_X, n_features)
+        Input set.
+    Y : array-like, shape (n_samples_Y, n_features)
+        Input set.
+    metric : string or callable
+        The metric to use when calculating distance between instances in a
+        feature array. If metric is a string, it must be one of the options
+        allowed by scipy.spatial.distance.pdist for its metric parameter, or
+        a metric listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS.
+        If metric is "precomputed", X is assumed to be a distance matrix and
+        must be square.
+    axis : int
+        The axis along which the minimum distances are to be computed.
+    
+    Returns
+    -------
+    min_distances : array-like, shape (n_samples_X,)
+        The minimum distances between each point of X and the points of Y.
+    
+    Examples
+    --------
+    >>> from sklearn.metrics.pairwise import pairwise_distances_argmin
+    >>> X = [[0, 1], [3, 4]]
+    >>> Y = [[1, 1], [2, 2]]
+    >>> pairwise_distances_argmin(X, Y, axis=1)
+    array([0, 1])
+    """
+    distances = pairwise_distances(X, Y, metric=metric, axis=axis)
+    min_distances = np.argmin(distances, axis=axis)
+    return min_distances
+Generated code for sklearn.metrics.pairwise_distances_argmin_min
+
+
+from sklearn.metrics import pairwise_distances_argmin_min
+
+def pairwise_distances_argmin_min(X, Y, metric='euclidean', **kwds):
+    """Compute minimum distances between one point and a set of points.
+    This function computes the distances between one point and a set of
+    points using the specified distance metric. It returns the indices of
+    the points in the set which are closest to the specified point.
+    Parameters
+    ----------
+    X : array_like, shape (n_samples, n_features)
+        Array containing the point.
+    Y : array_like, shape (m_samples, n_features)
+        Array containing the set of points.
+    metric : string, or callable
+        The metric to use when calculating distance between instances in a
+        feature array. If metric is a string, it must be one of the options
+        allowed by scipy.spatial.distance.pdist for its metric parameter, or
+        a metric listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS.
+        If metric is "precomputed", X is assumed to be a distance matrix and
+        must be square. X may be a sparse matrix, in which case only "nonzero"
+        elements may be considered neighbors for DBSCAN.
+    **kwds : optional keyword parameters
+        Any further parameters are passed directly to the distance function.
+        If using a scipy.spatial.distance metric, the parameters are still
+        metric dependent. See the scipy docs for usage examples.
+    Returns
+    -------
+    distances : ndarray
+        Array of shape (m_samples,) containing the distances to the closest
+        point in Y for each point in X.
+    indices : ndarray
+        Array of shape (m_samples,) containing the indices of the points in
+        Y which are closest to each point in X.
+    """
+    distances = pairwise_distances(X, Y, metric=metric, **kwds)
+    indices = distances.argmin(axis=1)
+    return distances.min(axis=1), indices
+Generated code for sklearn.metrics.pairwise_distances_chunked
+
+
+def pairwise_distances_chunked(X, Y=None, metric='euclidean', n_jobs=None,
+                              working_memory=None, **kwds):
+    """Compute the pairwise distances between X and Y in chunks.
+
+    This is more memory efficient than pairwise_distances for a large number
+    of samples.
+
+    Read more in the :ref:`User Guide <metrics>`.
+
+    Parameters
+    ----------
+    X : array, shape (n_samples_X, n_features)
+
+    Y : array, shape (n_samples_Y, n_features), optional (default=None)
+
+    metric : string or callable, default 'euclidean'
+        The metric to use when calculating distance between instances in a
+        feature array. If metric is a string, it must be one of the options
+        allowed by scipy.spatial.distance.pdist for its metric parameter, or
+        a metric listed in pairwise.PAIRWISE_DISTANCE_FUNCTIONS.
+        If metric is "precomputed", X is assumed to be a distance matrix and
+        must be square. X may be a sparse matrix, in which case only "nonzero"
+        elements may be considered neighbors for DBSCAN.
+        
+    n_jobs : int or None, optional (default=None)
+        The number of jobs to use for the computation. This works by breaking
+        down the pairwise matrix into n_jobs even slices and computing them in
+        parallel.
+        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
+        for more details.
+
+    working_memory : float, optional (default=None)
+        The maximum number of elements (samples * features) in the working
+        memory. If None, the value is set to 2 * n_samples * n_features.
+        The working memory is the memory used to store the pairwise distances
+        of a single chunk.
+
+    **kwds : dict
+        Keyword arguments to pass to the distance function.
+
+   
+Generated code for sklearn.metrics.ConfusionMatrixDisplay
+
+
+from sklearn.metrics import ConfusionMatrixDisplay
+
+# Create a confusion matrix
+y_true = [2, 0, 2, 2, 0, 1]
+y_pred = [0, 0, 2, 2, 0, 2]
+cm = confusion_matrix(y_true, y_pred)
+
+# Create a ConfusionMatrixDisplay
+cm_display = ConfusionMatrixDisplay(cm, display_labels=['Class 0', 'Class 1', 'Class 2'])
+
+# Plot the confusion matrix
+cm_display.plot()
+Generated code for sklearn.metrics.DetCurveDisplay
+
+
+from sklearn.metrics import DetCurveDisplay
+
+# Generate some data
+y_true = [0, 0, 0, 0, 1, 1, 1, 1]
+y_score = [0.1, 0.3, 0.2, 0.4, 0.8, 0.6, 0.7, 0.5]
+
+# Create DetCurveDisplay object
+det_display = DetCurveDisplay(y_true, y_score)
+
+# Plot the DET curve
+det_display.plot()
+Generated code for sklearn.metrics.PrecisionRecallDisplay
+
+
+from sklearn.metrics import precision_recall_curve
+
+def PrecisionRecallDisplay(y_true, y_score):
+    precision, recall, _ = precision_recall_curve(y_true, y_score)
+    plt.step(recall, precision, color='b', alpha=0.2,
+             where='post')
+    plt.fill_between(recall, precision, step='post', alpha=0.2,
+                     color='b')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.ylim([0.0, 1.05])
+    plt.xlim([0.0, 1.0])
+    plt.title('2-class Precision-Recall curve')
+Generated code for sklearn.metrics.PredictionErrorDisplay
+
+
+from sklearn.metrics import mean_squared_error
+
+def prediction_error_display(y_true, y_pred):
+    """
+    Calculates and displays the prediction error.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated target values.
+    
+    Returns
+    -------
+    None
+    """
+    mse = mean_squared_error(y_true, y_pred)
+    print('Mean Squared Error:', mse)
+Generated code for sklearn.metrics.RocCurveDisplay
+
+
+from sklearn.metrics import roc_curve
+import matplotlib.pyplot as plt
+
+# Generate the data
+y_true = [0, 0, 1, 1]
+y_scores = [0.1, 0.4, 0.35, 0.8]
+
+# Compute the false positive rate, true positive rate, and thresholds
+fpr, tpr, thresholds = roc_curve(y_true, y_scores)
+
+# Plot the ROC curve
+plt.plot(fpr, tpr)
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.show()
+Generated code for sklearn.calibration.CalibrationDisplay
+
+
+from sklearn.calibration import CalibrationDisplay
+
+# Create a calibration display object
+calibration_display = CalibrationDisplay(predictions, labels)
+
+# Plot the calibration curve
+calibration_display.plot()
+
+# Get the calibration error
+calibration_error = calibration_display.calibration_error
+
+# Get the reliability diagram
+reliability_diagram = calibration_display.reliability_diagram
+Generated code for sklearn.mixture.BayesianGaussianMixture
+
+
+import numpy as np
+from sklearn.mixture import BayesianGaussianMixture
+
+# Generate data
+X = np.random.rand(100, 2)
+
+# Create and fit the Bayesian Gaussian Mixture model
+bgm = BayesianGaussianMixture(n_components=3, covariance_type='full')
+bgm.fit(X)
+
+# Predict the cluster for each data point
+y_pred = bgm.predict(X)
+
+# Print the cluster labels
+print(y_pred)
+Generated code for sklearn.mixture.GaussianMixture
+
+
+import numpy as np
+from sklearn.mixture import GaussianMixture
+
+# Create a Gaussian Mixture model
+gmm = GaussianMixture(n_components=3)
+
+# Fit the model to the data
+gmm.fit(X)
+
+# Predict the labels for the data
+labels = gmm.predict(X)
+
+# Compute the log-likelihood of the data
+log_likelihood = gmm.score(X)
+
+# Compute the means of the Gaussian components
+means = gmm.means_
+
+# Compute the covariance matrices of the Gaussian components
+covariances = gmm.covariances_
+
+# Compute the weights of the Gaussian components
+weights = gmm.weights_
+Generated code for sklearn.model_selection.GroupKFold
+
+
+from sklearn.model_selection import GroupKFold
+
+# Create a GroupKFold object
+group_kfold = GroupKFold(n_splits=5)
+
+# Fit the object to the data
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+y = np.array([1, 2, 3, 4])
+groups = np.array([1, 1, 2, 2])
+group_kfold.get_n_splits(X, y, groups)
+
+# Iterate through the splits
+for train_index, test_index in group_kfold.split(X, y, groups):
+    print("TRAIN:", train_index, "TEST:", test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    print(X_train, X_test, y_train, y_test)
+Generated code for sklearn.model_selection.GroupShuffleSplit
+
+
+from sklearn.model_selection import GroupShuffleSplit
+
+# Create a GroupShuffleSplit object
+gss = GroupShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+
+# Fit the object to the data
+X = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+groups = [1, 1, 1, 2, 2, 2, 3, 3, 3, 3]
+gss.get_n_splits(X, y, groups)
+
+# Generate the splits
+for train_index, test_index in gss.split(X, y, groups):
+    print("TRAIN:", train_index, "TEST:", test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    print(X_train, X_test, y_train, y_test)
+Generated code for sklearn.model_selection.KFold
+
+
+from sklearn.model_selection import KFold
+
+# Create a KFold object
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Iterate through the splits
+for train_index, test_index in kf.split(X):
+    # Generate training and testing data
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    # Fit the model and generate predictions
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    
+    # Evaluate the model
+    score = model.score(X_test, y_test)
+    print(score)
+Generated code for sklearn.model_selection.LeaveOneGroupOut
+
+
+from sklearn.model_selection import LeaveOneGroupOut
+
+# Create a list of groups
+groups = [1, 1, 1, 2, 2, 2, 3, 3, 3]
+
+# Create the LeaveOneGroupOut object
+logo = LeaveOneGroupOut()
+
+# Generate the splits
+for train_index, test_index in logo.split(X, y, groups):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    # Fit the model and make predictions
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+Generated code for sklearn.model_selection.LeavePGroupsOut
+
+
+from sklearn.model_selection import LeavePGroupsOut
+
+# Create LeavePGroupsOut object
+lpgo = LeavePGroupsOut(n_groups=3, p=2)
+
+# Generate indices for training and testing sets
+for train_index, test_index in lpgo.split(X, y, groups):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    # Fit model and make predictions
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+Generated code for sklearn.model_selection.LeaveOneOut
+
+
+from sklearn.model_selection import LeaveOneOut
+
+# Create a LeaveOneOut object
+loo = LeaveOneOut()
+
+# Iterate through the splits
+for train_index, test_index in loo.split(X):
+    # Create train and test sets
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    # Fit the model
+    model.fit(X_train, y_train)
+    
+    # Make predictions
+    y_pred = model.predict(X_test)
+    
+    # Calculate accuracy
+    accuracy = accuracy_score(y_test, y_pred)
+    
+    # Store accuracy
+    accuracies.append(accuracy)
+Generated code for sklearn.model_selection.LeavePOut
+
+
+from sklearn.model_selection import LeavePOut
+
+# Create a dataset
+X = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12], [13, 14], [15, 16]]
+
+# Create the LeavePOut object
+lpo = LeavePOut(p=2)
+
+# Generate the splits
+for train_index, test_index in lpo.split(X):
+    print("Train Index:", train_index, "\nTest Index:", test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    print("X_train:", X_train, "\nX_test:", X_test)
+    print("\n")
+Generated code for sklearn.model_selection.PredefinedSplit
+
+
+from sklearn.model_selection import PredefinedSplit
+
+# Create a predefined split object
+split_object = PredefinedSplit(test_fold=[-1, 0, 0, 1, 1, 1])
+
+# Fit the model using the predefined split object
+model.fit(X, y, predefined_split=split_object)
+Generated code for sklearn.model_selection.RepeatedKFold
+
+
+from sklearn.model_selection import RepeatedKFold
+
+# Create the RepeatedKFold object
+rkf = RepeatedKFold(n_splits=5, n_repeats=2, random_state=42)
+
+# Iterate through the splits
+for train_index, test_index in rkf.split(X):
+    # Generate training and testing sets
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    # Fit the model and generate predictions
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    
+    # Evaluate the model
+    score = model.score(X_test, y_test)
+    print(score)
+Generated code for sklearn.model_selection.RepeatedStratifiedKFold
+
+
+from sklearn.model_selection import RepeatedStratifiedKFold
+
+# Create the RepeatedStratifiedKFold object
+rskf = RepeatedStratifiedKFold(n_splits=5, n_repeats=2, random_state=42)
+
+# Iterate through the splits
+for train_index, test_index in rskf.split(X, y):
+   print("Train:", train_index, "Test:", test_index)
+   X_train, X_test = X[train_index], X[test_index]
+   y_train, y_test = y[train_index], y[test_index]
+Generated code for sklearn.model_selection.ShuffleSplit
+
+
+from sklearn.model_selection import ShuffleSplit
+
+# Create a ShuffleSplit object
+shuffle_split = ShuffleSplit(n_splits=5, test_size=0.2, random_state=0)
+
+# Iterate through the splits
+for train_index, test_index in shuffle_split.split(X):
+    # Generate training and testing datasets
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+
+    # Fit a model on the training data
+    model.fit(X_train, y_train)
+
+    # Make predictions on the test data
+    predictions = model.predict(X_test)
+Generated code for sklearn.model_selection.StratifiedKFold
+
+
+from sklearn.model_selection import StratifiedKFold
+
+X = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+y = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+
+skf = StratifiedKFold(n_splits=5)
+
+for train_index, test_index in skf.split(X, y):
+    print("Train:", train_index, "Test:", test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+
+# Output
+# Train: [2 3 4 5 6 7 8 9] Test: [0 1]
+# Train: [0 1 4 5 6 7 8 9] Test: [2 3]
+# Train: [0 1 2 3 6 7 8 9] Test: [4 5]
+# Train: [0 1 2 3 4 5 8 9] Test: [6 7]
+# Train: [0 1 2 3 4 5 6 7] Test: [8 9]
+Generated code for sklearn.model_selection.StratifiedShuffleSplit
+
+
+from sklearn.model_selection import StratifiedShuffleSplit
+
+# Create the Stratified Shuffle Split object
+sss = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=0)
+
+# Fit the SSS object to the data
+sss.fit(X, y)
+
+# Iterate through the splits
+for train_index, test_index in sss.split(X, y):
+    # Generate training and testing datasets
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    # Fit the model on the training data
+    model.fit(X_train, y_train)
+    
+    # Make predictions on the test data
+    y_pred = model.predict(X_test)
+    
+    # Evaluate the model
+    score = model.score(X_test, y_test)
+Generated code for sklearn.model_selection.StratifiedGroupKFold
+
+
+from sklearn.model_selection import StratifiedGroupKFold
+
+# Create a StratifiedGroupKFold object
+sgkf = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=42)
+
+# Create a list of the groups
+groups = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]
+
+# Create a list of the labels
+labels = [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]
+
+# Iterate through the splits
+for train_index, test_index in sgkf.split(X, y, groups):
+    # Get the training and testing data
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    # Fit the model on the training data
+    model.fit(X_train, y_train)
+    # Make predictions on the testing data
+    y_pred = model.predict(X_test)
+    # Evaluate the model
+    print(metrics.accuracy_score(y_test, y_pred))
+Generated code for sklearn.model_selection.TimeSeriesSplit
+
+
+from sklearn.model_selection import TimeSeriesSplit
+
+# Create TimeSeriesSplit object
+tscv = TimeSeriesSplit(n_splits=5)
+
+# Split data into train/test sets
+for train_index, test_index in tscv.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    # Fit model on train set
+    model.fit(X_train, y_train)
+    
+    # Make predictions on test set
+    y_pred = model.predict(X_test)
+Generated code for sklearn.model_selection.check_cv
+
+
+import numpy as np
+from sklearn.model_selection import check_cv
+
+# Generate a random dataset
+X = np.random.rand(100, 5)
+y = np.random.randint(2, size=100)
+
+# Create a cross-validation object
+cv = check_cv(cv=5, X=X, y=y, classifier=True)
+
+# Print the results
+print(cv)
+Generated code for sklearn.model_selection.train_test_split
+
+
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+# Create a data set
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
+y = np.array([1, 2, 3, 4])
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Print the results
+print("X_train:", X_train)
+print("y_train:", y_train)
+print("X_test:", X_test)
+print("y_test:", y_test)
+Generated code for sklearn.model_selection.GridSearchCV
+
+
+import numpy as np
+from sklearn.model_selection import GridSearchCV
+
+# Create a classifier
+clf = DecisionTreeClassifier()
+
+# Create a parameter grid
+param_grid = {'max_depth': np.arange(3, 10),
+              'min_samples_leaf': np.arange(3, 10)}
+
+# Instantiate the GridSearchCV object
+grid_search = GridSearchCV(clf, param_grid, cv=5)
+
+# Fit the model
+grid_search.fit(X, y)
+
+# Print the best parameters
+print(grid_search.best_params_)
+Generated code for sklearn.model_selection.HalvingGridSearchCV
+
+
+import numpy as np
+from sklearn.model_selection import HalvingGridSearchCV
+
+# Create a classifier
+clf = DecisionTreeClassifier()
+
+# Create a parameter grid
+param_grid = {'max_depth': np.arange(1, 10),
+              'min_samples_split': np.arange(2, 10)}
+
+# Create a HalvingGridSearchCV object
+halving_grid_search = HalvingGridSearchCV(clf, param_grid, cv=5, scoring='accuracy')
+
+# Fit the model
+halving_grid_search.fit(X, y)
+
+# Print the best parameters
+print(halving_grid_search.best_params_)
+Generated code for sklearn.model_selection.ParameterGrid
+
+
+from sklearn.model_selection import ParameterGrid
+
+param_grid = {'a': [1, 2], 'b': [True, False]}
+
+param_grid_list = list(ParameterGrid(param_grid))
+
+for params in param_grid_list:
+    print(params)
+
+# Output:
+# {'a': 1, 'b': True}
+# {'a': 1, 'b': False}
+# {'a': 2, 'b': True}
+# {'a': 2, 'b': False}
+Generated code for sklearn.model_selection.ParameterSampler
+
+
+from sklearn.model_selection import ParameterSampler
+
+# define the parameter space
+param_space = {
+    'n_estimators': [10, 50, 100],
+    'max_depth': [3, 5, 7],
+    'min_samples_split': [2, 5, 10]
+}
+
+# create the ParameterSampler
+param_sampler = ParameterSampler(param_space, n_iter=10, random_state=42)
+
+# iterate through the parameter combinations
+for params in param_sampler:
+    print(params)
+Generated code for sklearn.model_selection.RandomizedSearchCV
+
+
+import numpy as np
+from sklearn.model_selection import RandomizedSearchCV
+
+# Define the parameter values that should be searched
+param_grid = {'n_estimators': np.arange(10, 200, 10),
+              'max_depth': np.arange(1, 10)}
+
+# Create a base model
+model = RandomForestClassifier()
+
+# Instantiate the random search model
+random_search = RandomizedSearchCV(estimator = model, param_distributions = param_grid, 
+                                   n_iter = 10, cv = 3, verbose=2, random_state=42, n_jobs = -1)
+
+# Fit the random search model
+random_search.fit(X_train, y_train)
+Generated code for sklearn.model_selection.HalvingRandomSearchCV
+
+
+import numpy as np
+from sklearn.model_selection import HalvingRandomSearchCV
+
+# define the model
+model = SomeModel()
+
+# define the parameter grid
+param_grid = {
+    'param1': np.arange(0, 10, 0.5),
+    'param2': np.arange(0, 10, 0.5),
+    'param3': np.arange(0, 10, 0.5)
+}
+
+# define the HalvingRandomSearchCV
+halving_rs = HalvingRandomSearchCV(model, param_grid, cv=5, n_iter=10, scoring='accuracy')
+
+# fit the model
+halving_rs.fit(X, y)
+
+# print the best parameters
+print(halving_rs.best_params_)
+Generated code for sklearn.model_selection.cross_validate
+
+
+from sklearn.model_selection import cross_validate
+
+def cross_validate(estimator, X, y, scoring=None, cv=None,
+                   n_jobs=None, verbose=0, fit_params=None,
+                   pre_dispatch='2*n_jobs', return_train_score=False):
+    """Evaluate a score by cross-validation
+    Read more in the :ref:`User Guide <cross_validation>`.
+    Parameters
+    ----------
+    estimator : estimator object implementing 'fit'
+        The object to use to fit the data.
+    X : array-like
+        The data to fit. Can be, for example a list, or an array.
+    y : array-like, optional, default: None
+        The target variable to try to predict in the case of
+        supervised learning.
+    scoring : string, callable, list/tuple, dict or None, default: None
+        A single string (see :ref:`scoring_parameter`) or a callable
+        (see :ref:`scoring`) to evaluate the predictions on the test set.
+        For evaluating multiple metrics, either give a list of (unique) strings
+        or a dict with names as keys and callables as values.
+        NOTE that when using custom scorers, each scorer should return a single
+        value. Metric functions returning a list/array of values can be wrapped
+        into multiple scorers that return one value each.
+        See :ref:`multimetric_grid_search` for an example.
+        If None, the estimator's score method is used.
+    cv : int, cross-validation generator or an iterable, optional
+        Determines the cross-validation splitting strategy.
+        Possible inputs for cv are:
+        - None, to use the default 5-fold cross-validation,
+        - integer, to specify the number of folds.
+        - :term:`CV splitter`,
+        - An iterable yielding (train, test) splits as arrays of indices.
+        For integer/None inputs, if ``y`` is binary or multiclass,
+        :class:`StratifiedKFold` used.
+Generated code for sklearn.model_selection.cross_val_predict
+
+
+from sklearn.model_selection import cross_val_predict
+
+def cross_val_predict(estimator, X, y, cv=None):
+    """
+    Generate cross-validated estimates for each input data point
+    
+    Parameters
+    ----------
+    estimator : estimator object implementing 'fit'
+        The object to use to fit the data.
+    
+    X : array-like
+        The data to fit.
+    
+    y : array-like
+        The target variable to try to predict.
+    
+    cv : int, cross-validation generator or an iterable, optional
+        Determines the cross-validation splitting strategy.
+        Possible inputs for cv are:
+          - None, to use the default 3-fold cross-validation,
+          - integer, to specify the number of folds.
+          - An object to be used as a cross-validation generator.
+          - An iterable yielding train/test splits.
+    
+    Returns
+    -------
+    predictions : array-like
+        The predicted values.
+    """
+    # Generate cross-validation folds
+    cv_folds = cv or 3
+    kf = KFold(n_splits=cv_folds)
+    # Fit the model on each fold
+    predictions = []
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        estimator.fit(X_train, y_train)
+        predictions.append(estimator.predict(X_test))
+    # Return the predictions
+    return np.concatenate(predictions)
+Generated code for sklearn.model_selection.cross_val_score
+
+
+import numpy as np
+from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+
+# Create a random forest classifier
+clf = RandomForestClassifier(n_estimators=10)
+
+# Create a dataset
+X = np.random.rand(100, 10)
+y = np.random.randint(2, size=100)
+
+# Calculate the cross-validation score
+scores = cross_val_score(clf, X, y, cv=5)
+
+# Print the mean score
+print("Mean cross-validation score: {:.2f}".format(scores.mean()))
+Generated code for sklearn.model_selection.learning_curve
+
+
+import numpy as np
+from sklearn.model_selection import learning_curve
+from sklearn.svm import SVC
+
+# Generate a random dataset
+X = np.random.rand(1000, 10)
+y = np.random.randint(2, size=1000)
+
+# Create a Support Vector Classifier
+svc = SVC(gamma='auto')
+
+# Generate the learning curve
+train_sizes, train_scores, test_scores = learning_curve(svc, X, y, cv=10, scoring='accuracy',
+                                                        n_jobs=-1, train_sizes=np.linspace(.1, 1.0, 5))
+
+# Calculate the mean and standard deviation for training and testing scores
+train_mean = np.mean(train_scores, axis=1)
+train_std = np.std(train_scores, axis=1)
+test_mean = np.mean(test_scores, axis=1)
+test_std = np.std(test_scores, axis=1)
+
+# Plot the learning curve
+plt.plot(train_sizes, train_mean, '--', color="#111111",  label="Training score")
+plt.plot(train_sizes, test_mean, color="#111111", label="Cross-validation score")
+
+# Draw bands
+plt.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, color="#DDDDDD")
+plt.fill_between(train_sizes, test_mean - test_std, test_mean + test_std, color="#DDDDDD")
+
+# Create plot
+plt.title("Learning Curve")
+plt.xlabel("Training Set Size"), plt.ylabel("Accuracy Score"), plt.legend(loc="best")
+plt.tight_layout()
+plt.show()
+Generated code for sklearn.model_selection.permutation_test_score
+
+
+import numpy as np
+from sklearn.model_selection import permutation_test_score
+
+# Generate some data
+X = np.random.rand(100, 10)
+y = np.random.randint(2, size=100)
+
+# Fit a model
+model = SomeModel()
+model.fit(X, y)
+
+# Calculate the permutation test score
+score, pvalue, _ = permutation_test_score(model, X, y, cv=5, n_permutations=100)
+
+print("Score: %f, p-value: %f" % (score, pvalue))
+Generated code for sklearn.model_selection.validation_curve
+
+
+from sklearn.model_selection import validation_curve
+
+def validation_curve_example(model, X, y, param_name, param_range):
+    train_scores, test_scores = validation_curve(
+        model, X, y, param_name=param_name, param_range=param_range,
+        cv=3, scoring="accuracy", n_jobs=-1)
+    train_mean = np.mean(train_scores, axis=1)
+    train_std = np.std(train_scores, axis=1)
+    test_mean = np.mean(test_scores, axis=1)
+    test_std = np.std(test_scores, axis=1)
+    plt.plot(param_range, train_mean, 
+             color='blue', marker='o', 
+             markersize=5, label='training accuracy')
+    plt.fill_between(param_range, train_mean + train_std,
+                     train_mean - train_std, alpha=0.15,
+                     color='blue')
+    plt.plot(param_range, test_mean, 
+             color='green', linestyle='--', 
+             marker='s', markersize=5, 
+             label='validation accuracy')
+    plt.fill_between(param_range, 
+                     test_mean + test_std,
+                     test_mean - test_std, 
+                     alpha=0.15, color='green')
+    plt.grid()
+    plt.xscale('log')
+    plt.legend(loc='lower right')
+    plt.xlabel('Parameter')
+    plt.ylabel('Accuracy')
+    plt.ylim([0.8, 1.0])
+    plt.show()
+Generated code for sklearn.model_selection.LearningCurveDisplay
+
+
+from sklearn.model_selection import LearningCurveDisplay
+
+# Create a LearningCurveDisplay object
+lcd = LearningCurveDisplay(estimator, 
+                           X, 
+                           y, 
+                           cv=5, 
+                           scoring='accuracy', 
+                           train_sizes=np.linspace(0.1, 1.0, 10))
+
+# Fit the model
+lcd.fit(X, y)
+
+# Plot the learning curve
+lcd.poof()
+Generated code for sklearn.multiclass.OneVsRestClassifier
+
+
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.svm import SVC
+
+# Create the model
+model = OneVsRestClassifier(SVC(kernel='linear'))
+
+# Fit the model
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+Generated code for sklearn.multiclass.OneVsOneClassifier
+
+
+from sklearn.multiclass import OneVsOneClassifier
+
+# Create a classifier object
+clf = OneVsOneClassifier()
+
+# Train the classifier
+clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+accuracy = clf.score(X_test, y_test)
+Generated code for sklearn.multiclass.OutputCodeClassifier
+
+
+from sklearn.multiclass import OutputCodeClassifier
+
+# Create the OutputCodeClassifier object
+clf = OutputCodeClassifier(estimator=None, code_size=2, random_state=0)
+
+# Fit the model using the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+accuracy = clf.score(X_test, y_test)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.multioutput.ClassifierChain
+
+
+from sklearn.multioutput import ClassifierChain
+
+# Create the classifier chain
+clf_chain = ClassifierChain()
+
+# Fit the classifier chain to the training data
+clf_chain.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf_chain.predict(X_test)
+
+# Compute accuracy
+accuracy = clf_chain.score(X_test, y_test)
+Generated code for sklearn.multioutput.MultiOutputRegressor
+
+
+from sklearn.multioutput import MultiOutputRegressor
+
+# Create the base estimator
+base_estimator = DecisionTreeRegressor()
+
+# Create the multi-output regressor
+multi_output_regressor = MultiOutputRegressor(base_estimator)
+
+# Fit the multi-output regressor
+multi_output_regressor.fit(X, y)
+
+# Make predictions
+predictions = multi_output_regressor.predict(X_test)
+Generated code for sklearn.multioutput.MultiOutputClassifier
+
+
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+# Create a random forest classifier
+clf = RandomForestClassifier(random_state=0)
+
+# Create a multi-output classifier
+multi_clf = MultiOutputClassifier(clf, n_jobs=-1)
+Generated code for sklearn.multioutput.RegressorChain
+
+
+from sklearn.multioutput import RegressorChain
+
+# Create the RegressorChain object
+regressor_chain = RegressorChain()
+
+# Fit the model
+regressor_chain.fit(X, y)
+
+# Make predictions
+predictions = regressor_chain.predict(X_test)
+
+# Evaluate the model
+score = regressor_chain.score(X_test, y_test)
+Generated code for sklearn.naive_bayes.BernoulliNB
+
+
+from sklearn.naive_bayes import BernoulliNB
+
+# Create an instance of the BernoulliNB classifier
+clf = BernoulliNB()
+
+# Fit the classifier to the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Calculate the accuracy of the model
+accuracy = clf.score(X_test, y_test)
+Generated code for sklearn.naive_bayes.CategoricalNB
+
+
+from sklearn.naive_bayes import CategoricalNB
+
+# Create an instance of the CategoricalNB class
+clf = CategoricalNB()
+
+# Fit the model to the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Calculate the accuracy of the model
+accuracy = clf.score(X_test, y_test)
+Generated code for sklearn.naive_bayes.ComplementNB
+
+
+from sklearn.naive_bayes import ComplementNB
+
+# Create an instance of the ComplementNB class
+clf = ComplementNB()
+
+# Fit the model to the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+predictions = clf.predict(X_test)
+
+# Evaluate the model's performance
+accuracy = clf.score(X_test, y_test)
+print("Accuracy: {:.2f}%".format(accuracy*100))
+Generated code for sklearn.naive_bayes.GaussianNB
+
+
+from sklearn.naive_bayes import GaussianNB
+
+# Create a Gaussian Classifier
+model = GaussianNB()
+
+# Train the model using the training sets
+model.fit(X_train, y_train)
+
+# Predict Output
+predicted= model.predict(X_test)
+Generated code for sklearn.naive_bayes.MultinomialNB
+
+
+from sklearn.naive_bayes import MultinomialNB
+
+# Create an instance of the MultinomialNB classifier
+clf = MultinomialNB()
+
+# Train the classifier using the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+predictions = clf.predict(X_test)
+
+# Evaluate the accuracy of the model
+accuracy = clf.score(X_test, y_test)
+Generated code for sklearn.neighbors.BallTree
+
+
+from sklearn.neighbors import BallTree
+
+# Create a BallTree object
+ball_tree = BallTree(data, leaf_size=30, metric='euclidean')
+
+# Query the tree for the k nearest neighbors
+distances, indices = ball_tree.query(query_point, k=k)
+
+# Get the neighbors
+neighbors = data[indices]
+Generated code for sklearn.neighbors.KDTree
+
+
+from sklearn.neighbors import KDTree
+
+# Create a KDTree object
+kdtree = KDTree(data, leaf_size=30, metric='euclidean')
+
+# Query the tree for the nearest neighbors
+dist, ind = kdtree.query(query_point, k=k)
+
+# Get the distances and indices of the k nearest neighbors
+neighbors = data[ind]
+distances = dist
+Generated code for sklearn.neighbors.KernelDensity
+
+
+from sklearn.neighbors import KernelDensity
+
+# Create the KernelDensity object
+kd = KernelDensity(bandwidth=1.0)
+
+# Fit the data to the model
+kd.fit(X)
+
+# Make predictions
+predictions = kd.predict(X)
+Generated code for sklearn.neighbors.KNeighborsClassifier
+
+
+from sklearn.neighbors import KNeighborsClassifier
+
+# Create a KNeighborsClassifier object
+knn = KNeighborsClassifier()
+
+# Fit the model using the training data
+knn.fit(X_train, y_train)
+
+# Make predictions on the test data
+predictions = knn.predict(X_test)
+
+# Evaluate the model
+accuracy = knn.score(X_test, y_test)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.neighbors.KNeighborsRegressor
+
+
+from sklearn.neighbors import KNeighborsRegressor
+
+# Create a KNeighborsRegressor object
+knn_regressor = KNeighborsRegressor()
+
+# Fit the model to the data
+knn_regressor.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = knn_regressor.predict(X_test)
+
+# Evaluate the model
+score = knn_regressor.score(X_test, y_test)
+Generated code for sklearn.neighbors.KNeighborsTransformer
+
+
+from sklearn.neighbors import KNeighborsTransformer
+
+# Create a KNeighborsTransformer object
+knn_transformer = KNeighborsTransformer(n_neighbors=3, weights='distance')
+
+# Fit the transformer to the data
+knn_transformer.fit(X)
+
+# Transform the data
+X_transformed = knn_transformer.transform(X)
+Generated code for sklearn.neighbors.LocalOutlierFactor
+
+
+from sklearn.neighbors import LocalOutlierFactor
+
+# Create the Local Outlier Factor (LOF) model
+lof_model = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
+
+# Fit the model to the data
+lof_model.fit(X)
+
+# Get the outlier scores
+outlier_scores = lof_model.negative_outlier_factor_
+
+# Get the indices of the outliers
+outlier_indices = np.where(outlier_scores > 1.2)[0]
+
+# Print the outliers
+print(X[outlier_indices])
+Generated code for sklearn.neighbors.RadiusNeighborsClassifier
+
+
+from sklearn.neighbors import RadiusNeighborsClassifier
+
+# Create a RadiusNeighborsClassifier object
+rnc = RadiusNeighborsClassifier(radius=1.0)
+
+# Fit the model using the training data
+rnc.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = rnc.predict(X_test)
+
+# Evaluate the model
+accuracy = rnc.score(X_test, y_test)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.neighbors.RadiusNeighborsRegressor
+
+
+from sklearn.neighbors import RadiusNeighborsRegressor
+
+# Create a RadiusNeighborsRegressor object
+rneigh = RadiusNeighborsRegressor(radius=1.0)
+
+# Fit the model using the training data
+rneigh.fit(X_train, y_train)
+
+# Make predictions using the test data
+y_pred = rneigh.predict(X_test)
+
+# Evaluate the model
+score = rneigh.score(X_test, y_test)
+print("RadiusNeighborsRegressor score: %.2f" % score)
+Generated code for sklearn.neighbors.RadiusNeighborsTransformer
+
+
+from sklearn.neighbors import RadiusNeighborsTransformer
+
+# Create an instance of the transformer
+radius_neighbors_transformer = RadiusNeighborsTransformer()
+
+# Fit the transformer to the data
+radius_neighbors_transformer.fit(X)
+
+# Transform the data
+X_transformed = radius_neighbors_transformer.transform(X)
+Generated code for sklearn.neighbors.NearestCentroid
+
+
+from sklearn.neighbors import NearestCentroid
+
+# Create a NearestCentroid object
+clf = NearestCentroid()
+
+# Fit the model to the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+predictions = clf.predict(X_test)
+
+# Evaluate the model
+score = clf.score(X_test, y_test)
+Generated code for sklearn.neighbors.NearestNeighbors
+
+
+from sklearn.neighbors import NearestNeighbors
+
+# Create a NearestNeighbors object
+neigh = NearestNeighbors(n_neighbors=3)
+
+# Fit the model using the training data
+neigh.fit(X_train)
+
+# Find the k-nearest neighbors of a given point
+distances, indices = neigh.kneighbors([point])
+
+# Get the labels of the k-nearest neighbors
+labels = [y_train[i] for i in indices]
+Generated code for sklearn.neighbors.NeighborhoodComponentsAnalysis
+
+
+from sklearn.neighbors import NeighborhoodComponentsAnalysis
+
+# Create an instance of the NeighborhoodComponentsAnalysis class
+nca = NeighborhoodComponentsAnalysis(random_state=42)
+
+# Fit the model to the data
+nca.fit(X, y)
+
+# Make predictions
+predictions = nca.predict(X_test)
+
+# Evaluate the model
+score = nca.score(X_test, y_test)
+Generated code for sklearn.neighbors.kneighbors_graph
+
+
+import numpy as np
+from sklearn.neighbors import kneighbors_graph
+
+# Generate sample data
+X = np.random.random((10, 2))
+
+# Compute the k-neighbors graph
+knn_graph = kneighbors_graph(X, n_neighbors=3, mode='connectivity', include_self=True)
+
+# Print the resulting adjacency matrix
+print(knn_graph.toarray())
+Generated code for sklearn.neighbors.radius_neighbors_graph
+
+
+from sklearn.neighbors import radius_neighbors_graph
+
+# Create a graph of radius-based neighbors
+X = [[0], [3], [1]]
+radius = 1.0
+graph = radius_neighbors_graph(X, radius, mode='connectivity', include_self=True)
+
+# Print the graph
+print(graph.toarray())
+
+# Output:
+# [[1. 1. 0.]
+#  [1. 1. 1.]
+#  [0. 1. 1.]]
+Generated code for sklearn.neighbors.sort_graph_by_row_values
+
+
+def sort_graph_by_row_values(graph, row_values):
+    """
+    Sort a graph by row values.
+    
+    Parameters
+    ----------
+    graph : numpy.ndarray
+        The graph to be sorted.
+    row_values : list
+        A list of row values to sort the graph by.
+    
+    Returns
+    -------
+    sorted_graph : numpy.ndarray
+        The sorted graph.
+    """
+    # Get the indices of the rows in the graph
+    row_indices = np.arange(graph.shape[0])
+    
+    # Sort the row indices by the row values
+    sorted_row_indices = np.argsort(row_values)
+    
+    # Create a new graph with the sorted row indices
+    sorted_graph = graph[sorted_row_indices, :]
+    
+    return sorted_graph
+Generated code for sklearn.neural_network.BernoulliRBM
+
+
+from sklearn.neural_network import BernoulliRBM
+
+# Create BernoulliRBM object
+rbm = BernoulliRBM(n_components=100, learning_rate=0.01, n_iter=20, random_state=0)
+
+# Fit the model to the data
+rbm.fit(X_train)
+
+# Transform the data
+X_transformed = rbm.transform(X_train)
+
+# Predict the labels
+y_pred = rbm.predict(X_test)
+Generated code for sklearn.neural_network.MLPClassifier
+
+
+# Importing the necessary libraries
+from sklearn.neural_network import MLPClassifier
+
+# Creating the MLPClassifier object
+mlp = MLPClassifier(hidden_layer_sizes=(100,100,100), activation='relu', solver='adam', max_iter=500)
+
+# Fitting the model
+mlp.fit(X_train, y_train)
+
+# Making predictions
+y_pred = mlp.predict(X_test)
+
+# Evaluating the model
+accuracy = mlp.score(X_test, y_test)
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+Generated code for sklearn.neural_network.MLPRegressor
+
+
+from sklearn.neural_network import MLPRegressor
+
+# Create the MLPRegressor object
+mlp_regressor = MLPRegressor(hidden_layer_sizes=(100,), activation='relu', solver='adam', 
+                             alpha=0.0001, batch_size='auto', learning_rate='constant', 
+                             learning_rate_init=0.001, power_t=0.5, max_iter=200, shuffle=True, 
+                             random_state=None, tol=0.0001, verbose=False, warm_start=False, 
+                             momentum=0.9, nesterovs_momentum=True, early_stopping=False, 
+                             validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+
+# Fit the model to the data
+mlp_regressor.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = mlp_regressor.predict(X_test)
+Generated code for sklearn.pipeline.FeatureUnion
+
+
+from sklearn.pipeline import FeatureUnion
+
+class FeatureUnion(BaseEstimator, TransformerMixin):
+    """
+    A FeatureUnion is a transformer that combines several transformer objects
+    to form a new transformer.
+    """
+    def __init__(self, transformer_list):
+        self.transformer_list = transformer_list
+
+    def fit(self, X, y=None):
+        for (name, t) in self.transformer_list:
+            t.fit(X, y)
+        return self
+
+    def transform(self, X):
+        Xts = [t.transform(X) for _, t in self.transformer_list]
+        return np.hstack(Xts)
+Generated code for sklearn.pipeline.Pipeline
+
+
+from sklearn.pipeline import Pipeline
+
+# Create a pipeline object
+pipeline = Pipeline([
+    ('clf', SomeClassifier()),
+    ('scaler', StandardScaler()),
+    ('pca', PCA())
+])
+
+# Fit the pipeline to the data
+pipeline.fit(X_train, y_train)
+
+# Make predictions
+y_pred = pipeline.predict(X_test)
+Generated code for sklearn.pipeline.make_pipeline
+
+
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+# Create a pipeline object
+pipeline = make_pipeline(StandardScaler(), LogisticRegression())
+
+# Fit the pipeline to the training data
+pipeline.fit(X_train, y_train)
+
+# Predict the labels of the test set
+y_pred = pipeline.predict(X_test)
+Generated code for sklearn.pipeline.make_union
+
+
+from sklearn.pipeline import make_union
+
+# Create a list of transformers
+transformers = [('transformer1', transformer1),
+                ('transformer2', transformer2),
+                ('transformer3', transformer3)]
+
+# Create the union
+union = make_union(*transformers)
+Generated code for sklearn.preprocessing.Binarizer
+
+
+from sklearn.preprocessing import Binarizer
+
+# Create an instance of the Binarizer class
+binarizer = Binarizer()
+
+# Fit the binarizer to the data
+binarizer.fit(X)
+
+# Transform the data
+X_binarized = binarizer.transform(X)
+Generated code for sklearn.preprocessing.FunctionTransformer
+
+
+from sklearn.preprocessing import FunctionTransformer
+
+def custom_function(X):
+    # Custom function to be applied to the data
+    return X**2
+
+transformer = FunctionTransformer(custom_function)
+
+# Fit the transformer to the data
+transformer.fit(X)
+
+# Transform the data
+X_transformed = transformer.transform(X)
+Generated code for sklearn.preprocessing.KBinsDiscretizer
+
+
+from sklearn.preprocessing import KBinsDiscretizer
+
+# Create the discretizer
+discretizer = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='uniform')
+
+# Fit the discretizer to the data
+discretizer.fit(X)
+
+# Transform the data
+X_binned = discretizer.transform(X)
+Generated code for sklearn.preprocessing.KernelCenterer
+
+
+class KernelCenterer:
+    """
+    Centering a kernel matrix
+    """
+    def __init__(self):
+        self.mean_ = None
+
+    def fit(self, K):
+        """
+        Fit the centering operation on the kernel matrix
+        Parameters
+        ----------
+        K : array-like, shape (n_samples, n_samples)
+            Kernel matrix
+        Returns
+        -------
+        self : returns an instance of self.
+        """
+        n_samples = K.shape[0]
+        self.mean_ = np.sum(K, axis=0) / n_samples
+        return self
+
+    def transform(self, K):
+        """
+        Center the kernel matrix
+        Parameters
+        ----------
+        K : array-like, shape (n_samples, n_samples)
+            Kernel matrix
+        Returns
+        -------
+        K_new : array-like, shape (n_samples, n_samples)
+            Centered kernel matrix
+        """
+        K_new = K - self.mean_[:, np.newaxis] - self.mean_[np.newaxis, :]
+        K_new += np.mean(self.mean_)
+        return K_new
+Generated code for sklearn.preprocessing.LabelBinarizer
+
+
+from sklearn.preprocessing import LabelBinarizer
+
+# Create an instance of LabelBinarizer
+lb = LabelBinarizer()
+
+# Fit the LabelBinarizer to the data
+lb.fit(data)
+
+# Transform the data
+transformed_data = lb.transform(data)
+
+# Print the transformed data
+print(transformed_data)
+Generated code for sklearn.preprocessing.LabelEncoder
+
+
+from sklearn.preprocessing import LabelEncoder
+
+# Create an instance of LabelEncoder
+label_encoder = LabelEncoder()
+
+# Fit the encoder to the data
+label_encoder.fit(data)
+
+# Transform the data
+transformed_data = label_encoder.transform(data)
+
+# Print the transformed data
+print(transformed_data)
+Generated code for sklearn.preprocessing.MultiLabelBinarizer
+
+
+from sklearn.preprocessing import MultiLabelBinarizer
+
+mlb = MultiLabelBinarizer()
+
+# Fit the MultiLabelBinarizer to the data
+mlb.fit(data)
+
+# Transform the data into a binary matrix
+binary_matrix = mlb.transform(data)
+
+# Print the binary matrix
+print(binary_matrix)
+Generated code for sklearn.preprocessing.MaxAbsScaler
+
+
+from sklearn.preprocessing import MaxAbsScaler
+
+# Create an instance of MaxAbsScaler
+scaler = MaxAbsScaler()
+
+# Fit the scaler to the data
+scaler.fit(X)
+
+# Transform the data
+X_scaled = scaler.transform(X)
+Generated code for sklearn.preprocessing.MinMaxScaler
+
+
+from sklearn.preprocessing import MinMaxScaler
+
+# Create an instance of the MinMaxScaler
+scaler = MinMaxScaler()
+
+# Fit the scaler to the data
+scaler.fit(data)
+
+# Transform the data
+scaled_data = scaler.transform(data)
+Generated code for sklearn.preprocessing.Normalizer
+
+
+from sklearn.preprocessing import Normalizer
+
+# Create an instance of the Normalizer class
+normalizer = Normalizer()
+
+# Fit the Normalizer to the data
+normalizer.fit(X)
+
+# Transform the data
+X_normalized = normalizer.transform(X)
+Generated code for sklearn.preprocessing.OneHotEncoder
+
+
+from sklearn.preprocessing import OneHotEncoder
+
+# Create an instance of the OneHotEncoder
+onehot_encoder = OneHotEncoder()
+
+# Fit the encoder to the data
+onehot_encoder.fit(X)
+
+# Transform the data
+X_onehot = onehot_encoder.transform(X)
+Generated code for sklearn.preprocessing.OrdinalEncoder
+
+
+from sklearn.preprocessing import OrdinalEncoder
+
+# Create an instance of the OrdinalEncoder
+ordinal_encoder = OrdinalEncoder()
+
+# Fit the encoder to the data
+ordinal_encoder.fit(X)
+
+# Transform the data
+X_encoded = ordinal_encoder.transform(X)
+Generated code for sklearn.preprocessing.PolynomialFeatures
+
+
+from sklearn.preprocessing import PolynomialFeatures
+
+# Create an instance of the PolynomialFeatures class
+poly = PolynomialFeatures(degree=2, include_bias=False)
+
+# Fit the instance to the data
+X = [[1, 2], [3, 4]]
+poly.fit(X)
+
+# Transform the data
+X_poly = poly.transform(X)
+
+# Print the transformed data
+print(X_poly)
+
+# Output:
+# [[ 1.  2.  1.  2.  4.]
+#  [ 3.  4.  9. 12. 16.]]
+Generated code for sklearn.preprocessing.PowerTransformer
+
+
+from sklearn.preprocessing import PowerTransformer
+
+# Create an instance of the PowerTransformer
+pt = PowerTransformer()
+
+# Fit the PowerTransformer to the data
+pt.fit(X)
+
+# Transform the data using the PowerTransformer
+X_transformed = pt.transform(X)
+Generated code for sklearn.preprocessing.QuantileTransformer
+
+
+import numpy as np
+from sklearn.preprocessing import QuantileTransformer
+
+# Create a random array
+X = np.random.rand(10, 5)
+
+# Create the transformer
+qt = QuantileTransformer(output_distribution='normal')
+
+# Fit and transform the data
+X_transformed = qt.fit_transform(X)
+
+# Print the transformed data
+print(X_transformed)
+Generated code for sklearn.preprocessing.RobustScaler
+
+
+from sklearn.preprocessing import RobustScaler
+
+# Create an instance of the RobustScaler
+scaler = RobustScaler()
+
+# Fit the scaler to the data
+scaler.fit(X)
+
+# Transform the data
+X_scaled = scaler.transform(X)
+Generated code for sklearn.preprocessing.SplineTransformer
+
+
+from sklearn.preprocessing import SplineTransformer
+
+# Create an instance of the SplineTransformer
+spline_transformer = SplineTransformer()
+
+# Fit the transformer to the data
+spline_transformer.fit(X)
+
+# Transform the data
+X_transformed = spline_transformer.transform(X)
+Generated code for sklearn.preprocessing.StandardScaler
+
+
+from sklearn.preprocessing import StandardScaler
+
+# Create an instance of the StandardScaler class
+scaler = StandardScaler()
+
+# Fit the scaler to the data
+scaler.fit(data)
+
+# Transform the data
+scaled_data = scaler.transform(data)
+Generated code for sklearn.preprocessing.add_dummy_feature
+
+
+import numpy as np
+from sklearn.preprocessing import add_dummy_feature
+
+# Create a sample array
+X = np.array([[1, 2, 3], [4, 5, 6]])
+
+# Add a dummy feature
+X_dummy = add_dummy_feature(X)
+
+# Print the new array
+print(X_dummy)
+Generated code for sklearn.preprocessing.binarize
+
+
+import numpy as np
+from sklearn.preprocessing import binarize
+
+# Create a sample array
+x = np.array([[1, -1, 2],
+              [2, 0, 0],
+              [0, 1, -1]])
+
+# Binarize the array
+binarized_x = binarize(x, threshold=1.5)
+
+# Print the binarized array
+print(binarized_x)
+Generated code for sklearn.preprocessing.label_binarize
+
+
+from sklearn.preprocessing import label_binarize
+
+def label_binarize(y, classes):
+    """
+    Binarize labels in a one-vs-all fashion.
+
+    Parameters
+    ----------
+    y : array-like of shape (n_samples,)
+        Target values.
+
+    classes : array-like of shape (n_classes,)
+        Unique class labels.
+
+    Returns
+    -------
+    Y : array of shape (n_samples, n_classes)
+        Binarized labels.
+    """
+    y = np.asarray(y)
+    classes = np.asarray(classes)
+    n_classes = classes.shape[0]
+    Y = np.zeros((y.shape[0], n_classes))
+    for i in range(n_classes):
+        Y[y == classes[i], i] = 1
+    return Y
+Generated code for sklearn.preprocessing.maxabs_scale
+
+
+from sklearn.preprocessing import MaxAbsScaler
+
+# Create an instance of MaxAbsScaler
+max_abs_scaler = MaxAbsScaler()
+
+# Fit and transform the data
+scaled_data = max_abs_scaler.fit_transform(data)
+
+# Print the scaled data
+print(scaled_data)
+Generated code for sklearn.preprocessing.minmax_scale
+
+
+def minmax_scale(X, feature_range=(0, 1), axis=0, copy=True):
+    """
+    Scales all values in a numpy array X to be between a given
+    minimum and maximum value.
+    
+    Parameters
+    ----------
+    X : array-like, shape [n_samples, n_features]
+        The data to scale.
+    feature_range : tuple (min, max), default=(0, 1)
+        Desired range of transformed data.
+    axis : int (0 by default)
+        Axis along which to scale.
+    copy : bool, default=True
+        Set to False to perform inplace scaling.
+    
+    Returns
+    -------
+    X_scaled : ndarray, shape [n_samples, n_features]
+        Scaled data.
+    """
+    # Check input
+    X = check_array(X, copy=copy, ensure_2d=False)
+    if X.ndim == 1:
+        X = X.reshape(X.shape[0], 1)
+    n_samples, n_features = X.shape
+    
+    # Get min and max
+    data_min = np.min(X, axis=axis, keepdims=True)
+    data_max = np.max(X, axis=axis, keepdims=True)
+    data_range = data_max - data_min
+    if np.all(data_range == 0):
+        data_range = np.ones(n_features)
+    
+    # Scale
+    min, max = feature_range
+    X_scaled = (X - data_min) / data_range * (max - min) + min
+    
+    return X_scaled
+Generated code for sklearn.preprocessing.normalize
+
+
+from sklearn.preprocessing import normalize
+
+# Create a 2D array
+X = [[1, 2],
+     [3, 4]]
+
+# Normalize the array
+normalized_X = normalize(X, norm='l2')
+
+print(normalized_X)
+
+# Output
+# [[0.4472136  0.89442719]
+#  [0.6172134  0.78683274]]
+Generated code for sklearn.preprocessing.quantile_transform
+
+
+from sklearn.preprocessing import quantile_transform
+
+# Create an array of data
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# Transform the data using quantile_transform
+transformed_data = quantile_transform(data, n_quantiles=4, random_state=0)
+
+# Print the transformed data
+print(transformed_data)
+Generated code for sklearn.preprocessing.robust_scale
+
+
+from sklearn.preprocessing import robust_scale
+
+# Create an array
+X = [[ 1., -2.,  2.],
+     [ -2.,  1.,  3.],
+     [ 4.,  1., -2.]]
+
+# Apply robust scaling
+robust_scaled_X = robust_scale(X)
+
+# Print the result
+print(robust_scaled_X)
+Generated code for sklearn.preprocessing.scale
+
+
+from sklearn.preprocessing import scale
+
+def scale_data(data):
+    """
+    Scales the data using sklearn.preprocessing.scale
+    :param data: The data to be scaled
+    :return: The scaled data
+    """
+    return scale(data)
+Generated code for sklearn.preprocessing.power_transform
+
+
+from sklearn.preprocessing import power_transform
+
+# Sample data
+data = [1, 2, 3, 4, 5]
+
+# Transform data using Yeo-Johnson power transform
+transformed_data = power_transform(data, method='yeo-johnson')
+
+# Print transformed data
+print(transformed_data)
+Generated code for sklearn.random_projection.GaussianRandomProjection
+
+
+import numpy as np
+from sklearn.random_projection import GaussianRandomProjection
+
+# Create a GaussianRandomProjection object
+grp = GaussianRandomProjection(n_components=2)
+
+# Generate random data
+X = np.random.rand(10, 5)
+
+# Fit the data to the model
+grp.fit(X)
+
+# Transform the data
+X_transformed = grp.transform(X)
+
+# Print the transformed data
+print(X_transformed)
+Generated code for sklearn.random_projection.SparseRandomProjection
+
+
+import numpy as np
+from sklearn.random_projection import SparseRandomProjection
+
+# Create a random matrix of size (n_samples, n_features)
+X = np.random.rand(1000, 10)
+
+# Create a SparseRandomProjection object
+transformer = SparseRandomProjection(n_components=5)
+
+# Fit the random matrix to the transformer
+X_new = transformer.fit_transform(X)
+
+# Print the new matrix
+print(X_new)
+Generated code for sklearn.random_projection.johnson_lindenstrauss_min_dim
+
+
+import numpy as np
+from sklearn.random_projection import johnson_lindenstrauss_min_dim
+
+# Generate a random matrix of size (n_samples, n_features)
+X = np.random.rand(1000, 100)
+
+# Calculate the minimum number of dimensions required to preserve the 
+# pairwise distances between the samples
+min_dim = johnson_lindenstrauss_min_dim(n_samples=1000, eps=0.1)
+
+# Print the result
+print("Minimum number of dimensions required to preserve the pairwise distances:", min_dim)
+Generated code for sklearn.semi_supervised.LabelPropagation
+
+
+import numpy as np
+from sklearn.semi_supervised import LabelPropagation
+
+# Create a random dataset
+rng = np.random.RandomState(0)
+X = rng.rand(100, 2)
+
+# Create labels
+y = np.random.randint(2, size=(100,))
+
+# Create a label propagation model
+lp_model = LabelPropagation(kernel='rbf', gamma=20, n_neighbors=7)
+
+# Fit the model to the data
+lp_model.fit(X, y)
+
+# Predict labels for the data
+predicted_labels = lp_model.predict(X)
+Generated code for sklearn.semi_supervised.LabelSpreading
+
+
+from sklearn.semi_supervised import LabelSpreading
+
+# Create the LabelSpreading model
+model = LabelSpreading(kernel='rbf', gamma=20, n_neighbors=7)
+
+# Fit the model to the data
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+Generated code for sklearn.semi_supervised.SelfTrainingClassifier
+
+
+from sklearn.semi_supervised import SelfTrainingClassifier
+
+class SelfTrainingClassifier:
+    def __init__(self, estimator, n_iter=10, initial_labeled_samples=None):
+        self.estimator = estimator
+        self.n_iter = n_iter
+        self.initial_labeled_samples = initial_labeled_samples
+
+    def fit(self, X, y):
+        # Initialize the labeled and unlabeled sets
+        if self.initial_labeled_samples is None:
+            labeled_samples = []
+            unlabeled_samples = list(range(X.shape[0]))
+        else:
+            labeled_samples = self.initial_labeled_samples
+            unlabeled_samples = [i for i in range(X.shape[0]) if i not in self.initial_labeled_samples]
+
+        # Iterate over the number of iterations
+        for _ in range(self.n_iter):
+            # Train the model on the labeled data
+            self.estimator.fit(X[labeled_samples], y[labeled_samples])
+
+            # Make predictions on the unlabeled data
+            predictions = self.estimator.predict(X[unlabeled_samples])
+
+            # Add the most confident predictions to the labeled set
+            max_confidence = 0
+            max_confidence_index = None
+            for i, prediction in enumerate(predictions):
+                if prediction[1] > max_confidence:
+                    max_confidence = prediction[1]
+                    max_confidence_index = i
+
+            if max_confidence_index is not None:
+                labeled_samples.append(unlabeled_samples[max_confidence_index])
+                del unlabeled_samples[max_confidence_index]
+
+        # Return the trained model
+        return self.estimator
+Generated code for sklearn.svm.LinearSVC
+
+
+# Import the necessary libraries
+from sklearn.svm import LinearSVC
+from sklearn.datasets import make_classification
+
+# Generate a sample dataset
+X, y = make_classification(n_samples=1000, n_features=4, random_state=0)
+
+# Create a LinearSVC model
+clf = LinearSVC(random_state=0, tol=1e-5)
+
+# Fit the model to the data
+clf.fit(X, y)
+
+# Make predictions
+predictions = clf.predict(X)
+
+# Print the accuracy of the model
+print("Accuracy:", clf.score(X, y))
+Generated code for sklearn.svm.LinearSVR
+
+
+# Import necessary libraries
+from sklearn.svm import LinearSVR
+import numpy as np
+
+# Create a LinearSVR object
+svr_model = LinearSVR()
+
+# Create some sample data
+X = np.array([[1,2,3], [4,5,6], [7,8,9]])
+y = np.array([1,2,3])
+
+# Fit the model to the data
+svr_model.fit(X, y)
+
+# Make predictions
+predictions = svr_model.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.svm.NuSVC
+
+
+# Import necessary libraries
+from sklearn.svm import NuSVC
+from sklearn.datasets import make_classification
+
+# Generate a sample dataset
+X, y = make_classification(n_samples=1000, n_features=4, n_informative=2, n_redundant=0, random_state=0)
+
+# Create an instance of NuSVC
+clf = NuSVC(gamma='auto')
+
+# Fit the model to the data
+clf.fit(X, y)
+
+# Make predictions
+predictions = clf.predict(X)
+
+# Evaluate the model
+score = clf.score(X, y)
+print("Model accuracy:", score)
+Generated code for sklearn.svm.NuSVR
+
+
+# Import necessary libraries
+from sklearn.svm import NuSVR
+import numpy as np
+
+# Create a sample dataset
+X = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12]])
+y = np.array([1,2,3,4])
+
+# Create a NuSVR model
+model = NuSVR()
+
+# Fit the model to the data
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Print predictions
+print(predictions)
+Generated code for sklearn.svm.OneClassSVM
+
+
+#importing the necessary libraries
+import numpy as np
+from sklearn.svm import OneClassSVM
+
+#creating the data
+X = np.array([[1,2], [2,4], [3,6], [4,8], [5,10], [6,12], [7,14], [8,16], [9,18], [10,20]])
+
+#creating the model
+model = OneClassSVM(gamma='auto')
+
+#fitting the model
+model.fit(X)
+
+#predicting the labels
+labels = model.predict(X)
+
+#printing the labels
+print(labels)
+Generated code for sklearn.svm.SVC
+
+
+from sklearn.svm import SVC
+
+# Create a SVC classifier using a linear kernel
+clf = SVC(kernel='linear')
+
+# Train the classifier using the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Calculate the accuracy of the model
+accuracy = clf.score(X_test, y_test)
+Generated code for sklearn.svm.SVR
+
+
+from sklearn.svm import SVR
+
+# Create a Support Vector Regression (SVR) model
+svr_model = SVR()
+
+# Train the model using the training sets
+svr_model.fit(X_train, y_train)
+
+# Predict the response for test dataset
+y_pred = svr_model.predict(X_test)
+
+# Evaluate the model
+score = svr_model.score(X_test, y_test)
+print("Score: %.2f" % score)
+Generated code for sklearn.svm.l1_min_c
+
+
+# Import necessary libraries
+from sklearn.svm import LinearSVC
+from sklearn.datasets import make_classification
+
+# Generate a synthetic dataset
+X, y = make_classification(n_samples=1000, n_features=20, random_state=42)
+
+# Create an instance of the LinearSVC class
+clf = LinearSVC(penalty='l1', dual=False, random_state=42)
+
+# Fit the model to the data
+clf.fit(X, y)
+
+# Get the minimum value of C
+l1_min_c = clf.C_[0]
+
+# Print the minimum value of C
+print('The minimum value of C is:', l1_min_c)
+Generated code for sklearn.tree.DecisionTreeClassifier
+
+
+#importing necessary libraries
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+
+#loading the dataset
+df = pd.read_csv('dataset.csv')
+
+#defining the features and target
+X = df.drop('target', axis=1)
+y = df['target']
+
+#instantiating the model
+model = DecisionTreeClassifier()
+
+#fitting the model
+model.fit(X, y)
+
+#making predictions
+predictions = model.predict(X)
+
+#evaluating the model
+score = model.score(X, y)
+
+#printing the results
+print('Model Score:', score)
+print('Predictions:', predictions)
+Generated code for sklearn.tree.DecisionTreeRegressor
+
+
+from sklearn.tree import DecisionTreeRegressor
+
+# Create the Decision Tree regressor object
+regressor = DecisionTreeRegressor()
+
+# Fit the regressor to the data
+regressor.fit(X, y)
+
+# Make predictions
+y_pred = regressor.predict(X_test)
+Generated code for sklearn.tree.ExtraTreeClassifier
+
+
+# Import the necessary libraries
+from sklearn.tree import ExtraTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Load the data
+X = [[0, 0], [1, 1]]
+y = [0, 1]
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create the ExtraTreeClassifier
+clf = ExtraTreeClassifier()
+
+# Fit the model to the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Calculate the accuracy
+accuracy = accuracy_score(y_test, y_pred)
+
+# Print the accuracy
+print("Accuracy:", accuracy)
+Generated code for sklearn.tree.ExtraTreeRegressor
+
+
+# Import the necessary libraries
+from sklearn.tree import ExtraTreeRegressor
+import numpy as np
+
+# Create the data
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+y = np.array([1, 2, 3])
+
+# Create the ExtraTreeRegressor
+regressor = ExtraTreeRegressor()
+
+# Fit the model
+regressor.fit(X, y)
+
+# Make predictions
+predictions = regressor.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.tree.export_graphviz
+
+
+import graphviz
+from sklearn.tree import export_graphviz
+
+def visualize_tree(tree, feature_names):
+    with open("dt.dot", 'w') as f:
+        export_graphviz(tree, out_file=f,
+                        feature_names=feature_names)
+
+    command = ["dot", "-Tpng", "dt.dot", "-o", "dt.png"]
+    try:
+        subprocess.check_call(command)
+    except:
+        exit("Could not run dot, ie graphviz, to "
+             "produce visualization")
+
+visualize_tree(tree, feature_names)
+Generated code for sklearn.tree.export_text
+
+
+from sklearn.tree import export_text
+
+def export_tree_text(tree, feature_names):
+    tree_str = export_text(tree, feature_names=feature_names)
+    lines = tree_str.split('\n')
+    for i in range(len(lines)):
+        lines[i] = '    ' * i + lines[i]
+    return '\n'.join(lines)
+
+print(export_tree_text(tree, feature_names))
+Generated code for sklearn.tree.plot_tree
+
+
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
+
+# Create a decision tree classifier
+clf = DecisionTreeClassifier(random_state=0)
+
+# Train the classifier
+clf.fit(X_train, y_train)
+
+# Plot the decision tree
+plt.figure(figsize=(15,7))
+plot_tree(clf, filled=True, rounded=True, class_names=['Negative', 'Positive'], feature_names=X_train.columns)
+plt.show()
+Generated code for sklearn.utils.Bunch
+
+
+import sklearn
+
+class Bunch(dict):
+    """Container object for datasets: dictionary-like object that
+       exposes its keys as attributes."""
+
+    def __init__(self, **kwargs):
+        dict.__init__(self, kwargs)
+        self.__dict__ = self
+
+
+if __name__ == '__main__':
+    data = Bunch(name='Foo', age=20, height=180)
+    print(data.name)
+    print(data.age)
+    print(data.height)
+Generated code for sklearn.utils.arrayfuncs.min_pos
+
+
+def min_pos(arr):
+    """
+    Find the minimum positive value in an array.
+
+    Parameters
+    ----------
+    arr : array_like
+        Input array.
+
+    Returns
+    -------
+    min_pos : float
+        The minimum positive value in the array.
+        If there are no positive values, returns 0.
+    """
+    min_pos = 0
+    for val in arr:
+        if val > 0 and (min_pos == 0 or val < min_pos):
+            min_pos = val
+    return min_pos
+Generated code for sklearn.utils.as_float_array
+
+
+def as_float_array(X):
+    """Convert an array-like to an array of floats
+    Parameters
+    ----------
+    X : array-like
+        The input array.
+    Returns
+    -------
+    X_float : ndarray
+        An array of floats.
+    """
+    X_float = np.array(X, dtype=float)
+    return X_float
+Generated code for sklearn.utils.assert_all_finite
+
+
+def assert_all_finite(X):
+    """Throw a ValueError if X contains NaN or infinity.
+    Parameters
+    ----------
+    X : array or sparse matrix
+    """
+    X = np.asanyarray(X)
+    # First try an O(n) time, O(1) space solution for the common case that
+    # everything is finite; this is expected to turn up most of the time.
+    if (X.dtype.char in np.typecodes['AllFloat'] and not np.isfinite(X.sum())
+            and not np.isfinite(X).all()):
+        raise ValueError("Input contains NaN, infinity"
+                         " or a value too large for %r." % X.dtype)
+Generated code for sklearn.utils.check_X_y
+
+
+def check_X_y(X, y, accept_sparse=False, accept_large_sparse=True, dtype="numeric", order=None, copy=False, force_all_finite=True, ensure_2d=True, allow_nd=False, multi_output=False, ensure_min_samples=1, ensure_min_features=1, y_numeric=False, estimator=None):
+    """Input validation for standard estimators.
+    Checks X and y for consistent length, enforces X to be 2D and y 1D. By default,
+    X is checked to be non-empty and containing only finite values. Standard input
+    checks are also applied to y, such as checking that y does not have np.nan or
+    np.inf targets. For multi-label y, set multi_output=True to allow 2D and sparse
+    y. If the dtype of X is object, attempt converting to float, raising on failure.
+    Parameters
+    ----------
+    X : nd-array, list or sparse matrix
+        Input data.
+    y : nd-array, list or sparse matrix
+        Labels.
+    accept_sparse : string, boolean or list/tuple of strings (default=False)
+        String[s] representing allowed sparse matrix formats, such as 'csc',
+        'csr', etc. If the input is sparse but not in the allowed format,
+        it will be converted to the first listed format. True allows the input
+        to be any format. False means that a sparse matrix input will
+        raise an error.
+    accept_large_sparse : bool (default=True)
+        If a CSR, CSC, COO or BSR sparse matrix is supplied and accepted by
+        accept_sparse, accept_large_sparse=False will cause it to be accepted
+        only if its indices are stored with a 32-bit dtype.
+    dtype : string, type, list of types or None (default="numeric")
+        Data type of result. If None, the dtype of the input is preserved.
+        If "numeric", dtype is preserved unless array.dtype is object.
+    order : 'F',
+Generated code for sklearn.utils.check_array
+
+
+def check_array(array, accept_sparse=False, accept_large_sparse=True,
+                dtype="numeric", order=None, copy=False, force_all_finite=True,
+                ensure_2d=True, allow_nd=False, ensure_min_samples=1,
+                ensure_min_features=1, warn_on_dtype=False,
+                estimator=None):
+    """Input validation on an array, list, sparse matrix or similar.
+    By default, the input is converted to an at least 2nd numpy array.
+    If the dtype of the array is object, attempt converting to float,
+    raising on failure.
+    Parameters
+    ----------
+    array : object
+        Input object to check / convert.
+    accept_sparse : string, boolean or list/tuple of strings (default=False)
+        String[s] representing allowed sparse matrix formats, such as 'csc',
+        'csr', etc. If the input is sparse but not in the allowed format,
+        it will be converted to the first listed format. True allows the input
+        to be any format. False means that a sparse matrix input will
+        raise an error.
+    accept_large_sparse : bool (default=True)
+        If a CSR, CSC, COO or BSR sparse matrix is supplied and accepted by
+        accept_sparse, accept_large_sparse=False will cause it to be accepted
+        only if its indices are stored with a 32-bit dtype.
+    dtype : string, type, list of types or None (default="numeric")
+        Data type of result. If None, the dtype of the input is preserved.
+        If "numeric", dtype is preserved unless array.dtype is object.
+        If dtype is a list of types, conversion on the first type is only
+        performed if the dtype of the input is not in the list.
+    order : 'F', 'C' or None (default=None)
+        Whether an array will be forced to be fortran or c-style.
+    copy : boolean (default=False)
+        Whether a forced copy will be triggered. If copy=
+Generated code for sklearn.utils.check_scalar
+
+
+def check_scalar(x, name=None):
+    """
+    Check if x is a scalar.
+    Parameters
+    ----------
+    x : any
+        The object to check.
+    name : str, optional
+        The name of the object to check, for error messages.
+    Returns
+    -------
+    is_scalar : bool
+        True if x is a scalar, False otherwise.
+    """
+    is_scalar = True
+    if not isinstance(x, (int, float, complex)):
+        is_scalar = False
+        if name is None:
+            name = 'x'
+        raise TypeError('{0} is not a scalar'.format(name))
+    return is_scalar
+Generated code for sklearn.utils.check_consistent_length
+
+
+def check_consistent_length(*arrays):
+    """Check that all arrays have consistent first dimensions.
+    Checks whether all objects in arrays have the same shape or length.
+    Parameters
+    ----------
+    *arrays : list or tuple of input objects.
+        Objects that will be checked for consistent length.
+    Returns
+    -------
+    consistent : bool
+        True if objects in arrays have same shape or length.
+    """
+    lengths = [len(X) for X in arrays if X is not None]
+    uniques = np.unique(lengths)
+    if len(uniques) > 1:
+        raise ValueError("Input arrays must have consistent lengths. "
+                         "Found lengths: %r" % (lengths,))
+    return len(uniques) == 1
+Generated code for sklearn.utils.check_random_state
+
+
+import numpy as np
+
+def check_random_state(seed):
+    """Turn seed into a np.random.RandomState instance
+    Parameters
+    ----------
+    seed : None | int | instance of RandomState
+        If seed is None, return the RandomState singleton used by np.random.
+        If seed is an int, return a new RandomState instance seeded with seed.
+        If seed is already a RandomState instance, return it.
+        Otherwise raise ValueError.
+    """
+    if seed is None or seed is np.random:
+        return np.random.mtrand._rand
+    if isinstance(seed, (int, np.integer)):
+        return np.random.RandomState(seed)
+    if isinstance(seed, np.random.RandomState):
+        return seed
+    raise ValueError('%r cannot be used to seed a numpy.random.RandomState'
+                     ' instance' % seed)
+Generated code for sklearn.utils.class_weight.compute_class_weight
+
+
+import numpy as np
+from sklearn.utils import class_weight
+
+# define the labels
+labels = np.array([0, 1, 2, 3, 4, 5])
+
+# define the class weights
+class_weights = class_weight.compute_class_weight('balanced', labels, labels)
+
+# print the class weights
+print(class_weights)
+Generated code for sklearn.utils.class_weight.compute_sample_weight
+
+
+def compute_sample_weight(class_weight, y, indices=None):
+    """Estimate sample weights by class for unbalanced datasets.
+    
+    Parameters
+    ----------
+    class_weight : dict, {class_label: weight}
+        Weights associated with classes. If not given, all classes
+        are supposed to have weight one.
+    
+    y : array-like, shape (n_samples,)
+        Array of original class labels per sample.
+    
+    indices : array-like, shape (n_samples,), optional
+        Array of sample indices to be used instead of ``y``.
+    
+    Returns
+    -------
+    sample_weight : array-like, shape (n_samples,)
+        Array of sample weights.
+    """
+    if indices is None:
+        indices = np.arange(y.shape[0])
+    sample_weight = np.ones(y.shape[0], dtype=np.float64)
+    for class_ in np.unique(y):
+        if class_ in class_weight:
+            sample_weight[indices[y == class_]] = class_weight[class_]
+    return sample_weight
+Generated code for sklearn.utils.deprecated
+
+
+import warnings
+
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used."""
+    def new_func(*args, **kwargs):
+        warnings.warn("Call to deprecated function {}.".format(func.__name__),
+                      category=DeprecationWarning)
+        return func(*args, **kwargs)
+    new_func.__name__ = func.__name__
+    new_func.__doc__ = func.__doc__
+    new_func.__dict__.update(func.__dict__)
+    return new_func
+Generated code for sklearn.utils.estimator_checks.check_estimator
+
+
+def check_estimator(estimator):
+    """Check if estimator adheres to scikit-learn conventions.
+    Parameters
+    ----------
+    estimator : estimator instance
+        Estimator to check.
+    Returns
+    -------
+    errors : list
+        List of strings, describing problems found.
+    """
+    from sklearn.base import clone
+    from sklearn.exceptions import NotFittedError
+    from sklearn.utils.estimator_checks import check_parameters
+    from sklearn.utils.estimator_checks import check_no_attributes_set_in_init
+    from sklearn.utils.estimator_checks import check_estimators_dtypes
+    from sklearn.utils.estimator_checks import check_fit_score_takes_y
+    from sklearn.utils.estimator_checks import check_dtype_object
+    from sklearn.utils.estimator_checks import check_sample_weights_pandas_series
+    from sklearn.utils.estimator_checks import check_sample_weights_list
+    from sklearn.utils.estimator_checks import check_estimators_fit_returns_self
+    from sklearn.utils.estimator_checks import check_estimators_fit_returns_score
+    from sklearn.utils.estimator_checks import check_estimators_predict
+    from sklearn.utils.estimator_checks import check_estimators_transform
+    from sklearn.utils.estimator_checks import check_estimators_pickle
+    from sklearn.utils.estimator_checks import check_estimators_data_not_an_array
+    from sklearn.utils.estimator_checks import check_estimators_empty_data_messages
+    from sklearn.utils.estimator_checks import check_estimators_nan_inf
+    from sklearn.utils.estimator_checks import check_estimators_overwrite_params
+    from sklearn.utils.estimator_checks import check_estimator_sparse_data
+    from sk
+Generated code for sklearn.utils.estimator_checks.parametrize_with_checks
+
+
+import inspect
+import numpy as np
+
+from sklearn.utils.estimator_checks import check_estimator
+
+def parametrize_with_checks(estimator_class, **parameters):
+    """
+    Parametrize an estimator class with the given parameters and check it.
+
+    Parameters
+    ----------
+    estimator_class : estimator class
+        The estimator class to parametrize and check.
+
+    **parameters : keyword arguments
+        The parameters to parametrize the estimator class with.
+
+    Returns
+    -------
+    estimator : estimator instance
+        An instance of the estimator class with the given parameters.
+    """
+    # Get the signature of the estimator class
+    signature = inspect.signature(estimator_class)
+
+    # Create a list of keyword arguments to pass to the estimator class
+    kwargs = {
+        name: value
+        for name, value in parameters.items()
+        if name in signature.parameters
+    }
+
+    # Create an instance of the estimator class with the given parameters
+    estimator = estimator_class(**kwargs)
+
+    # Check the estimator
+    check_estimator(estimator)
+
+    return estimator
+Generated code for sklearn.utils.estimator_html_repr
+
+
+def estimator_html_repr(estimator):
+    """
+    Generates an HTML representation of an estimator.
+    
+    Parameters
+    ----------
+    estimator : estimator object
+        The estimator to generate an HTML representation for.
+    
+    Returns
+    -------
+    html_str : str
+        An HTML representation of the estimator.
+    """
+    # Get the estimator's name
+    estimator_name = estimator.__class__.__name__
+    
+    # Get the estimator's parameters
+    estimator_params = estimator.get_params()
+    
+    # Generate the HTML string
+    html_str = '<h3>{}</h3>\n'.format(estimator_name)
+    html_str += '<ul>\n'
+    for param_name, param_value in estimator_params.items():
+        html_str += '<li><strong>{}:</strong> {}</li>\n'.format(param_name, param_value)
+    html_str += '</ul>'
+    
+    return html_str
+Generated code for sklearn.utils.extmath.safe_sparse_dot
+
+
+def safe_sparse_dot(a, b, dense_output=False):
+    """Dot product that handle the sparse matrix case correctly
+    This is a drop-in replacement for np.dot.
+    Parameters
+    ----------
+    a : array or sparse matrix
+    b : array or sparse matrix
+    dense_output : boolean (optional), default False
+        When False, the output is a sparse matrix.
+        When True, the output is a dense matrix.
+    Returns
+    -------
+    dot_product : array or sparse matrix
+        sparse if a or b is sparse and dense_output=False.
+    """
+    from scipy import sparse
+    if sparse.issparse(a) or sparse.issparse(b):
+        ret = a * b
+        if dense_output:
+            ret = ret.toarray()
+        return ret
+    else:
+        return np.dot(a, b)
+Generated code for sklearn.utils.extmath.randomized_range_finder
+
+
+def randomized_range_finder(A, size, n_iter, random_state=None):
+    """Computes an orthonormal matrix whose range approximates the range of A.
+
+    Parameters
+    ----------
+    A : ndarray or sparse matrix
+        The input matrix to be decomposed
+    size : int
+        Size of the return array
+    n_iter : int
+        Number of power iterations used to stabilize the result
+    random_state : int, RandomState instance or None, optional (default=None)
+        If int, random_state is the seed used by the random number generator;
+        If RandomState instance, random_state is the random number generator;
+        If None, the random number generator is the RandomState instance used
+        by `np.random`.
+
+    Returns
+    -------
+    Q : ndarray or sparse matrix
+        Orthonormal basis for the range of A.
+    """
+    random_state = check_random_state(random_state)
+    Q = random_state.normal(size=(A.shape[1], size))
+
+    # Perform power iterations with Q to further 'imprint' the top
+    # singular vectors of A in Q
+    for i in range(n_iter):
+        Q, _ = linalg.lu(A @ Q, permute_l=True)
+        Q, _ = linalg.lu(A.T @ Q, permute_l=True)
+
+    # Sample the range of A using by computing QQ^T A
+    Q, _ = linalg.qr(A @ Q, mode='economic')
+
+    return Q
+Generated code for sklearn.utils.extmath.randomized_svd
+
+
+import numpy as np
+from scipy import linalg
+
+def randomized_svd(M, n_components, n_oversamples=10, n_iter=0):
+    """Computes a truncated randomized SVD
+    Parameters
+    ----------
+    M : array-like, shape (n_samples, n_features)
+        Input data.
+    n_components : int
+        Number of singular values and vectors to extract.
+    n_oversamples : int (default is 10)
+        Additional number of random vectors to sample the range of M so as
+        to ensure proper conditioning. The total number of random vectors
+        used to find the range of M is n_components + n_oversamples.
+    n_iter : int (default is 0)
+        Number of power iterations (can be used to deal with very noisy
+        problems).
+    Notes
+    -----
+    This algorithm finds a (usually very good) approximate truncated
+    singular value decomposition using randomization to speed up the
+    computations. It is particularly fast on large matrices on the
+    order of hundreds of thousands of rows.
+    References
+    ----------
+    * Finding structure with randomness: Stochastic algorithms for constructing
+      approximate matrix decompositions
+      Halko, et al., 2009 http://arxiv.org/abs/arXiv:0909.4061
+    """
+    n_random = n_components + n_oversamples
+    n_samples, n_features = M.shape
+
+    # Generate random sample
+    random_state = np.random.RandomState(None)
+    R = random_state.normal(size=(n_features, n_random))
+
+    # Compute the matrix product
+    Y = np.dot(M, R)
+    del R
+
+    # Compute the QR factorization
+    Q, _ = linalg.qr(Y, mode='economic')
+    del Y
+
+    # Compute the singular values
+    B = np.dot(Q.T, M)
+    Uhat, s, V = linalg.svd(B, full_matrices=False)
+    del B
+    U = np.
+Generated code for sklearn.utils.extmath.fast_logdet
+
+
+def fast_logdet(A):
+    """Compute log(det(A)) for A symmetric
+    Parameters
+    ----------
+    A : array_like, shape (N, N)
+        Symmetric positive definite input matrix
+    Returns
+    -------
+    logdet : float
+        Determinant of `A`.
+    """
+    sign, ld = np.linalg.slogdet(A)
+    if not sign > 0:
+        raise ValueError("A must be positive definite")
+    return ld
+Generated code for sklearn.utils.extmath.density
+
+
+def density(w, **kwargs):
+    """Compute density of a sparse vector.
+
+    Parameters
+    ----------
+    w : {array-like, sparse matrix}, shape (n_features,) or (n_samples, n_features)
+        Input array.
+
+    Returns
+    -------
+    density : float
+        Density of input array.
+    """
+    w = np.asarray(w)
+    if w.ndim == 1:
+        w = w[np.newaxis, :]
+    n_samples, n_features = w.shape
+    density = 0.
+    for i in range(n_samples):
+        density += np.count_nonzero(w[i, :]) / n_features
+    return density / n_samples
+Generated code for sklearn.utils.extmath.weighted_mode
+
+
+def weighted_mode(a, w, axis=0):
+    """
+    Calculates a weighted mode of an array.
+    
+    Parameters
+    ----------
+    a : array_like
+        Input array.
+    w : array_like
+        Array of weights, same shape as `a`.
+    axis : int, optional
+        Axis along which to operate. Default is 0.
+    
+    Returns
+    -------
+    mode : ndarray
+        The weighted mode of `a`.
+    
+    Notes
+    -----
+    This function is based on scipy.stats.mode.
+    """
+    if axis is None:
+        a = np.ravel(a)
+        w = np.ravel(w)
+        axis = 0
+    else:
+        a = np.asarray(a)
+        w = np.asarray(w)
+    if a.shape != w.shape:
+        raise ValueError('The input array and weights must have the same shape.')
+    if len(a) == 0:
+        return np.nan
+    if np.all(w == 0):
+        return np.nan
+    bins = np.unique(a)
+    weights = np.array([np.sum(w[a == b]) for b in bins])
+    ind = np.argmax(weights)
+    return bins[ind]
+Generated code for sklearn.utils.gen_batches
+
+
+def gen_batches(n_samples, batch_size):
+    """Generator to create slices containing batch_size elements, from 0 to n_samples."""
+    start = 0
+    for _ in range(int(n_samples // batch_size)):
+        end = start + batch_size
+        yield slice(start, end)
+        start = end
+    if start < n_samples:
+        yield slice(start, n_samples)
+Generated code for sklearn.utils.gen_even_slices
+
+
+def gen_even_slices(n, n_packs):
+    """Generate n_packs slices of size n/n_packs.
+
+    Parameters
+    ----------
+    n : int
+        The number of elements in the array to be divided into slices.
+    n_packs : int
+        The number of slices to generate.
+
+    Returns
+    -------
+    slices : list of slice objects
+        The list of slices generated.
+    """
+    start = 0
+    stop = n
+    step = n // n_packs
+    slices = []
+    for i in range(n_packs):
+        slices.append(slice(start, stop, step))
+        start += step
+        stop += step
+    return slices
+Generated code for sklearn.utils.graph.single_source_shortest_path_length
+
+
+def single_source_shortest_path_length(G, source):
+    """Compute the shortest path length between source and all other reachable
+    nodes for a weighted graph.
+
+    Parameters
+    ----------
+    G : NetworkX graph
+
+    source : node
+       Starting node for path
+
+    Returns
+    -------
+    lengths : dictionary
+       Dictionary of shortest path lengths keyed by target.
+
+    Examples
+    --------
+    >>> G=nx.path_graph(5)
+    >>> length=nx.single_source_shortest_path_length(G,0)
+    >>> length[4]
+    4
+    >>> print(length)
+    {0: 0, 1: 1, 2: 2, 3: 3, 4: 4}
+
+    Notes
+    -----
+    Edge weight attributes must be numerical.
+    Distances are calculated as sums of weighted edges traversed.
+
+    """
+    seen = {source: 0}
+    level = 0
+    nextlevel = {source}
+    while nextlevel:
+        thislevel = nextlevel
+        nextlevel = set()
+        for v in thislevel:
+            for w, edgedata in G[v].items():
+                if w not in seen:
+                    seen[w] = level + edgedata.get('weight', 1)
+                    nextlevel.add(w)
+        level = level + 1
+    return seen
+Generated code for sklearn.utils.indexable
+
+
+import numpy as np
+from sklearn.utils import indexable
+
+def indexable_data(data):
+    """
+    Convert a data array into an indexable object.
+    
+    Parameters
+    ----------
+    data : array-like
+        The data to be converted.
+    
+    Returns
+    -------
+    indexable : indexable object
+        The indexable object.
+    """
+    # Check if data is already indexable
+    if isinstance(data, indexable):
+        return data
+    
+    # Convert data to numpy array
+    data = np.array(data)
+    
+    # Check if data is a valid array
+    if not isinstance(data, np.ndarray):
+        raise ValueError('Data must be an array-like object.')
+    
+    # Create indexable object
+    indexable_data = indexable(data)
+    
+    return indexable_data
+Generated code for sklearn.utils.metaestimators.available_if
+_attribute
+
+def available_if_attribute(estimator, attr, default=True):
+    """
+    Check if an estimator has an attribute with a given value.
+
+    Parameters
+    ----------
+    estimator : estimator object
+        Estimator object to check for the attribute.
+
+    attr : string
+        Attribute name to check for.
+
+    default : bool, optional (default=True)
+        Value to return if the attribute is not present.
+
+    Returns
+    -------
+    out : bool
+        True if the attribute is present and has the given value,
+        False otherwise.
+    """
+    if hasattr(estimator, attr):
+        return getattr(estimator, attr) == default
+    else:
+        return default
+Generated code for sklearn.utils.multiclass.type_of_target
+
+
+def type_of_target(y):
+    """Determine the type of data indicated by target y
+    Parameters
+    ----------
+    y : array-like
+        The target to be classified
+    Returns
+    -------
+    target_type : string
+        One of: 'continuous', 'binary', 'multiclass', 'multilabel-indicator'
+    """
+    valid_types = (np.integer, np.floating, np.bool, np.object)
+    if isinstance(y, valid_types):
+        if y.dtype.kind in ('O', 'b'):
+            y = np.asarray(y)
+        if y.ndim == 1:
+            if np.issubdtype(y.dtype, np.bool):
+                return 'binary'
+            elif np.issubdtype(y.dtype, np.floating):
+                return 'continuous'
+            elif np.issubdtype(y.dtype, np.integer):
+                if len(np.unique(y)) == 2:
+                    return 'binary'
+                else:
+                    return 'multiclass'
+        elif y.ndim == 2:
+            if np.array_equal(y, np.eye(y.shape[1])):
+                return 'multilabel-indicator'
+            else:
+                raise ValueError("Unknown label type")
+        else:
+            raise ValueError("Unknown label type")
+    else:
+        raise ValueError("Unknown label type")
+Generated code for sklearn.utils.multiclass.is_multilabel
+
+
+def is_multilabel(y):
+    """
+    Check if ``y`` is in a multilabel format.
+    Parameters
+    ----------
+    y : numpy array of shape [n_samples] or sequence of sequences
+        Target values. In the multilabel case the nested sequences can
+        have variable lengths.
+    Returns
+    -------
+    out : bool,
+        Return ``True``, if ``y`` is in a multilabel format, else ```False``.
+    """
+    if hasattr(y, '__iter__') and not isinstance(y, str):
+        y_type = type(y[0])
+        if y_type is tuple or y_type is list:
+            return True
+        else:
+            return False
+    else:
+        return False
+Generated code for sklearn.utils.multiclass.unique_labels
+
+
+def unique_labels(y): 
+    """
+    Find the unique labels in a label array.
+
+    Parameters
+    ----------
+    y : array-like of shape (n_samples,)
+        Target values.
+
+    Returns
+    -------
+    out : ndarray of shape (n_unique_labels,)
+        Unique labels in `y`.
+    """
+    y = np.asarray(y)
+    if y.ndim == 1:
+        labels = np.unique(y)
+    else:
+        labels = np.unique(y.reshape(-1))
+    return labels
+Generated code for sklearn.utils.murmurhash3_32
+
+
+def murmurhash3_32(data, seed=0):
+    """
+    Computes a 32-bit MurmurHash3 checksum of the given data.
+    The data is assumed to be an array of bytes.
+    The seed is an optional integer that can be used to alter the
+    resulting hash value.
+    """
+    c1 = 0xcc9e2d51
+    c2 = 0x1b873593
+
+    length = len(data)
+    h1 = seed
+    roundedEnd = (length & 0xfffffffc)  # round down to 4 byte block
+    for i in range(0, roundedEnd, 4):
+        # little endian load order
+        k1 = (data[i] & 0xff) | ((data[i + 1] & 0xff) << 8) | \
+            ((data[i + 2] & 0xff) << 16) | (data[i + 3] << 24)
+        k1 *= c1
+        k1 = (k1 << 15) | ((k1 & 0xffffffff) >> 17)  # ROTL32(k1,15)
+        k1 *= c2
+        h1 ^= k1
+        h1 = (h1 << 13) | ((h1 & 0xffffffff) >> 19)  # ROTL32(h1,13)
+        h1 = h1 * 5 + 0xe6546b64
+
+    # tail
+    k1 = 0
+    val = length & 0x03
+    if val == 3:
+        k1 = (data[roundedEnd + 2] & 0xff) << 16
+    # fallthrough
+    if val in [2, 3]:
+        k1 |= (data[roundedEnd + 1] & 0xff) << 8
+    # fallthrough
+    if val in [1, 2, 3]:
+        k1 |= data[roundedEnd] & 0xff
+        k1 *= c1
+        k1 = (k1 << 15) | ((k1 & 0xffffffff) >> 17)  # ROTL32(k1,15)
+        k1 *= c2
+        h1 ^= k1
+
+
+Generated code for sklearn.utils.resample
+
+
+import numpy as np
+from sklearn.utils import resample
+
+# data sample
+data = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+# resample with replacement
+resample_with_replacement = resample(data, replace=True, n_samples=5)
+
+# resample without replacement
+resample_without_replacement = resample(data, replace=False, n_samples=5)
+
+print('Resample with replacement:', resample_with_replacement)
+print('Resample without replacement:', resample_without_replacement)
+Generated code for sklearn.utils._safe_indexing
+
+
+def _safe_indexing(X, indices):
+    """Return items or rows from X using indices.
+
+    Allows simple indexing of lists or arrays.
+
+    Parameters
+    ----------
+    X : array-like, sparse-matrix, list, pandas.DataFrame, pandas.Series.
+        Data from which to sample rows or items.
+    indices : array-like of int
+        Indices according to which X will be subsampled.
+
+    Returns
+    -------
+    subset
+        Subset of X on first axis.
+    """
+    if hasattr(X, "iloc"):
+        # Work-around for indexing with read-only indices in pandas
+        indices = indices if indices.flags.writeable else np.asarray(indices)
+        return X.iloc[indices]
+    elif hasattr(X, "shape"):
+        if hasattr(X, 'take') and (hasattr(indices, 'dtype') and
+                                   indices.dtype.kind == 'i'):
+            # This is often substantially faster than X[indices]
+            return X.take(indices, axis=0)
+        else:
+            return X[indices]
+    else:
+        return [X[idx] for idx in indices]
+Generated code for sklearn.utils.safe_mask
+
+
+def safe_mask(X, mask):
+    """
+    Return a mask which is safe to use on X.
+
+    Parameters
+    ----------
+    X : ndarray
+        Input data.
+    mask : array_like
+        Mask to be used on X.
+
+    Returns
+    -------
+    safe_mask : ndarray
+        A mask which is safe to use on X.
+    """
+    X = np.asarray(X)
+    mask = np.asarray(mask)
+    if X.shape != mask.shape:
+        raise ValueError("X and mask must have the same shape. Got %s and %s"
+                         % (X.shape, mask.shape))
+    safe_mask = np.zeros_like(mask, dtype=bool)
+    safe_mask[mask] = True
+    return safe_mask
+Generated code for sklearn.utils.safe_sqr
+
+
+def safe_sqr(x):
+    """
+    Computes the square of a number x, but returns 0 if x is negative.
+    
+    Parameters
+    ----------
+    x : float
+        The number to be squared.
+    
+    Returns
+    -------
+    float
+        The square of x if x is positive, 0 otherwise.
+    """
+    if x >= 0:
+        return x**2
+    else:
+        return 0
+Generated code for sklearn.utils.shuffle
+
+
+def shuffle(arr, random_state=None):
+    """
+    Shuffle an array in-place.
+
+    Parameters
+    ----------
+    arr : array-like
+        The array to be shuffled.
+    random_state : int, RandomState instance or None, optional (default=None)
+        If int, random_state is the seed used by the random number generator;
+        If RandomState instance, random_state is the random number generator;
+        If None, the random number generator is the RandomState instance used
+        by `np.random`.
+
+    Returns
+    -------
+    arr : array-like
+        The shuffled array.
+    """
+    rng = np.random.RandomState(random_state)
+    rng.shuffle(arr)
+    return arr
+Generated code for sklearn.utils.sparsefuncs.incr_mean_variance_axis
+
+
+def incr_mean_variance_axis(X, axis=0):
+    """Compute mean and variance incrementally along the given axis.
+    Parameters
+    ----------
+    X : array-like, shape (n_samples, n_features)
+        Input data.
+    axis : int, optional (default=0)
+        Axis along which the incremental mean and variance are computed.
+    Returns
+    -------
+    mean : array, shape (n_features,)
+        Incremental mean.
+    var : array, shape (n_features,)
+        Incremental variance.
+    """
+    n_samples, n_features = X.shape
+    mean = np.zeros(n_features)
+    var = np.zeros(n_features)
+    for i in range(n_samples):
+        x_i = X[i, :]
+        delta = x_i - mean
+        mean += delta / (i + 1)
+        var += delta * (x_i - mean)
+    var /= (n_samples - 1)
+    return mean, var
+Generated code for sklearn.utils.sparsefuncs.inplace_column_scale
+
+
+def inplace_column_scale(X, scale):
+    """Scale the columns of a sparse matrix inplace.
+    
+    Parameters
+    ----------
+    X : {scipy.sparse.csr_matrix, scipy.sparse.csc_matrix}
+        Sparse matrix to scale.
+    scale : array-like, shape (n_features,)
+        Per-feature scaling factors.
+    """
+    if not isinstance(X, (scipy.sparse.csr_matrix, scipy.sparse.csc_matrix)):
+        raise ValueError("X should be a sparse matrix")
+    if len(scale) != X.shape[1]:
+        raise ValueError("scale should have length equal to the number of columns of X")
+    for i in range(X.shape[1]):
+        X.data[X.indptr[i]:X.indptr[i + 1]] *= scale[i]
+Generated code for sklearn.utils.sparsefuncs.inplace_row_scale
+
+
+def inplace_row_scale(X, scale):
+    """Scale rows of a CSR matrix inplace.
+    
+    Parameters
+    ----------
+    X : {csr_matrix, csc_matrix}
+        Input matrix.
+    scale : array, shape (n_samples,)
+        Per-sample scaling factors.
+    """
+    if not isinstance(X, (sparse.csr_matrix, sparse.csc_matrix)):
+        raise ValueError("X should be a CSR or CSC matrix")
+
+    n_samples = X.shape[0]
+    if len(scale) != n_samples:
+        raise ValueError("scale should have length n_samples")
+
+    # Multiply each row by corresponding scaling factor
+    for i in range(n_samples):
+        X.data[X.indptr[i]:X.indptr[i + 1]] *= scale[i]
+Generated code for sklearn.utils.sparsefuncs.inplace_swap_row
+
+
+def inplace_swap_row(X, i, j):
+    """Swap row i and row j of a CSR or CSC matrix
+    Parameters
+    ----------
+    X : {csr_matrix, csc_matrix}
+        Matrix
+    i : int
+        Row to swap with row j
+    j : int
+        Row to swap with row i
+    """
+    if not (hasattr(X, 'indptr') and hasattr(X, 'indices')):
+        raise ValueError("Swapping is only supported for CSR and CSC matrices")
+
+    n_rows, n_cols = X.shape
+    if i >= n_rows or j >= n_rows:
+        raise ValueError("`i` and `j` should be smaller than n_rows")
+
+    # Swap data
+    if hasattr(X, 'data'):
+        temp = X.data[X.indptr[i]:X.indptr[i + 1]].copy()
+        X.data[X.indptr[i]:X.indptr[i + 1]] = X.data[X.indptr[j]:X.indptr[j + 1]]
+        X.data[X.indptr[j]:X.indptr[j + 1]] = temp
+
+    # Swap indices
+    temp = X.indices[X.indptr[i]:X.indptr[i + 1]].copy()
+    X.indices[X.indptr[i]:X.indptr[i + 1]] = X.indices[X.indptr[j]:X.indptr[j + 1]]
+    X.indices[X.indptr[j]:X.indptr[j + 1]] = temp
+
+    # Swap indptr
+    temp = X.indptr[i]
+    X.indptr[i] = X.indptr[j]
+    X.indptr[j] = temp
+Generated code for sklearn.utils.sparsefuncs.inplace_swap_column
+
+
+def inplace_swap_column(X, i, j):
+    """Swap columns in a CSR or CSC matrix
+    Swap column i and j in the CSR or CSC matrix X.
+    Parameters
+    ----------
+    X : {csr_matrix, csc_matrix}
+        Matrix
+    i : int
+        Column i
+    j : int
+        Column j
+    Returns
+    -------
+    X : {csr_matrix, csc_matrix}
+        Matrix with columns i and j swapped
+    """
+    if not (hasattr(X, 'tocsr') or hasattr(X, 'tocsc')):
+        raise ValueError("Expected csr_matrix or csc_matrix, got %s" %
+                         type(X))
+
+    # Check that the indices are valid
+    n_cols = X.shape[1]
+    if i >= n_cols or j >= n_cols:
+        raise ValueError("Column index out of range")
+
+    # Do the swap
+    if hasattr(X, 'tocsr'):
+        data = X.data
+        indices = X.indices
+        indptr = X.indptr
+        for row_idx in range(X.shape[0]):
+            # Find the start and end of the row
+            row_start = indptr[row_idx]
+            row_end = indptr[row_idx + 1]
+
+            # Find the indices of the elements in column i and j
+            i_idx = row_start + np.searchsorted(indices[row_start:row_end], i)
+            j_idx = row_start + np.searchsorted(indices[row_start:row_end], j)
+
+            # Swap the elements
+            data[i_idx], data[j_idx] = data[j_idx], data[i_idx]
+            indices[i_idx], indices[j_idx] = indices[j_idx], indices[i_idx]
+
+        X = X.tocsr()
+
+    elif hasattr(X, 'tocsc'
+Generated code for sklearn.utils.sparsefuncs.mean_variance_axis
+
+
+def mean_variance_axis(X, axis=0):
+    """Compute mean and variance along an axis of a sparse matrix.
+    Parameters
+    ----------
+    X : {scipy.sparse.csr_matrix, scipy.sparse.csc_matrix}
+        Input sparse matrix.
+    axis : int (default=0)
+        Axis along which the mean and variance are to be computed.
+    Returns
+    -------
+    mean, variance : tuple of ndarrays
+        The mean and variance along the specified axis.
+    """
+    if axis not in (0, 1):
+        raise ValueError("axis should be 0 or 1, got %r" % axis)
+
+    if axis == 0:
+        # axis 0 is the rows
+        X = X.tocsc()
+    else:
+        # axis 1 is the columns
+        X = X.tocsr()
+
+    mean = np.zeros(X.shape[axis])
+    variance = np.zeros(X.shape[axis])
+
+    for i in range(X.shape[axis]):
+        if axis == 0:
+            # axis 0 is the rows
+            row = X.getrow(i)
+        else:
+            # axis 1 is the columns
+            row = X.getcol(i)
+
+        mean[i] = row.mean()
+        variance[i] = row.var()
+
+    return mean, variance
+Generated code for sklearn.utils.sparsefuncs.inplace_csr_column_scale
+
+
+def inplace_csr_column_scale(X, scale):
+    """
+    Scale the columns of a CSR matrix in-place.
+    
+    Parameters
+    ----------
+    X : {csr_matrix}
+        Input matrix.
+    scale : {array-like, sparse matrix}
+        Scaling factors for each column.
+    
+    Returns
+    -------
+    X : {csr_matrix}
+        Scaled matrix.
+    """
+    n_samples, n_features = X.shape
+    if not isinstance(scale, np.ndarray):
+        scale = np.asarray(scale)
+    if scale.shape[0] != n_features:
+        raise ValueError("Incorrect shape for scale.")
+    for i in range(n_features):
+        start, end = X.indptr[i], X.indptr[i + 1]
+        X.data[start:end] *= scale[i]
+    return X
+Generated code for sklearn.utils.sparsefuncs_fast.inplace_csr_row_normalize_l1
+
+
+def inplace_csr_row_normalize_l1(csr, copy=False):
+    """
+    Normalize the rows of a CSR matrix by their L1 norm.
+    This is an inplace operation that modifies the matrix ``csr``.
+    Parameters
+    ----------
+    csr : scipy.sparse.csr_matrix
+        Input matrix.
+    copy : bool, optional
+        Whether to copy ``csr`` or perform normalization inplace.
+        The inplace version might be slightly faster.
+    Returns
+    -------
+    csr : scipy.sparse.csr_matrix
+        Normalized matrix.
+    """
+    if copy:
+        csr = csr.copy()
+
+    n_samples, n_features = csr.shape
+    row_sums = np.asarray(csr.sum(axis=1)).ravel()
+
+    # compute the normalization factors
+    nonzeros = row_sums != 0
+    row_inv_sums = np.zeros(n_samples)
+    row_inv_sums[nonzeros] = 1.0 / row_sums[nonzeros]
+
+    # apply the normalization
+    csr.data *= row_inv_sums[csr.indices]
+
+    return csr
+Generated code for sklearn.utils.sparsefuncs_fast.inplace_csr_row_normalize_l2
+
+
+def inplace_csr_row_normalize_l2(csr, copy=False):
+    """
+    Normalize the rows of a CSR matrix by their L-2 norm.
+    This is faster than scipy.sparse.linalg.norm but less flexible.
+    Parameters
+    ----------
+    csr : scipy.sparse.csr_matrix
+        Input matrix.
+    copy : bool, optional
+        If True, returns a copy of the input matrix.
+        Otherwise, the input matrix is modified in-place.
+    Returns
+    -------
+    csr : scipy.sparse.csr_matrix
+        Normalized matrix.
+    """
+    if copy:
+        csr = csr.copy()
+    n_samples, n_features = csr.shape
+    row_norms = np.sqrt(np.array(csr.power(2).sum(1))).reshape(-1, 1)
+    row_norms[row_norms == 0] = 1
+    csr /= row_norms
+    return csr
+Generated code for sklearn.utils.random.sample_without_replacement
+
+
+def sample_without_replacement(population, k): 
+    # population is a list of elements from which to choose 
+    # k is the number of elements to choose 
+    n = len(population) 
+    if not 0 <= k <= n: 
+        raise ValueError("Sample larger than population or is negative") 
+  
+    # Choose indices of sampled elements 
+    indices = [] 
+    for i in range(k): 
+        j = random.randrange(n - i) 
+        indices.append(j) 
+        population[j], population[n - i - 1] = population[n - i - 1], population[j] 
+  
+    # Return the sampled elements 
+    return [population[i] for i in indices]
+Generated code for sklearn.utils.validation.check_is_fitted
+
+
+def check_is_fitted(estimator, attributes, msg=None, all_or_any=all):
+    """Perform is_fitted validation for estimator.
+
+    Checks if the estimator is fitted by verifying the presence of
+    "all_or_any" of the passed attributes and raises a NotFittedError with the
+    given message.
+
+    Parameters
+    ----------
+    estimator : estimator instance.
+        estimator instance for which the check is performed.
+
+    attributes : attribute name(s) given as string or a list/tuple of strings
+        Eg. : ["coef_", "estimator_", ...], "coef_"
+
+    msg : string
+        The default error message is, "This %(name)s instance is not fitted
+        yet. Call 'fit' with appropriate arguments before using this method."
+
+        For custom messages if "%(name)s" is present in the message string,
+        it is substituted for the estimator name.
+
+        Eg. : "Estimator, %(name)s, must be fitted before sparsifying".
+
+    all_or_any : {all, any}, default all
+        Specify whether all or any of the given attributes must exist.
+
+    Returns
+    -------
+    None
+
+    Raises
+    ------
+    NotFittedError
+        If the attributes are not found.
+    """
+    if msg is None:
+        msg = ("This %(name)s instance is not fitted yet. Call 'fit' with "
+               "appropriate arguments before using this method.")
+
+    if not hasattr(estimator, 'fit'):
+        raise TypeError("%s is not an estimator instance." % (estimator))
+
+    if not isinstance(attributes, (list, tuple)):
+        attributes = [attributes]
+
+    if all_or_any == 'all':
+        if not all(hasattr(estimator, attr) for attr in attributes):
+            raise NotFittedError(msg % {'name': type(estimator).__name__})
+    elif all_or_any == 'any':
+        if not any(hasattr(estimator, attr) for attr
+Generated code for sklearn.utils.validation.check_memory
+
+
+def check_memory(estimator, X, y=None):
+    """Check that the estimator doesn't exceed the memory limit.
+    Parameters
+    ----------
+    estimator : estimator instance
+        Estimator to validate.
+    X : array-like, sparse matrix
+        Input data.
+    y : array-like, optional (default=None)
+        Target data.
+    Returns
+    -------
+    memory_usage : float
+        Memory usage of the estimator.
+    """
+    from sklearn.utils.validation import _check_estimator
+    _check_estimator(estimator)
+
+    # Get the size of the input data
+    X_size = X.shape[0] * X.shape[1] * X.dtype.itemsize
+
+    # Get the size of the target data
+    if y is not None:
+        y_size = y.shape[0] * y.dtype.itemsize
+    else:
+        y_size = 0
+
+    # Get the size of the estimator
+    estimator_size = estimator.get_params()['memory_limit']
+
+    # Calculate the total memory usage
+    memory_usage = X_size + y_size + estimator_size
+
+    # Check if the memory usage is within the limit
+    if memory_usage > estimator_size:
+        raise MemoryError('Estimator exceeds memory limit.')
+
+    return memory_usage
+Generated code for sklearn.utils.validation.check_symmetric
+
+
+def check_symmetric(array, tol=1e-8):
+    """
+    Checks if an array is symmetric.
+    
+    Parameters
+    ----------
+    array : array_like
+        Input array to check.
+    tol : float
+        Tolerance for comparison.
+    
+    Returns
+    -------
+    is_symmetric : bool
+        True if array is symmetric, False otherwise.
+    """
+    if array.shape[0] != array.shape[1]:
+        return False
+    for i in range(array.shape[0]):
+        for j in range(array.shape[1]):
+            if abs(array[i, j] - array[j, i]) > tol:
+                return False
+    return True
+Generated code for sklearn.utils.validation.column_or_1d
+
+
+def column_or_1d(y, warn=False):
+    """ Ravel column or 1d numpy array, else raises an error
+
+    Parameters
+    ----------
+    y : array-like
+
+    warn : boolean, default False
+       To control display of warnings.
+
+    Returns
+    -------
+    y : array
+
+    """
+    shape = np.shape(y)
+    if len(shape) == 1:
+        return np.ravel(y)
+    if len(shape) == 2 and shape[1] == 1:
+        if warn:
+            warnings.warn("A column-vector y was passed when a 1d array was"
+                          " expected. Please change the shape of y to "
+                          "(n_samples, ), for example using ravel().",
+                          DataConversionWarning, stacklevel=2)
+        return np.ravel(y)
+
+    raise ValueError("y should be a 1d array, or a column vector. "
+                     "Reshape your array to (n_samples, )")
+Generated code for sklearn.utils.validation.has_fit_parameter
+
+
+def has_fit_parameter(estimator, parameter):
+    """
+    Check if an estimator has a given parameter.
+    
+    Parameters
+    ----------
+    estimator : estimator object
+        Estimator object to check.
+    parameter : str
+        Parameter name to check for.
+    
+    Returns
+    -------
+    has_parameter : bool
+        True if the estimator has the parameter, False otherwise.
+    """
+    try:
+        estimator.get_params()[parameter]
+        return True
+    except KeyError:
+        return False
+Generated code for sklearn.utils.discovery.all_estimators
+
+
+from sklearn.utils.discovery import all_estimators
+
+estimators = all_estimators()
+
+for name, class_ in estimators:
+    if hasattr(class_, 'fit'):
+        print(name)
+Generated code for sklearn.utils.discovery.all_displays
+
+
+import sklearn
+from sklearn.utils import discovery
+
+def all_displays():
+    """
+    Return a list of all available display functions.
+    """
+    displays = []
+    for name, obj in discovery.iter_modules(sklearn.utils.discovery):
+        if hasattr(obj, 'display'):
+            displays.append(obj.display)
+    return displays
+Generated code for sklearn.utils.discovery.all_functions
+
+
+import sklearn.utils.discovery
+
+# Get all functions in sklearn.utils.discovery
+all_functions = sklearn.utils.discovery.all_functions()
+
+# Print all functions
+for func in all_functions:
+    print(func)
+Generated code for sklearn.utils.parallel.delayed
+
+
+import multiprocessing
+from functools import partial
+
+def parallel_delayed(func, args, n_jobs=1):
+    """
+    Execute a function in parallel using multiprocessing.
+    Parameters
+    ----------
+    func : callable
+        The function to execute in parallel.
+    args : list
+        A list of arguments to pass to the function.
+    n_jobs : int, optional (default=1)
+        The number of jobs to run in parallel.
+    Returns
+    -------
+    results : list
+        A list of results from the function calls.
+    """
+    pool = multiprocessing.Pool(n_jobs)
+    results = pool.map(partial(func, *args))
+    pool.close()
+    pool.join()
+    return results
+Generated code for sklearn.utils.parallel_backend
+
+
+import multiprocessing
+from sklearn.utils import parallel_backend
+
+# Define the number of cores to use
+n_jobs = multiprocessing.cpu_count()
+
+# Set the backend for parallel processing
+with parallel_backend('multiprocessing', n_jobs=n_jobs):
+    # Your code here
+    pass
+Generated code for sklearn.utils.register_parallel_backend
+
+
+import sklearn
+from sklearn.utils import register_parallel_backend
+
+def register_parallel_backend(backend, n_jobs=1, **backend_args):
+    """Register a parallel backend for joblib.
+
+    Parameters
+    ----------
+    backend : str
+        The name of the backend to register.
+    n_jobs : int, optional (default=1)
+        The number of jobs to use for the backend.
+    **backend_args : dict
+        Additional keyword arguments to pass to the backend.
+
+    Returns
+    -------
+    registered_backend : joblib.parallel.BackendBase
+        The registered backend instance.
+    """
+    from joblib import parallel
+    backend_cls = parallel.get_backend_cls(backend)
+    registered_backend = backend_cls(n_jobs=n_jobs, **backend_args)
+    parallel.register_parallel_backend(backend, registered_backend)
+    return registered_backend
+Generated code for sklearn.utils.parallel.Parallel
+
+
+import multiprocessing
+from sklearn.utils.parallel import Parallel
+
+def parallel_function(data, func, n_jobs=1, backend='threading', verbose=0):
+    """
+    Execute a function in parallel.
+
+    Parameters
+    ----------
+    data : iterable
+        The data to be processed.
+    func : callable
+        The function to be applied to each element of the data.
+    n_jobs : int, optional (default=1)
+        The number of jobs to use for the computation.
+    backend : str, optional (default='threading')
+        The backend to use for the computation.
+    verbose : int, optional (default=0)
+        The verbosity level.
+
+    Returns
+    -------
+    results : list
+        The results of the computation.
+    """
+    pool = multiprocessing.Pool(n_jobs, backend=backend)
+    results = pool.map(func, data)
+    pool.close()
+    pool.join()
+    if verbose > 0:
+        print("Done parallel processing")
+    return results
+
+Parallel(n_jobs=1, backend='threading', verbose=0)(
+    [delayed(parallel_function)(data, func) for data, func in zip(data_list, func_list)]
+)
+Generated code for sklearn.utils.metaestimators.if_delegate_has_method
+
+
+def if_delegate_has_method(delegate, method_name):
+    """
+    Checks if the given delegate has the given method.
+    
+    Parameters
+    ----------
+    delegate : object
+        The object to check for the given method.
+    method_name : str
+        The name of the method to check for.
+        
+    Returns
+    -------
+    bool
+        True if the delegate has the given method, False otherwise.
+    """
+    if hasattr(delegate, method_name):
+        return True
+    else:
+        return False
