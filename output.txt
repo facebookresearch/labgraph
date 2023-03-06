@@ -1,0 +1,123 @@
+
+
+import numpy as np
+from scipy.signal import convolve
+
+# Create two arrays
+x = np.array([1, 2, 3, 4])
+h = np.array([1, 2, 3])
+
+# Perform convolution
+y = convolve(x, h)
+
+# Print result
+print(y)
+
+
+import numpy as np
+from scipy import signal
+
+def correlate(x, y):
+    # Compute the correlation between two signals
+    # x and y must be the same length
+    # x and y should be numpy arrays
+    return signal.correlate(x, y, mode='full')
+
+# Example usage
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([2, 3, 4, 5, 6])
+
+correlation = correlate(x, y)
+print(correlation)
+
+
+import numpy as np
+from scipy.signal import fftconvolve
+
+def fftconvolve(x, y):
+    """
+    Computes the convolution of two 1-dimensional sequences using the
+    Fast Fourier Transform (FFT).
+
+    Parameters
+    ----------
+    x : array_like
+        First input array.
+    y : array_like
+        Second input array.
+
+    Returns
+    -------
+    out : ndarray
+        Discrete linear convolution of `x` and `y`.
+
+    Examples
+    --------
+    Compute the linear convolution of two length-3 sequences:
+
+    >>> x = np.array([1, 2, 3])
+    >>> y = np.array([0, 1, 0.5])
+    >>> np.convolve(x, y)
+    array([ 0. ,  2. ,  5.5,  4. ,  1.5])
+
+    Note that convolve computes the full convolution, while fftconvolve
+    computes the linear convolution.
+
+    >>> np.fftconvolve(x, y)
+    array([ 2. ,  5.5,  4. ])
+
+    """
+    x = np.asarray(x)
+    y = np.asarray(y)
+
+    if np.ndim(x) > 1 or np.ndim(y) > 1:
+        raise ValueError("x and y should be 1-dimensional.")
+
+    if x.size == 0 or y.size == 0:
+        return np.array([])
+
+    # Compute the FFT of the two sequences
+    fx = np.fft.fft(x, axis=0)
+    fy = np.fft.fft(y, axis=0)
+
+    # Multiply the FFTs and inverse transform the result
+    z = np.fft.ifft(fx * fy, axis=0)
+
+    # Trim the result to the correct length
+    return z[:x.size + y.size - 1]
+
+
+import numpy as np
+from scipy.signal import oaconvolve
+
+# Create a signal
+x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Create a filter
+h = np.array([1, 2, 3])
+
+# Perform the convolution
+y = oaconvolve(x, h)
+
+# Print the result
+print(y)
+
+
+import numpy as np
+from scipy.signal import convolve2d
+
+# Create a 2D array
+arr = np.array([[1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9]])
+
+# Create a 3x3 kernel
+kernel = np.array([[1, 0, 0],
+                   [0, 1, 0],
+                   [0, 0, 1]])
+
+# Perform convolution
+convolved_arr = convolve2d(arr, kernel, mode='same')
+
+# Print the result
+print(convolved_arr)
