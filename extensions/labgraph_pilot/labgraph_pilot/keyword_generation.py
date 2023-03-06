@@ -37,6 +37,16 @@ class KeywordGeneration:
                         for key, value in tag.attrs.items():
                             if key == 'title':
                                 self.keywords.append(value)
+
+        self.keywords.remove('(in joblib v1.3.0.dev0)') # remove unexpected parsed keyword
+
+        with open('keyword.txt', 'w') as file: # save all keywords to a text file
+            keywords = []
+
+            for keyword in self.keywords:
+                keywords.append(keyword)
+
+            file.writelines("% s\n" % keyword for keyword in keywords)
         return self.keywords
 test = KeywordGeneration()
 test.extract_keywords()
