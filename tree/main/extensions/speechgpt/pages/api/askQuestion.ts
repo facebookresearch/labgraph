@@ -14,7 +14,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
 
-    const {prompt, chatId, model, session} = req.body
+    const {prompt, chatId, model, session, chatHistory} = req.body
     
     if ( !prompt) { 
         res.status(400).json({ answer: 'Please provide a prompt' })
@@ -26,7 +26,7 @@ export default async function handler(
         return
     }
 
-    const response = await query(prompt, chatId, model)
+    const response = await query(prompt, chatId, model, chatHistory)
 
     const message: Message = {
 

@@ -8,6 +8,7 @@ import {getServerSession} from "next-auth"
 import {authOptions} from "../pages/api/auth/[...nextauth]"
 import Login from '../components/Login';
 import ClientProvider from '../components/ClientProvider';
+import SideBarLayout from '../components/SideBarLayout';
 
 export default async function RootLayout({
   children,
@@ -29,7 +30,7 @@ export default async function RootLayout({
              (
               <div className="flex">
               <div className="">
-                <SideBar />
+                <SideBarLayout />
               </div>
               
               <ClientProvider />
