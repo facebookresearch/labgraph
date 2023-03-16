@@ -6,5 +6,7 @@ interface Message {
     name: string;
     avatar: string;
   };
+  thumbsUp: boolean;
+  thumbsDown: boolean;
   
 }
