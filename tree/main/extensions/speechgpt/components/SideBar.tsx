@@ -68,10 +68,14 @@ const SideBar = ({
         >
           {!collapsed && <div className="flex flex-col">
             <NewChat />
-
+            {/* 
             <div className="">
               <ModelSelection></ModelSelection>
-            </div></div>}
+            </div> */}
+
+          </div>
+
+          }
           <button
             className="grid w-10 h-10 rounded-full opacity-0 place-content-center hover:bg-white md:opacity-100"
             onClick={() => setCollapsed(!collapsed)}

@@ -7,19 +7,19 @@ import { FormEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 import { db } from "../firebase";
 import ModelSelection from "./ModelSelection";
-import useSWR from "swr" 
+import useSWR from "swr"
 
 
 type Props = {
   chatId: string;
 };
 
-function ChatInput({chatId}: Props) {
+function ChatInput({ chatId }: Props) {
   const [prompt, setPrompt] = useState("");
-  const {data: session} = useSession();
+  const { data: session } = useSession();
 
 
-  const {data: model, mutate: setModel} = useSWR("model", {
+  const { data: model, mutate: setModel } = useSWR("model", {
     fallbackData: "text-davinci-003"
   })
 
@@ -38,34 +38,35 @@ function ChatInput({chatId}: Props) {
         _id: session?.user?.email!,
         name: session?.user?.name!,
         avatar: session?.user?.image! || `https://ui-avatars.com/api/?name=${session?.user?.name}`,
-
-      }
+      },
+      thumbsUp: false,
+      thumbsDown: false
     }
 
     await addDoc(
-      collection(db, 'users', session?.user?.email!, 'chats', chatId, 'messages'), 
+      collection(db, 'users', session?.user?.email!, 'chats', chatId, 'messages'),
       message
     )
 
 
-    
-  // Query the Firebase database to get all messages for this chat
-  const querySnapshot = await (await getDocs(collection(db, 'users', session?.user?.email!, 'chats', chatId, 'messages')))
-  
-  const chatHistory = querySnapshot.docs.map(doc => doc.data());
-  console.log("Snapshot", querySnapshot)
+
+    // Query the Firebase database to get all messages for this chat
+    const querySnapshot = await (await getDocs(collection(db, 'users', session?.user?.email!, 'chats', chatId, 'messages')))
+
+    const chatHistory = querySnapshot.docs.map(doc => doc.data());
+    console.log("Snapshot", querySnapshot)
 
     const notification = toast.loading('SpeechGPT is thinking...');
-    
+
     await fetch("/api/askQuestion", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        prompt: input, 
-        chatId, 
-        model, 
+        prompt: input,
+        chatId,
+        model,
         chatHistory,
         session,
       }),
@@ -81,11 +82,11 @@ function ChatInput({chatId}: Props) {
     <div className="text-sm text-gray-400 rounded-lg bg-gray-700/50">
       <form onSubmit={sendMessage} className="flex p-5 space-x-5">
         <input
-        className="flex-1 bg-transparent focus:outline-none disabled:cursor-not-allowed disabled:text-gray-300"
-        disabled={!session}
-        value={prompt}
-        onChange={e => setPrompt(e.target.value)}
-         type="text" placeholder="Type your message here..."
+          className="flex-1 bg-transparent focus:outline-none disabled:cursor-not-allowed disabled:text-gray-300"
+          disabled={!session}
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          type="text" placeholder="Type your message here..."
         />
 
         <button disabled={!prompt || !session} type="submit"
@@ -97,9 +98,9 @@ function ChatInput({chatId}: Props) {
       </form>
 
       <div>
-       <div className="md:hidden">
+        {/* <div className="md:hidden">
         <ModelSelection></ModelSelection>
-       </div>
+       </div> */}
       </div>
     </div>
   )
