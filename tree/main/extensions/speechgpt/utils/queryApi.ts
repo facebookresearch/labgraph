@@ -1,5 +1,14 @@
 import openai from './speechgpt'
 
+type ChatCompletionRequestMessage = {
+    role: ChatCompletionRequestMessageRoleEnum;
+    content: string;
+}
+
+enum ChatCompletionRequestMessageRoleEnum {
+    User = 'user',
+    Assistant = 'assistant', // update the value to 'Assistant'
+}
 
 const query = async (prompt: string, chatId: string, model: string, chatHistory: Array<Object>) => {
     console.log("Model is", model)
@@ -7,30 +16,24 @@ const query = async (prompt: string, chatId: string, model: string, chatHistory:
 
     console.log("ChatHistory is", chatHistory)
 
-
     const messages = chatHistory.map(message => (
-            {
-                role: message.user._id === "SpeechGPT" ? "assistant" : "user",
-                content: message.text
-            }
+        {
+            role: message.user._id === "SpeechGPT" ? ChatCompletionRequestMessageRoleEnum.Assistant : ChatCompletionRequestMessageRoleEnum.User, // use the enum values instead of strings
+            content: message.text
+        }
     ))
 
     console.log("Messages is", messages)
 
     let response
 
-
-    if (model === "gpt-3.5-turbo"  || model === "gpt-3.5-turbo-0301") {
-         response = await openai.createChatCompletion({
-
+    if (model === "gpt-3.5-turbo" || model === "gpt-3.5-turbo-0301") {
+        response = await openai.createChatCompletion({
             model,
             messages
-            
         }).then(res => res.data.choices[0].message).catch(err => `SpeechGPT was unable to find an answer for that! (Error: ${err.message})`)
-    
     } else {
-         response = await openai.createCompletion({
-
+        response = await openai.createCompletion({
             model,
             prompt,
             // todo: ask manager about creativity level aka temperature
@@ -41,7 +44,6 @@ const query = async (prompt: string, chatId: string, model: string, chatHistory:
             frequency_penalty: 0,
             presence_penalty: 0,
         }).then(res => res.data.choices[0].text).catch(err => `SpeechGPT was unable to find an answer for that! (Error: ${err.message})`)
-    
     }
 
     return response
