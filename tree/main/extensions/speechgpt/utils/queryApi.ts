@@ -8,23 +8,30 @@ type ChatCompletionRequestMessage = {
 enum ChatCompletionRequestMessageRoleEnum {
     User = 'user',
     Assistant = 'assistant', // update the value to 'Assistant'
+    System = 'system'
 }
 
 const query = async (prompt: string, chatId: string, model: string, chatHistory: Array<Object>) => {
     console.log("Model is", model)
     console.log("Prompt is", prompt)
 
-    console.log("ChatHistory is", chatHistory)
+    // console.log("ChatHistory is", chatHistory)
+    let messages: ChatCompletionRequestMessage[] = []
+    messages.push({
+        role: ChatCompletionRequestMessageRoleEnum.System,
+        content: "end your sentence with newline character"
+    })
 
+    messages.push({
+        role: ChatCompletionRequestMessageRoleEnum.System,
+        content: "Wrap code blocks in triple backticks"
+    })
+    messages.push(...chatHistory.map((message: any) => ({ // spread the mapped array elements into the 'messages' array
+        role: message.user._id === "SpeechGPT" ? ChatCompletionRequestMessageRoleEnum.Assistant : ChatCompletionRequestMessageRoleEnum.User,
+        content: message.text
+    })));
 
-    const messages = chatHistory.map((message: any) => (
-        {
-            role: message.user._id === "SpeechGPT" ? ChatCompletionRequestMessageRoleEnum.Assistant : ChatCompletionRequestMessageRoleEnum.User, // use the enum values instead of strings
-            content: message.text
-        }
-    ))
-
-    console.log("Messages is", messages)
+    // console.log("Messages is", messages)
 
     let response
     if (model === "gpt-3.5-turbo"  || model === "gpt-3.5-turbo-0301") {
@@ -35,8 +42,11 @@ const query = async (prompt: string, chatId: string, model: string, chatHistory:
         }).then(res => {
             const responseData = res.data;
             if (responseData.choices[0].message) {
-                console.log("api response:", responseData.choices[0].message )
+                console.log("api response:", responseData.choices[0].message)
+                // const returnMessage = responseData.choices[0].message.content.replace(/\n/g, "\\n").replace(/\t/g, "\\t");
+                // return returnMessage
                 return responseData.choices[0].message.content;
+
             } else {
                 throw new Error("Response data is undefined");
                 return `SpeechGPT was unable to find an answer for that! (Error)`
@@ -60,8 +70,6 @@ const query = async (prompt: string, chatId: string, model: string, chatHistory:
        }).then(res => res.data.choices[0].text).catch(err => `SpeechGPT was unable to find an answer for that! (Error: ${err.message})`)
    
    }
-
-
 
     return response
 }

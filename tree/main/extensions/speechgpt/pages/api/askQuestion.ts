@@ -7,6 +7,17 @@ import adminDb  from '../../firebaseAdmin'
 type Data = {
   answer: string
 }
+interface User {
+  _id: string;
+  name: string;
+  avatar: string;
+}
+
+interface Message {
+  text: string;
+  createdAt: admin.firestore.Timestamp;
+  user: User;
+}
 
 
 export default async function handler(
@@ -32,7 +43,7 @@ export default async function handler(
     console.log("being written to DB", response)
     const message: Message = {
 
-        text: response || "SpeechGPT was unable to find an answer for that!",
+        text: String(response) || "SpeechGPT was unable to find an answer for that!",
         createdAt: admin.firestore.Timestamp.now(),
         user: {
             _id: "SpeechGPT",
@@ -41,7 +52,6 @@ export default async function handler(
 
         },
     }
-
 
     await adminDb.collection('users').doc(session?.user?.email).collection('chats').doc(chatId).collection('messages').add(message);
 
