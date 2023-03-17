@@ -16,6 +16,7 @@ const query = async (prompt: string, chatId: string, model: string, chatHistory:
 
     console.log("ChatHistory is", chatHistory)
 
+
     const messages = chatHistory.map((message: any) => (
         {
             role: message.user._id === "SpeechGPT" ? ChatCompletionRequestMessageRoleEnum.Assistant : ChatCompletionRequestMessageRoleEnum.User, // use the enum values instead of strings
@@ -25,19 +26,42 @@ const query = async (prompt: string, chatId: string, model: string, chatHistory:
 
     console.log("Messages is", messages)
 
-    let response = await openai.createChatCompletion({
-            model: "gpt-3.5-turbo",
+    let response
+    if (model === "gpt-3.5-turbo"  || model === "gpt-3.5-turbo-0301") {
+    response = await openai.createChatCompletion({
+            //  model: "gpt-3.5-turbo",
+            model,
             messages
         }).then(res => {
             const responseData = res.data;
             if (responseData.choices[0].message) {
-                console.log("api response:", responseData.choices[0].message.content )
+                console.log("api response:", responseData.choices[0].message )
                 return responseData.choices[0].message.content;
             } else {
                 throw new Error("Response data is undefined");
                 return `SpeechGPT was unable to find an answer for that! (Error)`
             }
         }).catch(err => `SpeechGPT was unable to find an answer for that! (Error: ${err.message})`)
+    
+    }
+
+    else {
+        response = await openai.createCompletion({
+
+           model,
+           prompt,
+           // todo: ask manager about creativity level aka temperature
+           temperature: 0.9,
+           max_tokens: 1000,
+           top_p: 1,
+           // todo: not sure what this does
+           frequency_penalty: 0,
+           presence_penalty: 0,
+       }).then(res => res.data.choices[0].text).catch(err => `SpeechGPT was unable to find an answer for that! (Error: ${err.message})`)
+   
+   }
+
+
 
     return response
 }

@@ -67,12 +67,15 @@ const SideBar = ({
           })}
         >
           {!collapsed && <div className="flex flex-col">
-            <NewChat />
-            {/* 
-            <div className="">
-              <ModelSelection></ModelSelection>
-            </div> */}
 
+            <div className="w-60">
+              <NewChat />
+
+              <div className="hidden text-black sm:inline">
+                <ModelSelection></ModelSelection>
+              </div>
+
+            </div>
           </div>
 
           }
