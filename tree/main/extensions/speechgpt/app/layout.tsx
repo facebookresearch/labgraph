@@ -35,7 +35,7 @@ export default async function RootLayout({
               
               <ClientProvider />
               
-              <div className="bg-[#343541] flex-1">{children}</div>
+              <div className="bg-[#ffffff] flex-1">{children}</div>
             </div>
             )
 

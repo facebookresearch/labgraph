@@ -20,10 +20,10 @@ function Chat({ chatId }: Props) {
 
     {messages?.empty && (
       <>
-        <p className="mt-10 text-center text-white">
+        <p className="mt-10 text-center text-custom-gray">
           Type a prompt below to get started!
         </p>
-        <ArrowDownCircleIcon className="h-10 w-10 mx-auto mt-5 text-white animate-bounce"></ArrowDownCircleIcon>
+        <ArrowDownCircleIcon className="h-10 w-10 mx-auto mt-5 text-custom-gray animate-bounce"></ArrowDownCircleIcon>
       </>
     )}
     {messages?.docs.map((message) => {

@@ -24,8 +24,8 @@ function NewChat() {
   }
   return (
     <div onClick={createNewChat} className="border border-gray-700 chatRow">
-      <PlusIcon className="w-4 h-4"/>
-      <p>New Chat</p>
+      <PlusIcon className="text-custom-gray w-4 h-4"/>
+      <p className="text-custom-gray">New Chat</p>
     </div>
   );
 }

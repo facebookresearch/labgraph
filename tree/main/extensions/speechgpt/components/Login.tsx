@@ -9,10 +9,10 @@ import React from 'react'
 const Login = () => {
   // TODO change the image to a custom one
   return (
-    <div className="bg-[#343541] h-screen flex flex-col items-center justify-center text-center">
-      <div className=" flex flex-col space-y-2 items-center justify-center h-screen
-     px-2 text-white">
-        <div className="pb-2.5">
+    <div className="bg-[#ffffff] h-screen flex flex-col items-center justify-center text-center">
+      <div className=" flex flex-col space-y-3 items-center justify-center h-screen
+     px-2">
+        <div className="pb-2.5 ">
         <svg width="41" height="41" viewBox="0 0 41 41" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
           <path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676
            32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058
@@ -42,16 +42,25 @@ const Login = () => {
                      4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 
                      21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
         </div>
-    <div>Welcome to SpeechGPT</div>
-    <div className="pb-1">Log in with your account to continue</div>
-    <div className="flex space-x-3 ">
-      <button className="bg-[#11A37F] hover:bg-[#11A37F]/50 text-white  py-2 px-4 rounded text-sm" onClick={() => signIn('facebook')} >Facebook</button>
-      <button className="bg-[#11A37F] hover:bg-[#11A37F]/50 text-white  py-2 px-4 rounded text-sm" onClick={() => signIn('google')} >Google</button>
+        <div className="mb-2 text-center text-custom-gray">Welcome to SpeechGPT</div>
+        <div className="mb-4 text-center text-custom-gray">Log in with your Facebook account to continue</div>
+    <div className="flex space-x-3 mt-2">
+
+      <button className="bg-[#1877F2] hover:bg-[#1877F2]/50 text-white font-bold py-4 px-8 rounded-lg flex items-center" onClick={() => signIn('facebook')}>
+        <div className="bg-[#ffff] w-12 rounded-full flex items-center justify-center mr-4">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48">
+            <path fill="#1877F2" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"></path>
+            <path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v13.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z"></path>
+          </svg>
+        </div>
+        <span className="text-xl">Continue with Facebook</span>
+      </button>
+      
     </div>
     
      </div>
-    
-    
+     <button onClick={() => signIn('google')}>Log in with google</button>
+     <a className="text-sm">Disclaimer: This website is intended for research purposes only. All such trademarks, logos, and features are the property of their respective owners. Any use of such trademarks, logos, or features on this website is for research and informational purposes only. </a>
     </div>
   )
 }
