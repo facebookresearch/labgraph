@@ -80,10 +80,10 @@ const SideBar = ({
 
           }
           <button
-            className="grid w-10 h-10 rounded-full opacity-0 place-content-center hover:bg-custom-gray md:opacity-100"
+            className="grid w-10 h-10 rounded-full opacity-0 place-content-center hover:bg-gray-500/10 md:opacity-100"
             onClick={() => setCollapsed(!collapsed)}
           >
-            <Icon className="w-5 h-5" />
+            <Icon className="w-5 h-5 text-custom-gray" />
           </button>
         </div>
         <nav className="flex-grow">
