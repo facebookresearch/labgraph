@@ -13,7 +13,7 @@ const Login = () => {
       <div className=" flex flex-col space-y-3 items-center justify-center h-screen
      px-2">
         <div className="pb-2.5 ">
-          <img src='/images/logoupdatedcolor.png' height={200} width={200}></img>
+          <img className="drag-none" src='/images/logoupdatedcolor.png' height={200} width={200}></img>
         </div>
         <div className="mb-2 text-center text-custom-gray">Welcome to SpeechGPT</div>
         <div className="mb-4 text-center text-custom-gray">Log in with your Facebook account to continue</div>
