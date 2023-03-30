@@ -28,7 +28,7 @@ export default async function RootLayout({
           {
             !session ? (<Login></Login>) :
              (
-              <div className="flex ">
+              <div className="flex overflow-x-hidden">
               <div className="">
                 <SideBarLayout />
               </div>
