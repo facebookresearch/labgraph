@@ -21,7 +21,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, value }) => {
   const highlightedCode = hljs.highlight(value, { language }).value;
 
   return (
-    <pre
+    <pre className="bg-gray-200 px-4 py-2 rounded-md overflow-x-auto"
       style={{
         backgroundColor: 'black',
         color: 'white',
@@ -30,7 +30,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, value }) => {
         overflowX: 'auto',
       }}
     >
-      <code
+      <code className="font-mono"
         style={{
           fontFamily: 'monospace',
           fontSize: '1em',
@@ -121,12 +121,12 @@ const Message = ({
   };
 
   return (
-    <div className={`py-5 text-white ${isSpeechGPT && "bg-[#434654]"}`}>
+    <div className={`py-5 text-color-gray ${isSpeechGPT && "bg-[#E8EAEC]"}`}>
       <div className='flex max-w-2xl px-10 mx-auto space-x-5'>
         <img src={message.user.avatar} alt="" className='w-8 h-8'></img>
 
         {/* <ReactMarkdown className='pt-1 text-sm' renderers={renderers} >{message.text}</ReactMarkdown> */}
-        <ReactMarkdown className='pt-1 text-sm'>{message.text}</ReactMarkdown>
+        <ReactMarkdown className='pt-1 text-sm' >{message.text}</ReactMarkdown>
       </div>
       <div>
         {isSpeechGPT && (

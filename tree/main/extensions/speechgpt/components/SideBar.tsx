@@ -80,10 +80,10 @@ const SideBar = ({
 
           }
           <button
-            className="grid w-10 h-10 rounded-full opacity-0 place-content-center hover:bg-white md:opacity-100"
+            className="grid w-10 h-10 rounded-full opacity-0 place-content-center hover:bg-gray-500/10 md:opacity-100"
             onClick={() => setCollapsed(!collapsed)}
           >
-            <Icon className="w-5 h-5" />
+            <Icon className="w-5 h-5 text-custom-gray" />
           </button>
         </div>
         <nav className="flex-grow">
@@ -117,7 +117,7 @@ const SideBar = ({
             <> {
               session && (
                 // log out button
-                <a onClick={() => signOut()} className="flex items-center gap-3 px-3 py-3 text-sm text-white transition-colors duration-200 rounded-md cursor-pointer hover:bg-gray-500/10">
+                <a onClick={() => signOut()} className="flex items-center gap-3 px-3 py-3 text-sm text-custom-gray transition-colors duration-200 rounded-md cursor-pointer hover:bg-gray-500/10">
                   <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" className="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                     <polyline points="16 17 21 12 16 7"></polyline>

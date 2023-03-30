@@ -13,7 +13,7 @@ const SideBarLayout = (props: PropsWithChildren) => {
   return (
     <div
       className={classNames({
-        "grid bg-[#202123] min-h-screen": true,
+        "grid bg-[#F0F2F5] min-h-screen": true,
         "grid-cols-sidebar": !collapsed,
         "grid-cols-sidebar-collapsed": collapsed,
         "transition-[grid-template-columns] duration-300 ease-in-out": true,
