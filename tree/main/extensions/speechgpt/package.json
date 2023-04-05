@@ -6,7 +6,10 @@
     "start": "next start"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
     "@heroicons/react": "^2.0.16",
+    "@mui/material": "^5.11.16",
     "classnames": "^2.3.2",
     "firebase-admin": "^11.5.0",
     "heroicons": "^2.0.16",

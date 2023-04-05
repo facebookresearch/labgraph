@@ -22,13 +22,14 @@ export default async function RootLayout({
   // console.log(session);
   return (  
     <html>
+      
       <head />
       <body>
         <SessionProvider session={session}>
           {
             !session ? (<Login></Login>) :
              (
-              <div className="flex overflow-x-hidden">
+              <div className="flex overflow-x-hidden ">
               <div className="">
                 <SideBarLayout />
               </div>
