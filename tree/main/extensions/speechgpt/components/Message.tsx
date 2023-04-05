@@ -122,7 +122,7 @@ const Message = ({
         <img src={message.user.avatar} alt="" className='w-8 h-8'></img>
 
         {/* <ReactMarkdown className='pt-1 text-sm' renderers={renderers} >{message.text}</ReactMarkdown> */}
-        <div style={{ width: `100%`, overflowX: 'auto' }}>
+        <div style={{ width: `80%`, overflowX: 'auto' }}>
           <ReactMarkdown className='pt-1 text-sm ' >{message.text}</ReactMarkdown>
         </div>
       </div>
