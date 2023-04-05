@@ -129,10 +129,10 @@ function ChatInput({ chatId }: Props) {
   };
 
   return (
-    <div className="text-sm text-custom-gray rounded-lg bg-gray-700/50">
+    <div className="text-sm rounded-lg text-slate-200 bg-gray-700/50">
       <form onSubmit={sendMessage} className="flex p-5 space-x-5">
         <input
-          className="flex-1 bg-transparent focus:outline-none disabled:cursor-not-allowed disabled:text-gray-300 placeholder-custom-gray"
+          className="flex-1 bg-transparent text-slate-200 focus:outline-none disabled:cursor-not-allowed disabled:text-gray-300 placeholder-slate-200"
           disabled={!session}
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
