@@ -9,7 +9,6 @@ import { db } from "../firebase";
 import ModelSelection from "./ModelSelection";
 import useSWR from "swr"
 import { useRef, useEffect } from "react";
-import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 type Props = {
   chatId: string;
 };
@@ -17,8 +16,6 @@ type Props = {
 interface Window {
   webkitSpeechRecognition: any;
 }
-
-
 
 function ChatInput({ chatId }: Props) {
   const [prompt, setPrompt] = useState("");
@@ -33,8 +30,7 @@ function ChatInput({ chatId }: Props) {
   const [isRecording, setIsRecording] = useState(false);
 
   // TODO investigate why initialising this as SpeechRecognition causes an error
-  const recognition = useRef<SpeechRecognition | null>(null);
-  // const recognition = useRef<null>(null);
+  const recognition = useRef<SpeechRecognition | any>(null);
 
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) {
@@ -44,17 +40,16 @@ function ChatInput({ chatId }: Props) {
     }
 
 
-    recognition.current = new (window as Window).webkitSpeechRecognition(); // @ts-ignore
+    recognition.current = new (window as Window).webkitSpeechRecognition();
 
+    recognition.current.continuous = true;
+    recognition.current.interimResults = true;
 
-    recognition.current.continuous = true; // @ts-ignore
-    recognition.current.interimResults = true; // @ts-ignore
-
-    recognition.current.onstart = () => { // @ts-ignore
+    recognition.current.onstart = () => {
       setIsRecording(true);
     };
-    // @ts-ignore
-    recognition.current.onend = () => { // @ts-ignore
+
+    recognition.current.onend = () => {
       setIsRecording(false);
     };
   }, []);
@@ -62,16 +57,16 @@ function ChatInput({ chatId }: Props) {
   const handleMicrophoneClick = (e: any) => {
     e.preventDefault();
     if (isRecording) {
-      // @ts-ignore
+
       recognition.current?.stop();
     } else {
-      // @ts-ignore
+
       recognition.current?.start();
 
 
       // TODO decide the recording time
       setTimeout(() => {
-        // @ts-ignore
+
         recognition.current?.stop();
         setIsRecording(false);
       }, 5000); // Stop recording and recognizing after 5 seconds
@@ -80,7 +75,7 @@ function ChatInput({ chatId }: Props) {
 
   };
 
-  // @ts-ignore
+
   recognition.current?.addEventListener("result", (event: any) => {
     event.preventDefault()
     const transcript = Array.from(event.results)
