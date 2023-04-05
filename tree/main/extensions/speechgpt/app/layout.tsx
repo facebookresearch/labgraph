@@ -3,12 +3,14 @@ import SideBar from '../components/SideBar';
 import '../styles/globals.css';
 
 import SessionProvider from "../components/SessionProvider"
-import {getServerSession} from "next-auth"
+import { getServerSession } from "next-auth"
 
-import {authOptions} from "../pages/api/auth/[...nextauth]"
+import { authOptions } from "../pages/api/auth/[...nextauth]"
 import Login from '../components/Login';
 import ClientProvider from '../components/ClientProvider';
 import SideBarLayout from '../components/SideBarLayout';
+
+import { useState } from 'react';
 
 export default async function RootLayout({
   children,
@@ -20,7 +22,7 @@ export default async function RootLayout({
 
   // printed in server
   // console.log(session);
-  return (
+  return (  
     <html>
       <head />
       <body>
@@ -28,19 +30,19 @@ export default async function RootLayout({
           {
             !session ? (<Login></Login>) :
              (
-              <div className="flex">
-              <div className="">
-                <SideBarLayout />
-              </div>
+              <div className="flex overflow-x-hidden">
+                <div className="">
+                  <SideBarLayout />
+               </div>
               
-              <ClientProvider />
+               <ClientProvider />
               
-              <div className="bg-[#ffffff] flex-1">{children}</div>
+              <div className="bg-[#ffff] flex-1">{children}</div>
             </div>
             )
 
           }
-  
+
         </SessionProvider>
       </body>
     </html>

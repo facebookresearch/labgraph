@@ -42,6 +42,14 @@ const SideBar = ({
 
 
   return (
+    <div className="relative">
+    {/* When Sidebar expanded and something else is clicked collapse sidebar */}
+    {!collapsed && (
+      <div
+        className="fixed inset-0 z-10"
+        onClick={() => setCollapsed(true)}
+      ></div>
+    )}
     <div
       className={classNames({
         " text-zinc-50 fixed md:static md:translate-x-0 z-20":
@@ -57,6 +65,7 @@ const SideBar = ({
           "flex flex-col justify-between h-screen sticky inset-0 w-full": true,
         })}
       >
+        
         {/* logo and collapse button */}
         <div
           className={classNames({
@@ -130,6 +139,7 @@ const SideBar = ({
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 };
