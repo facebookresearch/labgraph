@@ -9,7 +9,7 @@ import { db } from "../firebase";
 import ModelSelection from "./ModelSelection";
 import useSWR from "swr"
 import { useRef, useEffect } from "react";
-
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 type Props = {
   chatId: string;
 };
@@ -26,16 +26,20 @@ function ChatInput({ chatId }: Props) {
 
 
   const { data: model, mutate: setModel } = useSWR("model", {
-    fallbackData: "text-davinci-003"
+    fallbackData: "gpt-3.5-turbo"
   })
 
 
   const [isRecording, setIsRecording] = useState(false);
 
+  // TODO investigate why initialising this as SpeechRecognition causes an error
   const recognition = useRef<SpeechRecognition | null>(null);
+  // const recognition = useRef<null>(null);
+
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) {
       // Browser doesn't support speech recognition
+      toast.error("Your browser does not support speech recognition");
       return;
     }
 
@@ -58,7 +62,16 @@ function ChatInput({ chatId }: Props) {
       recognition.current?.stop();
     } else {
       recognition.current?.start();
+
+
+      // TODO decide the recording time
+      setTimeout(() => {
+        recognition.current?.stop();
+        setIsRecording(false);
+      }, 5000); // Stop recording and recognizing after 5 seconds
+
     }
+
   };
 
 
@@ -71,6 +84,15 @@ function ChatInput({ chatId }: Props) {
     if (event.results[event.results.length - 1].isFinal) {
       setPrompt(transcript.trim());
     }
+
+    // TODO:  confirm if we want the user to be able 
+    // if (event.results[event.results.length - 1].isFinal) {
+    //   console.log("Final", transcript.trim())
+    //   setPrompt((prompt) => prompt + " " + transcript.trim());
+    // } else {
+
+    //   setPrompt(transcript.trim());
+    // }
   });
 
 
@@ -141,10 +163,10 @@ function ChatInput({ chatId }: Props) {
 
         <button
           onClick={handleMicrophoneClick}
-          className={`${isRecording ? "text-green-500" : "text-gray-400"
+          className={`${isRecording ? "text-green-500" : "text-white"
             } hover:text-green-500 focus:outline-none`}
         >
-          <MicrophoneIcon className="w-6 h-6" />
+          <MicrophoneIcon className="w-6 h-6 " />
         </button>
 
 
