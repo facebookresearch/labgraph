@@ -22,24 +22,24 @@ export default async function RootLayout({
 
   // printed in server
   // console.log(session);
-  return (
+  return (  
     <html>
       <head />
       <body>
         <SessionProvider session={session}>
           {
             !session ? (<Login></Login>) :
-              (
-                <div className="flex">
-                  <div className="">
-                    <SideBarLayout />
-                  </div>
-
-                  <ClientProvider />
-
-                  <div className="bg-[#343541] flex-1">{children}</div>
-                </div>
-              )
+             (
+              <div className="flex overflow-x-hidden">
+                <div className="">
+                  <SideBarLayout />
+               </div>
+              
+               <ClientProvider />
+              
+              <div className="bg-[#ffff] flex-1">{children}</div>
+            </div>
+            )
 
           }
 

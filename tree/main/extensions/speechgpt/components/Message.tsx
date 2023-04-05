@@ -123,6 +123,9 @@ const Message = ({
 
         {/* <ReactMarkdown className='pt-1 text-sm' renderers={renderers} >{message.text}</ReactMarkdown> */}
         <ReactMarkdown className={`pt-1 text-sm ${isSpeechGPT ? "" : "text-slate-200"}`} >{message.text}</ReactMarkdown>
+        <div style={{ width: '60%', overflowX: 'auto' }}>
+          <ReactMarkdown className='w-40 pt-1 text-sm' >{message.text}</ReactMarkdown>
+        </div>
       </div>
       <div>
         {isSpeechGPT && (
