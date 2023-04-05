@@ -125,8 +125,9 @@ const Message = ({
       <div className='flex max-w-2xl px-10 mx-auto space-x-5'>
         <img src={message.user.avatar} alt="" className='w-8 h-8'></img>
 
-        {/* <ReactMarkdown className='pt-1 text-sm' renderers={renderers} >{message.text}</ReactMarkdown> */}
-        <ReactMarkdown className='pt-1 text-sm' >{message.text}</ReactMarkdown>
+        <div style={{ width: '60%', overflowX: 'auto' }}>
+           <ReactMarkdown className='pt-1 text-sm w-40' >{message.text}</ReactMarkdown>
+        </div>
       </div>
       <div>
         {isSpeechGPT && (
