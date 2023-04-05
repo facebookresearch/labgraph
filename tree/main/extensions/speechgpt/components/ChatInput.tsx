@@ -43,15 +43,18 @@ function ChatInput({ chatId }: Props) {
       return;
     }
 
-    recognition.current = new (window as Window).webkitSpeechRecognition();
-    recognition.current.continuous = true;
-    recognition.current.interimResults = true;
 
-    recognition.current.onstart = () => {
+    recognition.current = new (window as Window).webkitSpeechRecognition(); // @ts-ignore
+
+
+    recognition.current.continuous = true; // @ts-ignore
+    recognition.current.interimResults = true; // @ts-ignore
+
+    recognition.current.onstart = () => { // @ts-ignore
       setIsRecording(true);
     };
-
-    recognition.current.onend = () => {
+    // @ts-ignore
+    recognition.current.onend = () => { // @ts-ignore
       setIsRecording(false);
     };
   }, []);
@@ -59,13 +62,16 @@ function ChatInput({ chatId }: Props) {
   const handleMicrophoneClick = (e: any) => {
     e.preventDefault();
     if (isRecording) {
+      // @ts-ignore
       recognition.current?.stop();
     } else {
+      // @ts-ignore
       recognition.current?.start();
 
 
       // TODO decide the recording time
       setTimeout(() => {
+        // @ts-ignore
         recognition.current?.stop();
         setIsRecording(false);
       }, 5000); // Stop recording and recognizing after 5 seconds
@@ -74,7 +80,7 @@ function ChatInput({ chatId }: Props) {
 
   };
 
-
+  // @ts-ignore
   recognition.current?.addEventListener("result", (event: any) => {
     event.preventDefault()
     const transcript = Array.from(event.results)
