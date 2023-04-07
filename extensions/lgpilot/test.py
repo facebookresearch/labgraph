@@ -4,6 +4,7 @@ import labgraph as lg
 # Imports required for this example
 from scipy.signal import convolve
 import numpy as np
+from node import convolve, convolveNode
 
 # A data type used in streaming, see docs: Messages
 class InputMessage(lg.Message):
@@ -30,27 +31,6 @@ class NoiseGenerator(lg.Node):
     def generate_noise(self):
         yield self.OUTPUT, InputMessage(x=np.array([1, 2, 3, 4]), h=np.array([1, 2, 3]))
        
-
-# ================================= CONVOLUTION ===================================
-
-
-def convolve(x, h):
-	y = convolve(x, h)
-	return y
-
-class convolveNode(lg.Node):
-	INPUT = lg.Topic(InputMessage)
-	OUTPUT = lg.Topic(OutputMessage)
-
-	def setup(self):
-		self.func = convolve
-
-	@lg.subscriber(INPUT)
-	@lg.publisher(OUTPUT)
-
-	def convolve_feature(self, message: InputMessage):
-		y = self.func(message.x, message.h)
-		yield self.OUTPUT, y
 
 # ================================== CONVOLVED NOISE ====================================
 
