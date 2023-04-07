@@ -16,15 +16,14 @@ class OutputMessage(lg.Message):
 # ================================= NOISE GENERATOR ====================================
 # Configuration for NoiseGenerator, see docs: Lifecycles and Configuration
 class NoiseGeneratorConfig(lg.Config):
-    #TODO: Is this needed?
-    sample_rate: float  # Rate at which to generate noise
-    num_features: int  # Number of features to generate
+    x: np.ndarray
+    h: np.ndarray
 
 
 # A data source node that generates random noise to a single output topic
 class NoiseGenerator(lg.Node):
     OUTPUT = lg.Topic(InputMessage)
-    config: NoiseGeneratorConfig #TODO: Is this needed?
+    config: NoiseGeneratorConfig 
 
     # A publisher method that produces data on a single topic
     @lg.publisher(OUTPUT)
