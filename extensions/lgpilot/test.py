@@ -1,10 +1,21 @@
-
 # Import labgraph
 import labgraph as lg
 # Imports required for this example
 from scipy.signal import convolve
 import numpy as np
-from node import convolve, convolveNode
+
+import labgraph as lg
+import numpy as np
+import pytest
+from ...generators.sine_wave_generator import (
+    SineWaveChannelConfig,
+    SineWaveGenerator,
+)
+
+from ..mixer_one_input_node import MixerOneInputConfig, MixerOneInputNode
+from ..signal_capture_node import SignalCaptureConfig, SignalCaptureNode
+from ..signal_generator_node import SignalGeneratorNode
+
 
 # A data type used in streaming, see docs: Messages
 class InputMessage(lg.Message):
@@ -14,58 +25,112 @@ class InputMessage(lg.Message):
 class OutputMessage(lg.Message):
     data: np.ndarray
 
-# ================================= NOISE GENERATOR ====================================
-# Configuration for NoiseGenerator, see docs: Lifecycles and Configuration
-class NoiseGeneratorConfig(lg.Config):
-    x: np.ndarray
-    h: np.ndarray
+
+# ================================= CONVOLUTION ===================================
 
 
-# A data source node that generates random noise to a single output topic
-class NoiseGenerator(lg.Node):
-    OUTPUT = lg.Topic(InputMessage)
-    config: NoiseGeneratorConfig 
+def convolve(x, h):
+	y = convolve(x, h)
+	return y
 
-    # A publisher method that produces data on a single topic
-    @lg.publisher(OUTPUT)
-    def generate_noise(self):
-        yield self.OUTPUT, InputMessage(x=np.array([1, 2, 3, 4]), h=np.array([1, 2, 3]))
-       
+class ConvolveNode(lg.Node):
+	INPUT = lg.Topic(InputMessage)
+	OUTPUT = lg.Topic(OutputMessage)
 
-# ================================== CONVOLVED NOISE ====================================
+	def setup(self):
+		self.func = convolve
+
+	@lg.subscriber(INPUT)
+	@lg.publisher(OUTPUT)
+
+	def convolve_feature(self, message: InputMessage):
+		y = self.func(message.x, message.h)
+		yield self.OUTPUT, y
+
+# ======================================================================
 
 
-# Configuration for ConvolvedNoise
-class ConvolvedNoiseConfig(lg.Config):
-    x: np.ndarray
-    h: np.ndarray
+# class MixerOneInputConfig(lg.Config):
+#     # This is an NxM matrix (for M inputs, N outputs)
+#     weights: np.ndarray
 
-# A group that combines noise generation and rolling averaging. The output topic
-# contains averaged noise. We could just put all three nodes in a graph below, but we
-# add this group to demonstrate the grouping functionality.
-class AveragedNoise(lg.Group):
-    OUTPUT = lg.Topic(OutputMessage)
+class ConvolveInputConfig(lg.Config):
+    array: np.ndarray
+    kernel: np.ndarray
 
-    #TODO: Is this needed?
-    config: AveragedNoiseConfig
-    GENERATOR: NoiseGenerator
-    CONVOLVENODE: convolveNode
+
+class MyGraphConfig(lg.Config):
+    sine_wave_channel_config: SineWaveChannelConfig
+    convolve_config: ConvolveInputConfig
+    capture_config: SignalCaptureConfig
+
+
+class MyGraph(lg.Graph):
+
+    sample_source: SignalGeneratorNode
+    convolve_node: ConvolveNode
+    capture_node: SignalCaptureNode
+
+    def setup(self) -> None:
+        self.capture_node.configure(self.config.capture_config)
+        self.sample_source.set_generator(
+            SineWaveGenerator(self.config.sine_wave_channel_config)
+        )
+        self.convolve_node.configure(self.config.convolve_config)
 
     def connections(self) -> lg.Connections:
-        # To produce convolved noise, we connect the noise generator to the convolver
-        # Then we "expose" the averager's output as an output of this group
         return (
-            (self.GENERATOR.OUTPUT, self.CONVOLVENODE.INPUT),
-            (self.CONVOLVENODE.OUTPUT, self.OUTPUT),
+            (self.convolve_node.INPUT, self.sample_source.SAMPLE_TOPIC),
+            (self.capture_node.SAMPLE_TOPIC, self.mixer_node.OUTPUT),
         )
 
-    #TODO: What should happen here? 
-    def setup(self) -> None:
-        # Cascade this group's configuration to its contained nodes
-        self.GENERATOR.configure(
-            NoiseGeneratorConfig(
-                sample_rate=self.config.sample_rate,
-                num_features=self.config.num_features,
-            )
-        )
-        self.ROLLING_AVERAGER.configure(RollingConfig(window=self.config.window))
+
+def test_convolve_input_node() -> None:
+    """
+    Tests that node convolves correctly, uses numpy arrays and kernel sizes as input
+    """
+
+    sample_rate = 1  # Hz
+    test_duration = 10  # sec
+
+    # Test configurations
+    shape = (2,)
+    amplitudes = np.array([5.0, 3.0])
+    frequencies = np.array([5, 10])
+    phase_shifts = np.array([1.0, 5.0])
+    midlines = np.array([3.0, -2.5])
+
+    test_array = [1, 2, 3]
+    test_kernel = [2]
+
+    # Generate expected values
+    
+    expected = convolve(test_array, test_kernel) # use the convolve from the library to generate the expected values
+
+    # Create the graph
+    generator_config = SineWaveChannelConfig(
+        shape, amplitudes, frequencies, phase_shifts, midlines, sample_rate
+    )
+    capture_config = SignalCaptureConfig(int(test_duration / sample_rate))
+    
+    # mixer_weights = np.identity(2)
+    # mixer_config = MixerOneInputConfig(mixer_weights)
+    
+    convolve_input_array = [1, 2, 3]
+    convolve_input_kernel = [2]
+
+    convolve_config = ConvolveInputConfig(convolve_input_array, convolve_input_kernel)
+
+    my_graph_config = MyGraphConfig(generator_config, convolve_config, capture_config)
+
+    graph = MyGraph()
+    graph.configure(my_graph_config)
+
+    runner = lg.LocalRunner(module=graph)
+    runner.run()
+    received = np.array(graph.capture_node.samples).T
+    np.testing.assert_almost_equal(received, expected)
+
+# 1. test the convolve function
+# 2. create the graph and run it
+# 3. repeat the same thing for other APIs -- just need to create simple test cases
