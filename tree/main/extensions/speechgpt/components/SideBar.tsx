@@ -43,17 +43,7 @@ const SideBar = ({
 
   return (
     <div className="relative">
-      {/* When Sidebar expanded and something else is clicked collapse sidebar */}
-      <div
-        className={classNames({
-          " text-zinc-50 fixed md:static md:translate-x-0 z-20":
-            true,
-          "transition-all duration-300 ease-in-out": true,
-          "w-[300px]": !collapsed,
-          "w-16": collapsed,
-          "-translate-x-full": !shown,
-        })}
-      >
+      <div>
         <div
           className={classNames({
             "flex flex-col justify-between h-screen sticky inset-0 w-full": true,
@@ -104,7 +94,7 @@ const SideBar = ({
 
               {
                 chats?.docs.map((chat) => (
-                  <ChatRow key={chat.id} id={chat.id} />
+                  <ChatRow key={chat.id} id={chat.id} collapsed={collapsed}/>
                 )
                 )
               }
