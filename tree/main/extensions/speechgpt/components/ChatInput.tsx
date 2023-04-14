@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { PaperAirplaneIcon, MicrophoneIcon } from "@heroicons/react/24/solid";
@@ -9,6 +10,9 @@ import { db } from "../firebase";
 import ModelSelection from "./ModelSelection";
 import useSWR from "swr"
 import { useRef, useEffect } from "react";
+
+import useRecorder from "../hooks/useRecorder";
+
 type Props = {
   chatId: string;
 };
@@ -21,80 +25,47 @@ function ChatInput({ chatId }: Props) {
   const [prompt, setPrompt] = useState("");
   const { data: session } = useSession();
 
+  // initialize useRecorder hook
+  let [audioURL, isRecording, startRecording, stopRecording, audioBlob] =
+    useRecorder()
+
+  const [startedRecording, setStartedRecording] = useState(false)
 
   const { data: model, mutate: setModel } = useSWR("model", {
     fallbackData: "gpt-3.5-turbo"
   })
 
 
-  const [isRecording, setIsRecording] = useState(false);
 
   // TODO investigate why initialising this as SpeechRecognition causes an error
-  const recognition = useRef<SpeechRecognition | any>(null);
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition
 
-  useEffect(() => {
-    if (!("webkitSpeechRecognition" in window)) {
-      // Browser doesn't support speech recognition
-      toast.error("Your browser does not support speech recognition");
-      return;
+  // instantiate speech recognition object
+  const recognition = new SpeechRecognition()
+
+  var current, transcript, upperCase
+
+
+
+  // recording event handler
+  const startRecord = (e) => {
+    // capture the event
+    recognition.start(e)
+
+    recognition.onresult = (e) => {
+      // after the event has been processed by the browser, get the index
+      current = e.resultIndex
+      // get the transcript from the processed event
+      transcript = e.results[current][0].transcript
+      // the transcript is in lower case so set firse char to upper case
+      upperCase = transcript.charAt(0).toUpperCase() + transcript.substring(1)
+      console.log("voice event", e)
+      console.log("transcript", transcript)
+      setPrompt(transcript)
     }
+  }
 
-
-    recognition.current = new (window as Window).webkitSpeechRecognition();
-
-    recognition.current.continuous = true;
-    recognition.current.interimResults = true;
-
-    recognition.current.onstart = () => {
-      setIsRecording(true);
-    };
-
-    recognition.current.onend = () => {
-      setIsRecording(false);
-    };
-  }, []);
-
-  const handleMicrophoneClick = (e: any) => {
-    e.preventDefault();
-    if (isRecording) {
-
-      recognition.current?.stop();
-    } else {
-
-      recognition.current?.start();
-
-
-      // TODO decide the recording time
-      setTimeout(() => {
-
-        recognition.current?.stop();
-        setIsRecording(false);
-      }, 5000); // Stop recording and recognizing after 5 seconds
-
-    }
-
-  };
-
-
-  recognition.current?.addEventListener("result", (event: any) => {
-    event.preventDefault()
-    const transcript = Array.from(event.results)
-      .map((result: any) => result[0].transcript)
-      .join("");
-
-    if (event.results[event.results.length - 1].isFinal) {
-      setPrompt(transcript.trim());
-    }
-
-    // TODO:  confirm if we want the user to be able 
-    // if (event.results[event.results.length - 1].isFinal) {
-    //   console.log("Final", transcript.trim())
-    //   setPrompt((prompt) => prompt + " " + transcript.trim());
-    // } else {
-
-    //   setPrompt(transcript.trim());
-    // }
-  });
 
 
   const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
@@ -163,7 +134,10 @@ function ChatInput({ chatId }: Props) {
         />
 
         <button
-          onClick={handleMicrophoneClick}
+          onClick={(e) => {
+            setStartedRecording(true)
+            startRecord(e)
+          }}
           className={`${isRecording ? "text-green-500" : "text-white"
             } hover:text-green-500 focus:outline-none`}
         >
