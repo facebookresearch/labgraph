@@ -43,17 +43,7 @@ const SideBar = ({
 
   return (
     <div className="relative">
-      {/* When Sidebar expanded and something else is clicked collapse sidebar */}
-      <div
-        className={classNames({
-          " text-zinc-50 fixed md:static md:translate-x-0 z-20":
-            true,
-          "transition-all duration-300 ease-in-out": true,
-          "w-[300px]": !collapsed,
-          "w-16": collapsed,
-          "-translate-x-full": !shown,
-        })}
-      >
+      <div>
         <div
           className={classNames({
             "flex flex-col justify-between h-screen sticky inset-0 w-full": true,
@@ -82,14 +72,11 @@ const SideBar = ({
             </div>
 
             }
-            <button
-              className="grid w-10 h-10 rounded-full opacity-0 place-content-center hover:bg-gray-500/10 md:opacity-100"
-              onClick={() => setCollapsed(!collapsed)}
-            >
-              <Icon className="w-5 h-5 text-custom-gray" />
-            </button>
+            <button className="grid w-10 h-10 rounded-full opacity-50 place-items-center hover:bg-gray-500/10" onClick={() => setCollapsed(!collapsed)}>
+  <Icon className="w-5 h-5 text-custom-gray" />
+</button>
           </div>
-          <nav className="flex-grow">
+          <nav className="flex-grow overflow-y-scroll">
             <ul
               className={classNames({
                 "my-2 flex flex-col gap-2 items-stretch": true,
@@ -104,7 +91,7 @@ const SideBar = ({
 
               {
                 chats?.docs.map((chat) => (
-                  <ChatRow key={chat.id} id={chat.id} />
+                  <ChatRow key={chat.id} id={chat.id} collapsed={collapsed}/>
                 )
                 )
               }
