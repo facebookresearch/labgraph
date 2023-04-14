@@ -43,13 +43,7 @@ const SideBar = ({
 
   return (
     <div className="relative">
-    {/* When Sidebar expanded and something else is clicked collapse sidebar */}
-    {!collapsed && (
-      <div
-        className="fixed inset-0 z-10"
-        onClick={() => setCollapsed(true)}
-      ></div>
-    )}
+    
     <div
       className={classNames({
         " text-zinc-50 fixed md:static md:translate-x-0 z-20":
@@ -110,7 +104,7 @@ const SideBar = ({
 
             {
               chats?.docs.map((chat) => (
-                <ChatRow key={chat.id} id={chat.id} />
+                <ChatRow key={chat.id} id={chat.id} collapsed={collapsed}/>
               )
               )
             }

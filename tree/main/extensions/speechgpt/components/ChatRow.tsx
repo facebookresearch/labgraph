@@ -6,15 +6,17 @@ import { useSession } from 'next-auth/react';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { collection, deleteDoc, doc, orderBy, query } from 'firebase/firestore';
 import { db } from "../firebase";
+import { groupCollapsed } from 'console';
 
 
 
 type Props = {
     id: string;
+    collapsed: boolean;
   }
   
 
-const ChatRow = ({id} : Props) => {
+const ChatRow = ({id, collapsed} : Props) => {
   const pathname = usePathname();
   const router = useRouter();
   const {data: session} = useSession();
@@ -41,7 +43,10 @@ const ChatRow = ({id} : Props) => {
     <p className='flex-1 hidden truncate md:inline-flex text-gray-700/80'>
       {messages?.docs[messages?.docs.length - 1]?.data().text || "New Chat"}
     </p>
-    <TrashIcon onClick={removeChat} className='w-5 h-5 text-gray-700 hover:text-red-700'></TrashIcon></Link> 
+    {
+      collapsed ? "":<TrashIcon onClick={removeChat} className='w-5 h-5 text-gray-700 hover:text-red-700'></TrashIcon>
+    }
+    </Link> 
     </div>
   )
   
