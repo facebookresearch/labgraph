@@ -1,6 +1,7 @@
+// @ts-nocheck
 "use client";
 
-import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
+import { PaperAirplaneIcon, MicrophoneIcon } from "@heroicons/react/24/solid";
 import { addDoc, getDocs, collection, serverTimestamp } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { FormEvent, useState } from "react";
@@ -8,20 +9,63 @@ import { toast } from "react-hot-toast";
 import { db } from "../firebase";
 import ModelSelection from "./ModelSelection";
 import useSWR from "swr"
+import { useRef, useEffect } from "react";
 
+import useRecorder from "../hooks/useRecorder";
 
 type Props = {
   chatId: string;
 };
 
+interface Window {
+  webkitSpeechRecognition: any;
+}
+
 function ChatInput({ chatId }: Props) {
   const [prompt, setPrompt] = useState("");
   const { data: session } = useSession();
 
+  // initialize useRecorder hook
+  let [audioURL, isRecording, startRecording, stopRecording, audioBlob] =
+    useRecorder()
+
+  const [startedRecording, setStartedRecording] = useState(false)
 
   const { data: model, mutate: setModel } = useSWR("model", {
-    fallbackData: "text-davinci-003"
+    fallbackData: "gpt-3.5-turbo"
   })
+
+
+
+  // TODO investigate why initialising this as SpeechRecognition causes an error
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition
+
+  // instantiate speech recognition object
+  const recognition = new SpeechRecognition()
+
+  var current, transcript, upperCase
+
+
+
+  // recording event handler
+  const startRecord = (e) => {
+    // capture the event
+    recognition.start(e)
+
+    recognition.onresult = (e) => {
+      // after the event has been processed by the browser, get the index
+      current = e.resultIndex
+      // get the transcript from the processed event
+      transcript = e.results[current][0].transcript
+      // the transcript is in lower case so set firse char to upper case
+      upperCase = transcript.charAt(0).toUpperCase() + transcript.substring(1)
+      console.log("voice event", e)
+      console.log("transcript", transcript)
+      setPrompt(transcript)
+    }
+  }
+
 
 
   const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
@@ -79,15 +123,27 @@ function ChatInput({ chatId }: Props) {
   };
 
   return (
-    <div className="text-sm text-custom-gray rounded-lg bg-gray-700/50">
+    <div className="text-sm rounded-lg text-slate-200 bg-gray-700/50">
       <form onSubmit={sendMessage} className="flex p-5 space-x-5">
         <input
-          className="flex-1 bg-transparent focus:outline-none disabled:cursor-not-allowed disabled:text-gray-300 placeholder-custom-gray"
+          className="flex-1 bg-transparent text-slate-200 focus:outline-none disabled:cursor-not-allowed disabled:text-gray-300 placeholder-slate-200"
           disabled={!session}
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           type="text" placeholder="Type your message here..."
         />
+
+        <button
+          onClick={(e) => {
+            setStartedRecording(true)
+            startRecord(e)
+          }}
+          className={`${isRecording ? "text-green-500" : "text-white"
+            } hover:text-green-500 focus:outline-none`}
+        >
+          <MicrophoneIcon className="w-6 h-6 " />
+        </button>
+
 
         <button disabled={!prompt || !session} type="submit"
           className="bg-[#1877F2] hover:opacity-50 text-white font-bold
