@@ -48,7 +48,7 @@ export default async function handler(
         user: {
             _id: "SpeechGPT",
             name: "SpeechGPT",
-            avatar: "https://firebasestorage.googleapis.com/v0/b/speechgpt-77211.appspot.com/o/Avatar%20ChatGPT.png?alt=media&token=4f789405-6cad-483b-8945-0fbda2722bc1",
+            avatar: "https://firebasestorage.googleapis.com/v0/b/speechgpt-77211.appspot.com/o/MetaProfile.png?alt=media&token=9dc515e5-ff7b-49da-9ea5-a12e54b7bfe2",
         },
     }
 
