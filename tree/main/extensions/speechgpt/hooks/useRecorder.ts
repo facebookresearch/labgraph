@@ -27,7 +27,7 @@ const useRecorder = (): [string, boolean, () => void, () => void, Blob] => {
     // Obtain the audio when ready.
     const handleData = (e: BlobEvent) => {
       // e.data is a blob containing the audio data.
-      console.log(e.data);
+      // console.log(e.data);
       setAudioBlob(e.data);
       // Convert the blob to a URL.
       setAudioURL(URL.createObjectURL(e.data));

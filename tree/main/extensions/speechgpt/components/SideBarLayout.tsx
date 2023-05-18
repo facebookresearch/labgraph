@@ -2,8 +2,6 @@
 
 import classNames from "classnames";
 import React, { PropsWithChildren, useState } from "react";
-import Navbar from "./Navbar";
-// import SideBar from "./SideBar";
 
 import SideBar from "./SideBar";
 

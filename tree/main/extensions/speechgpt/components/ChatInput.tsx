@@ -37,7 +37,6 @@ function ChatInput({ chatId }: Props) {
 
 
 
-  // TODO investigate why initialising this as SpeechRecognition causes an error
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition
 
@@ -60,8 +59,8 @@ function ChatInput({ chatId }: Props) {
       transcript = e.results[current][0].transcript
       // the transcript is in lower case so set firse char to upper case
       upperCase = transcript.charAt(0).toUpperCase() + transcript.substring(1)
-      console.log("voice event", e)
-      console.log("transcript", transcript)
+      // console.log("voice event", e)
+      // console.log("transcript", transcript)
       setPrompt(transcript)
     }
   }
@@ -98,7 +97,7 @@ function ChatInput({ chatId }: Props) {
     const querySnapshot = await (await getDocs(collection(db, 'users', session?.user?.email!, 'chats', chatId, 'messages')))
 
     const chatHistory = querySnapshot.docs.map(doc => doc.data());
-    console.log("Snapshot", querySnapshot)
+    // console.log("Snapshot", querySnapshot)
 
     const notification = toast.loading('SpeechGPT is thinking...');
 
