@@ -40,7 +40,6 @@ export default async function handler(
     const response = await query(prompt, chatId, model, chatHistory)
 
 
-    console.log("being written to DB", response)
     const message: Message = {
 
         text: String(response) || "SpeechGPT was unable to find an answer for that!",

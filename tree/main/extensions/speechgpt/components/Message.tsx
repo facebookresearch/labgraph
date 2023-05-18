@@ -4,8 +4,6 @@ import { signOut, useSession } from "next-auth/react";
 import { doc, addDoc, getDocs, collection, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
-
-
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import Renderers from 'react-markdown';
@@ -42,25 +40,6 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ language, value }) => {
   );
 };
 
-// function CodeBlock({ language, value }: CodeBlockProps) {
-//   const highlightedCode = hljs.highlight(value, { language }).value;
-
-//   return (
-//     <pre className={`hljs ${language}`}>
-//       <code dangerouslySetInnerHTML={{ __html: highlightedCode }} />
-//     </pre>
-//   );
-// }
-const markdown = `
-# My Markdown Document
-
-Here's some code:
-
-\`\`\`javascript
-const greeting = "Hello, world!";
-console.log(greeting);
-\`\`\`
-`;
 
 type Props = {
   message: DocumentData

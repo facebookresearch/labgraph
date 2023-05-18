@@ -6,13 +6,13 @@ import {getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where, or
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-console.log(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)
-console.log(process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN)
-console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
-console.log(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET)
-console.log(process.env.NEXT_PUBLIC_FIREBASE_MESSAGE_SENDER_ID)
-console.log(process.env.NEXT_PUBLIC_FIREBASE_APP_ID)
-console.log(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID)
+// console.log(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)
+// console.log(process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN)
+// console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
+// console.log(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET)
+// console.log(process.env.NEXT_PUBLIC_FIREBASE_MESSAGE_SENDER_ID)
+// console.log(process.env.NEXT_PUBLIC_FIREBASE_APP_ID)
+// console.log(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID)
 
 // const firebaseConfig = {
 //   apiKey: process.env.FIREBASE_API_KEY,
