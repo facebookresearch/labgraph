@@ -1,8 +1,19 @@
-
 // initialize firebase firestore
-import {getApp, getApps, initializeApp} from 'firebase/app';
-import {getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where, orderBy, limit, startAfter, Timestamp} from 'firebase/firestore';
-
+import { getApp, getApps, initializeApp } from 'firebase/app';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  startAfter,
+  Timestamp,
+} from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -24,8 +35,6 @@ import {getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where, or
 //   measurementId: process.env.FIREBASE_MEASUREMENT_ID
 // };
 
-
-
 // const firebaseConfig = {
 //   apiKey: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
 //   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -36,18 +45,14 @@ import {getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where, or
 //   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 // };
 
-
-
 const firebaseConfig = {
-  apiKey: "AIzaSyBMd0Wn2-XGBbr0ADEStYAVUF2jo0Z5KE4",
-  authDomain: "speechgpt-77211.firebaseapp.com",
-  projectId: "speechgpt-77211",
-  storageBucket: "speechgpt-77211.appspot.com",
-  messagingSenderId: "496610468789",
-  appId: "1:496610468789:web:0606b7afd67e001792effc",
-  measurementId: "G-DDG6GC0FEF"
+  apiKey: 'AIzaSyBYvp3Zm3c_blRatPVaBuXalai4JgzaEX0',
+  authDomain: 'surveygpt.firebaseapp.com',
+  projectId: 'surveygpt',
+  storageBucket: 'surveygpt.appspot.com',
+  messagingSenderId: '1083664249898',
+  appId: '1:1083664249898:web:35e2c17425421f8c2c3f53',
 };
-
 
 // this is especially for next.js
 // singleton pattern encoding
@@ -55,4 +60,4 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 // const analytics = getAnalytics(app);
 
-export {db};
+export { db };
