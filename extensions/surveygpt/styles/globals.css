@@ -2,15 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-  .infoText{
-    @apply p-4 bg-[#1877F2] rounded-lg max-w-[300px]
+@layer base {
+  body {
+    @apply text-custom-black;
+  }
+}
 
+@layer components {
+  .infoText {
+    @apply p-4 bg-[#1877F2] rounded-lg max-w-[300px];
   }
 
-  .chatRow{
+  .chatRow {
     @apply rounded-lg px-5 py-3 text-sm flex items-center
     justify-center space-x-2 hover:bg-gray-700/70 cursor-pointer
-    text-gray-300 transition-all duration-200 ease-out
+    text-gray-300 transition-all duration-200 ease-out;
   }
 }
