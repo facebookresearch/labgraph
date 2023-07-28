@@ -10,7 +10,7 @@ module.exports = {
     extend: {
       colors: {
         'custom-black': '#1c2b33',
-        'custom-gray': { 100: '#F2F4F7', 200: '#67788a' },
+        'custom-gray': { 100: '#F2F4F7', 200: '#E5E5E5', 300: '#67788a' },
         'custom-blue': '#2962D8',
       },
       gridTemplateColumns: {
