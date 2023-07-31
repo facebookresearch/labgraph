@@ -23,9 +23,6 @@
     <!-- Enable instant app support -->
     <dist:module dist:instant="true" />
 
-    <!-- Declare features -->
-    <uses-feature android:name="android.hardware.camera" />
-
     <application
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
