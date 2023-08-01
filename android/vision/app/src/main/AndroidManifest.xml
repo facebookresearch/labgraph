@@ -18,7 +18,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.google.mediapipe.examples.objectdetection">
+    package="labgraph_vision.objectdetection">
 
     <!-- Enable instant app support -->
     <dist:module dist:instant="true" />
@@ -32,7 +32,7 @@
         tools:ignore="AllowBackup">
 
         <activity
-            android:name=".MainActivity"
+            android:name="labgraph_vision.objectdetection.MainActivity"
             android:clearTaskOnLaunch="true"
             android:theme="@style/AppTheme"
             android:exported="true"

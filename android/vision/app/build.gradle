@@ -24,7 +24,7 @@ android {
     compileSdkVersion 32
     defaultConfig {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        applicationId "com.google.mediapipe.examples.objectdetection"
+        applicationId "labgraph_vision.objectdetection"
         minSdkVersion 24
         targetSdkVersion 32
         versionCode 1
