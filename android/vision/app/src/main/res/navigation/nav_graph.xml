@@ -47,6 +47,6 @@
 
     <fragment
         android:id="@+id/gallery_fragment"
-        android:name="com.google.mediapipe.examples.objectdetection.fragments.GalleryFragment"
+        android:name="labgraph_vision.objectdetection.fragments.GalleryFragment"
         android:label="GalleryFragment" />
 </navigation>

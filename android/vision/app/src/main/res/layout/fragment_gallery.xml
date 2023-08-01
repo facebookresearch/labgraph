@@ -51,7 +51,7 @@
                 android:layout_height="match_parent"
                 android:visibility="gone" />
 
-            <com.google.mediapipe.examples.objectdetection.OverlayView
+            <labgraph_vision.objectdetection.OverlayView
                 android:id="@+id/overlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
