@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mediapipe.examples.objectdetection
+package labgraph_vision.objectdetection
 
 import android.content.Context
 import android.graphics.*

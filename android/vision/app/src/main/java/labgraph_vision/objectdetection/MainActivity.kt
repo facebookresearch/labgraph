@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.mediapipe.examples.objectdetection
+package labgraph_vision.objectdetection
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.google.mediapipe.examples.objectdetection.databinding.ActivityMainBinding
+import labgraph_vision.objectdetection.databinding.ActivityMainBinding
 
 /**
  * Main entry point into our app. This app follows the single-activity pattern, and all

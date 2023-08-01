@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.mediapipe.examples.objectdetection.fragments
+package labgraph_vision.objectdetection.fragments
 
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,9 +28,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.mediapipe.examples.objectdetection.MainViewModel
-import com.google.mediapipe.examples.objectdetection.ObjectDetectorHelper
-import com.google.mediapipe.examples.objectdetection.databinding.FragmentGalleryBinding
+import labgraph_vision.objectdetection.MainViewModel
+import labgraph_vision.objectdetection.ObjectDetectorHelper
+import labgraph_vision.objectdetection.databinding.FragmentGalleryBinding
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
