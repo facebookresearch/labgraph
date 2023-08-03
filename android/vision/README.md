@@ -14,7 +14,7 @@ This application should be run on a physical Android device to take advantage of
 ### Prerequisites
 
 *   The **[Android Studio](https://developer.android.com/studio/index.html)**
-    IDE. This sample has been tested on Android Studio Dolphin.
+    IDE. This sample has been tested on Android Studio Flamingo.
 
 *   A physical Android device with a minimum OS version of SDK 24 (Android 7.0 -
     Nougat) with developer mode enabled. The process of enabling developer mode
