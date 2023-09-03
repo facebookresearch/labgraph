@@ -1,0 +1,31 @@
+FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2019
+
+# Install Chocolatey
+RUN powershell -ExecutionPolicy Bypass -Command iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+# Install build deps using Chocolatey
+RUN choco install -y python3 --version 3.6.8 && choco install -y buck visualstudio2019-workload-vctools
+RUN pip install certifi wheel
+
+WORKDIR c:\\labgraph
+COPY . .
+
+# Build LabGraph Wheel
+RUN C:\Program^ Files^ ^(x86^)\Microsoft^ Visual^ Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat && python setup_py36.py build
+RUN C:\Program^ Files^ ^(x86^)\Microsoft^ Visual^ Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat && python setup_py36.py install
+RUN C:\Program^ Files^ ^(x86^)\Microsoft^ Visual^ Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat && python setup_py36.py bdist_wheel
+
+# Test LabGraph
+# FIXME Test fails with /O2 & /MD
+# RUN python -m pytest --pyargs -v labgraph._cthulhu
+RUN python -m pytest --pyargs -v labgraph.events
+RUN python -m pytest --pyargs -v labgraph.graphs
+RUN python -m pytest --pyargs -v labgraph.loggers
+RUN python -m pytest --pyargs -v labgraph.messages
+RUN python -m pytest --pyargs -v labgraph.runners.tests.test_process_manager
+RUN python -m pytest --pyargs -v labgraph.runners.tests.test_aligner
+RUN python -m pytest --pyargs -v labgraph.runners.tests.test_cpp
+# FIXME Test fails with /O2 & /MD
+#RUN python -m pytest --pyargs -v labgraph.runners.tests.test_exception
+RUN python -m pytest --pyargs -v labgraph.runners.tests.test_launch
+RUN python -m pytest --pyargs -v labgraph.runners.tests.test_runner
