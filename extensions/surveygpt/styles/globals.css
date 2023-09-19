@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-custom-black;
+  }
+}
+
+@layer components {
+  .infoCard {
+    @apply flex items-center px-4 py-4 bg-custom-gray-100 border border-solid border-custom-gray-200 rounded-3xl;
+  }
+}
