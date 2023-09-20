@@ -1,0 +1,5961 @@
+Generated code for sklearn.cluster.cluster_optics_dbscan
+
+
+import numpy as np
+from sklearn.cluster import OPTICS, cluster_optics_dbscan
+
+# Generate sample data
+np.random.seed(0)
+X = np.random.rand(12,2)
+
+# Compute DBSCAN
+clust = OPTICS(min_samples=2, xi=.05, min_cluster_size=0.05)
+
+# Run the fit
+clust.fit(X)
+
+# Extract labels
+labels_050 = cluster_optics_dbscan(reachability=clust.reachability_,
+                                   core_distances=clust.core_distances_,
+                                   ordering=clust.ordering_, eps=0.5)
+
+labels_200 = cluster_optics_dbscan(reachability=clust.reachability_,
+                                   core_distances=clust.core_distances_,
+                                   ordering=clust.ordering_, eps=2)
+
+space = np.arange(len(X))
+reachability = clust.reachability_[clust.ordering_]
+labels = clust.labels_[clust.ordering_]
+
+print(labels_050)
+print(labels_200)
+Generated code for sklearn.cluster.cluster_optics_xi
+
+
+from sklearn.cluster import OPTICS
+
+# Create an instance of the OPTICS clustering algorithm
+clustering = OPTICS(min_samples=50, xi=0.05, min_cluster_size=0.05)
+
+# Fit the model to the data
+clustering.fit(X)
+
+# Extract the labels for each point in the data
+labels = clustering.labels_
+
+# Visualize the results
+plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis')
+plt.show()
+Generated code for sklearn.cluster.compute_optics_graph
+
+
+import numpy as np
+from sklearn.cluster import OPTICS
+
+# Create a sample dataset
+X = np.array([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11]])
+
+# Create an instance of OPTICS
+clust = OPTICS(min_samples=2, xi=.05, min_cluster_size=.05)
+
+# Compute the OPTICS graph
+clust.fit(X)
+
+# Compute the OPTICS graph
+graph = clust.compute_optics_graph()
+Generated code for sklearn.cluster.dbscan
+
+
+# Import necessary libraries
+import numpy as np
+from sklearn.cluster import DBSCAN
+
+# Create a sample dataset
+X = np.array([[1, 2], [2, 2], [2, 3],
+              [8, 7], [8, 8], [25, 80]])
+
+# Create and fit the model
+dbscan = DBSCAN(eps=3, min_samples=2).fit(X)
+
+# Get the labels
+labels = dbscan.labels_
+
+# Print the labels
+print(labels)
+Generated code for sklearn.cluster.estimate_bandwidth
+
+
+from sklearn.cluster import estimate_bandwidth
+
+# Generate sample data
+X = np.array([[1, 2], [2, 1], [3, 4], [4, 3], [5, 6], [6, 5]])
+
+# Estimate the bandwidth of X
+bandwidth = estimate_bandwidth(X, quantile=0.5, n_samples=len(X))
+
+print("Estimated bandwidth: %f" % bandwidth)
+Generated code for sklearn.cluster.k_means
+
+
+from sklearn.cluster import KMeans
+
+# Create a KMeans object with 3 clusters
+kmeans = KMeans(n_clusters=3)
+
+# Fit the model to the data
+kmeans.fit(X)
+
+# Get the cluster labels
+labels = kmeans.labels_
+
+# Get the cluster centers
+cluster_centers = kmeans.cluster_centers_
+Generated code for sklearn.cluster.kmeans_plusplus
+
+
+from sklearn.cluster import KMeans
+
+# Create a KMeans instance with 3 clusters: kmeans
+kmeans = KMeans(n_clusters=3, init='k-means++')
+
+# Fit the model to the data
+kmeans.fit(X)
+
+# Predict the clusters
+predicted_clusters = kmeans.predict(X)
+Generated code for sklearn.cluster.mean_shift
+
+
+import numpy as np
+from sklearn.cluster import MeanShift
+
+# Create a random dataset
+X = np.random.rand(50,2)
+
+# Create the MeanShift object
+ms = MeanShift()
+
+# Fit the data
+ms.fit(X)
+
+# Get the labels
+labels = ms.labels_
+
+# Get the cluster centers
+cluster_centers = ms.cluster_centers_
+
+# Print the results
+print("Labels:", labels)
+print("Cluster Centers:", cluster_centers)
+Generated code for sklearn.cluster.spectral_clustering
+
+
+from sklearn.cluster import SpectralClustering
+
+# Create an instance of SpectralClustering
+clustering = SpectralClustering(n_clusters=3, affinity='nearest_neighbors', assign_labels='kmeans')
+
+# Fit the model to the data
+clustering.fit(X)
+
+# Predict the clusters
+clusters = clustering.predict(X)
+Generated code for sklearn.cluster.ward_tree
+
+
+from sklearn.cluster import WardTree
+
+# Create an instance of the WardTree clustering model
+model = WardTree()
+
+# Fit the model to the data
+model.fit(X)
+
+# Predict the clusters for each data point
+clusters = model.predict(X)
+
+# Print the cluster labels for each data point
+print(clusters)
+Generated code for sklearn.compose.ColumnTransformer
+
+
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler
+
+# Create a ColumnTransformer object
+column_transformer = ColumnTransformer(
+    transformers=[
+        ('scaler', StandardScaler(), [0,1,2])
+    ],
+    remainder='passthrough'
+)
+
+# Fit the ColumnTransformer object
+column_transformer.fit(X)
+
+# Transform the data
+X_transformed = column_transformer.transform(X)
+Generated code for sklearn.compose.TransformedTargetRegressor
+
+
+from sklearn.compose import TransformedTargetRegressor
+
+# Create the TransformedTargetRegressor
+regressor = TransformedTargetRegressor(
+    regressor=LinearRegression(),
+    transformer=MinMaxScaler())
+
+# Fit the model
+regressor.fit(X, y)
+
+# Make predictions
+predictions = regressor.predict(X)
+Generated code for sklearn.compose.make_column_transformer
+
+
+from sklearn.compose import make_column_transformer
+from sklearn.preprocessing import StandardScaler
+
+# Create a list of tuples containing the name of the transformer and the transformer class
+transformers = [('scaler', StandardScaler())]
+
+# Create the column transformer
+column_trans = make_column_transformer(transformers)
+Generated code for sklearn.compose.make_column_selector
+
+
+def make_column_selector(column_names):
+    """
+    Create a function that takes a list of column names and returns a function
+    that can be used to select those columns from a dataframe.
+
+    Parameters
+    ----------
+    column_names : list
+        List of column names to select.
+
+    Returns
+    -------
+    selector : function
+        Function that takes a dataframe and returns a dataframe with only the
+        specified columns.
+    """
+    def selector(df):
+        return df[column_names]
+    return selector
+Generated code for sklearn.covariance.EmpiricalCovariance
+
+
+import numpy as np
+from sklearn.covariance import EmpiricalCovariance
+
+# Generate some random data
+data = np.random.rand(100, 5)
+
+# Create an instance of the EmpiricalCovariance estimator
+estimator = EmpiricalCovariance()
+
+# Fit the estimator to the data
+estimator.fit(data)
+
+# Get the estimated covariance matrix
+covariance_matrix = estimator.covariance_
+Generated code for sklearn.covariance.EllipticEnvelope
+
+
+from sklearn.covariance import EllipticEnvelope
+
+# Create an instance of the EllipticEnvelope class
+envelope = EllipticEnvelope()
+
+# Fit the model to the data
+envelope.fit(X)
+
+# Predict the labels for the data
+labels = envelope.predict(X)
+
+# Get the scores for the data
+scores = envelope.decision_function(X)
+Generated code for sklearn.covariance.GraphicalLasso
+
+
+from sklearn.covariance import GraphicalLasso
+
+# Create an instance of GraphicalLasso
+gl = GraphicalLasso()
+
+# Fit the model to the data
+gl.fit(X)
+
+# Get the covariance matrix
+cov_matrix = gl.covariance_
+
+# Get the precision matrix
+precision_matrix = gl.precision_
+Generated code for sklearn.covariance.GraphicalLassoCV
+
+
+from sklearn.covariance import GraphicalLassoCV
+
+# Create an instance of GraphicalLassoCV
+glcv = GraphicalLassoCV()
+
+# Fit the model to the data
+glcv.fit(X)
+
+# Get the estimated covariance matrix
+cov_matrix = glcv.covariance_
+
+# Get the estimated precision matrix
+precision_matrix = glcv.precision_
+Generated code for sklearn.covariance.LedoitWolf
+
+
+from sklearn.covariance import LedoitWolf
+
+# Create an instance of the LedoitWolf estimator
+ledoit_wolf = LedoitWolf()
+
+# Fit the estimator to the data
+ledoit_wolf.fit(X)
+
+# Get the estimated covariance matrix
+cov_matrix = ledoit_wolf.covariance_
+
+# Get the estimated shrinkage parameter
+shrinkage_param = ledoit_wolf.shrinkage_
+Generated code for sklearn.covariance.MinCovDet
+
+
+from sklearn.covariance import MinCovDet
+
+# Create an instance of MinCovDet
+min_cov_det = MinCovDet()
+
+# Fit the model to the data
+min_cov_det.fit(X)
+
+# Get the estimated covariance matrix
+cov_matrix = min_cov_det.covariance_
+
+# Get the estimated robust location
+location = min_cov_det.location_
+
+# Get the estimated robust scale
+scale = min_cov_det.scale_
+Generated code for sklearn.covariance.OAS
+
+
+import numpy as np
+from sklearn.covariance import OAS
+
+# Generate some random data
+X = np.random.rand(100, 5)
+
+# Create an instance of the OAS estimator
+oas = OAS()
+
+# Fit the data
+oas.fit(X)
+
+# Get the covariance matrix
+cov_matrix = oas.covariance_
+Generated code for sklearn.covariance.ShrunkCovariance
+
+
+from sklearn.covariance import ShrunkCovariance
+
+# Create an instance of the ShrunkCovariance estimator
+shrunk_cov = ShrunkCovariance()
+
+# Fit the estimator to the data
+shrunk_cov.fit(X)
+
+# Get the shrunken covariance matrix
+shrunk_cov_matrix = shrunk_cov.covariance_
+
+# Get the shrunken precision matrix
+shrunk_precision_matrix = shrunk_cov.precision_
+Generated code for sklearn.covariance.empirical_covariance
+
+
+import numpy as np
+from sklearn.covariance import empirical_covariance
+
+# Generate random data
+data = np.random.rand(10, 5)
+
+# Calculate the empirical covariance
+cov = empirical_covariance(data)
+
+# Print the covariance matrix
+print(cov)
+Generated code for sklearn.covariance.graphical_lasso
+
+
+import numpy as np
+from sklearn.covariance import graphical_lasso
+
+# Generate some random data
+n_samples, n_features = 10, 5
+np.random.seed(0)
+X = np.random.randn(n_samples, n_features)
+
+# Fit the GraphicalLasso model
+model = graphical_lasso(X, alpha=0.01, mode='cd')
+
+# Get the precision matrix
+precision_matrix = model.precision_
+Generated code for sklearn.covariance.ledoit_wolf
+
+
+import numpy as np
+from sklearn.covariance import LedoitWolf
+
+# Generate some random data
+X = np.random.rand(100, 5)
+
+# Create the LedoitWolf estimator
+estimator = LedoitWolf()
+
+# Fit the estimator to the data
+estimator.fit(X)
+
+# Get the estimated covariance matrix
+cov_matrix = estimator.covariance_
+Generated code for sklearn.covariance.oas
+
+
+import numpy as np
+from sklearn.covariance import OAS
+
+# Generate some random data
+X = np.random.rand(100, 5)
+
+# Create an instance of the OAS estimator
+oas = OAS()
+
+# Fit the data
+oas.fit(X)
+
+# Get the covariance matrix
+cov_matrix = oas.covariance_
+Generated code for sklearn.covariance.shrunk_covariance
+
+
+import numpy as np
+from sklearn.covariance import shrunk_covariance
+
+# Generate random data
+X = np.random.rand(10, 5)
+
+# Compute the shrunk covariance
+shrunk_cov = shrunk_covariance(X)
+
+# Print the result
+print(shrunk_cov)
+Generated code for sklearn.cross_decomposition.CCA
+
+
+from sklearn.cross_decomposition import CCA
+
+# Create the CCA object
+cca = CCA(n_components=2)
+
+# Fit the CCA object to the data
+cca.fit(X, Y)
+
+# Transform the data
+X_c, Y_c = cca.transform(X, Y)
+
+# Get the correlation between the transformed data
+corr = np.corrcoef(X_c, Y_c)[0, 1]
+
+# Print the correlation
+print("Correlation: {:.2f}".format(corr))
+Generated code for sklearn.cross_decomposition.PLSCanonical
+
+
+from sklearn.cross_decomposition import PLSCanonical
+
+# Create an instance of the PLSCanonical class
+pls_canonical = PLSCanonical()
+
+# Fit the model to the data
+pls_canonical.fit(X, y)
+
+# Make predictions
+y_pred = pls_canonical.predict(X)
+
+# Get the coefficients of the model
+coef = pls_canonical.coef_
+
+# Get the score of the model
+score = pls_canonical.score(X, y)
+Generated code for sklearn.cross_decomposition.PLSRegression
+
+
+from sklearn.cross_decomposition import PLSRegression
+
+# Create an instance of the PLSRegression class
+pls_reg = PLSRegression()
+
+# Fit the model to the training data
+pls_reg.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = pls_reg.predict(X_test)
+
+# Calculate the mean squared error
+mse = mean_squared_error(y_test, y_pred)
+
+# Print the mean squared error
+print(mse)
+Generated code for sklearn.cross_decomposition.PLSSVD
+
+
+from sklearn.cross_decomposition import PLSSVD
+
+# Create PLSSVD object
+pls_svd = PLSSVD(n_components=2)
+
+# Fit the model
+pls_svd.fit(X, y)
+
+# Transform the data
+X_transformed = pls_svd.transform(X)
+
+# Get the explained variance ratio
+explained_variance_ratio = pls_svd.explained_variance_ratio_
+
+# Get the singular values
+singular_values = pls_svd.singular_values_
+Generated code for sklearn.datasets.clear_data_home
+
+
+#importing necessary libraries
+import pandas as pd
+from sklearn.datasets import clear_data_home
+
+#loading the dataset
+data = clear_data_home()
+
+#creating a dataframe
+df = pd.DataFrame(data.data, columns=data.feature_names)
+
+#viewing the dataframe
+df.head()
+Generated code for sklearn.datasets.dump_svmlight_file
+
+
+import numpy as np
+from sklearn.datasets import dump_svmlight_file
+
+# Generate some random data
+X = np.random.rand(100, 10)
+y = np.random.randint(2, size=100)
+
+# Dump the data to a file
+dump_svmlight_file(X, y, 'data.svmlight')
+Generated code for sklearn.datasets.fetch_20newsgroups
+
+
+from sklearn.datasets import fetch_20newsgroups
+
+# Fetch the 20 newsgroups dataset
+newsgroups_data = fetch_20newsgroups(subset='all', shuffle=True, random_state=42)
+
+# Print the categories
+print(newsgroups_data.target_names)
+
+# Print the number of documents
+print(len(newsgroups_data.data))
+
+# Print the first document
+print(newsgroups_data.data[0])
+Generated code for sklearn.datasets.fetch_20newsgroups_vectorized
+
+
+from sklearn.datasets import fetch_20newsgroups_vectorized
+
+# Load the data
+newsgroups_data = fetch_20newsgroups_vectorized()
+
+# Get the data and target
+X = newsgroups_data.data
+y = newsgroups_data.target
+
+# Split the data into training and test sets
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a classifier
+from sklearn.naive_bayes import MultinomialNB
+clf = MultinomialNB()
+clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: {:.2f}%".format(accuracy*100))
+Generated code for sklearn.datasets.fetch_california_housing
+
+
+import numpy as np
+from sklearn.datasets import fetch_california_housing
+
+# Fetch the California housing dataset
+cal_housing = fetch_california_housing()
+
+# Get the feature names
+features = cal_housing.feature_names
+
+# Get the data
+X = cal_housing.data
+
+# Get the target values
+y = cal_housing.target
+
+# Print the shape of the data
+print(X.shape)
+print(y.shape)
+
+# Print the feature names
+print(features)
+Generated code for sklearn.datasets.fetch_covtype
+
+
+from sklearn.datasets import fetch_covtype
+
+# Load the covtype dataset
+covtype_data = fetch_covtype()
+
+# Get the feature names
+feature_names = covtype_data.feature_names
+
+# Get the target names
+target_names = covtype_data.target_names
+
+# Get the data
+X = covtype_data.data
+y = covtype_data.target
+
+# Print the shape of the data
+print(X.shape)
+print(y.shape)
+
+# Print the feature names
+print(feature_names)
+
+# Print the target names
+print(target_names)
+Generated code for sklearn.datasets.fetch_kddcup99
+
+
+from sklearn.datasets import fetch_kddcup99
+
+# Load the KDD Cup 99 dataset
+kdd_data = fetch_kddcup99()
+
+# Get the feature names
+feature_names = kdd_data.feature_names
+
+# Get the target names
+target_names = kdd_data.target_names
+
+# Get the data
+X = kdd_data.data
+y = kdd_data.target
+
+# Print the shape of the data
+print(X.shape)
+print(y.shape)
+Generated code for sklearn.datasets.fetch_lfw_pairs
+
+
+import numpy as np
+from sklearn.datasets import fetch_lfw_pairs
+
+# Load the data
+lfw_pairs = fetch_lfw_pairs(resize=0.5)
+
+# Get the data and target
+X = lfw_pairs.data
+y = lfw_pairs.target
+
+# Split the data into train and test sets
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create a model
+from sklearn.svm import SVC
+model = SVC(kernel='linear')
+
+# Fit the model
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy:', accuracy)
+Generated code for sklearn.datasets.fetch_lfw_people
+
+
+from sklearn.datasets import fetch_lfw_people
+
+lfw_people = fetch_lfw_people(min_faces_per_person=70, resize=0.4)
+
+# introspect the images arrays to find the shapes (for plotting)
+n_samples, h, w = lfw_people.images.shape
+
+# for machine learning we use the 2 data directly (as relative pixel
+# positions info is ignored by this model)
+X = lfw_people.data
+n_features = X.shape[1]
+
+# the label to predict is the id of the person
+y = lfw_people.target
+target_names = lfw_people.target_names
+n_classes = target_names.shape[0]
+Generated code for sklearn.datasets.fetch_olivetti_faces
+
+
+from sklearn.datasets import fetch_olivetti_faces
+
+# Load the Olivetti faces dataset
+dataset = fetch_olivetti_faces()
+
+# Get the data and target
+data = dataset.data
+target = dataset.target
+
+# Print the shape of the data and target
+print("Data shape:", data.shape)
+print("Target shape:", target.shape)
+
+# Print the first 10 targets
+print("First 10 targets:", target[:10])
+Generated code for sklearn.datasets.fetch_openml
+
+
+import numpy as np
+from sklearn.datasets import fetch_openml
+
+# Fetch the openml dataset
+X, y = fetch_openml('openml_dataset', version=1, return_X_y=True)
+
+# Split the dataset into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Fit the model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.datasets.fetch_rcv1
+
+
+import numpy as np
+from sklearn.datasets import fetch_rcv1
+
+# Fetch the RCV1 dataset
+rcv1 = fetch_rcv1()
+
+# Get the data and target
+X = rcv1.data
+y = rcv1.target
+
+# Split the data into training and test sets
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Fit a logistic regression model
+from sklearn.linear_model import LogisticRegression
+clf = LogisticRegression(random_state=0).fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.datasets.fetch_species_distributions
+
+
+import numpy as np
+from sklearn.datasets import fetch_species_distributions
+
+# Load the data
+data = fetch_species_distributions()
+
+# Extract the features and target
+X = data.data
+y = data.target
+
+# Split the data into training and test sets
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Fit a model
+from sklearn.ensemble import RandomForestClassifier
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy:', accuracy)
+Generated code for sklearn.datasets.get_data_home
+
+
+import os
+from sklearn.datasets import get_data_home
+
+data_home = get_data_home()
+if not os.path.exists(data_home):
+    os.makedirs(data_home)
+
+print(data_home)
+Generated code for sklearn.datasets.load_breast_cancer
+
+
+from sklearn.datasets import load_breast_cancer
+
+# Load the breast cancer dataset
+cancer = load_breast_cancer()
+
+# Print the data
+print(cancer.data)
+
+# Print the target
+print(cancer.target)
+
+# Print the feature names
+print(cancer.feature_names)
+
+# Print the target names
+print(cancer.target_names)
+Generated code for sklearn.datasets.load_diabetes
+
+
+from sklearn.datasets import load_diabetes
+
+# Load the diabetes dataset
+diabetes_data = load_diabetes()
+
+# Get the feature names
+feature_names = diabetes_data.feature_names
+
+# Get the data
+data = diabetes_data.data
+
+# Get the target
+target = diabetes_data.target
+
+# Print the feature names
+print(feature_names)
+
+# Print the first 5 rows of the data
+print(data[:5])
+
+# Print the target values
+print(target)
+Generated code for sklearn.datasets.load_digits
+
+
+from sklearn.datasets import load_digits
+
+# Load the digits dataset
+digits = load_digits()
+
+# Get the data and target values
+X = digits.data
+y = digits.target
+
+# Print the shape of the data
+print(X.shape)
+print(y.shape)
+Generated code for sklearn.datasets.load_files
+
+
+from sklearn.datasets import load_files
+
+# Load the files
+data = load_files('path/to/files')
+
+# Get the data
+X = data.data
+y = data.target
+
+# Get the labels
+labels = data.target_names
+
+# Print the data
+print(X)
+print(y)
+print(labels)
+Generated code for sklearn.datasets.load_iris
+
+
+from sklearn.datasets import load_iris
+
+# Load the Iris dataset
+iris = load_iris()
+
+# Get the features and labels
+X = iris.data
+y = iris.target
+
+# Split the data into training and testing sets
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a model
+from sklearn.ensemble import RandomForestClassifier
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: {:.2f}%".format(accuracy*100))
+Generated code for sklearn.datasets.load_linnerud
+
+
+import numpy as np
+from sklearn.datasets import load_linnerud
+
+# Load the linnerud dataset
+linnerud_data = load_linnerud()
+
+# Extract the features and target
+X = linnerud_data.data
+y = linnerud_data.target
+
+# Print the shape of the data
+print("Shape of X:", X.shape)
+print("Shape of y:", y.shape)
+
+# Print the first 5 rows of the data
+print("First 5 rows of X: \n", X[:5])
+print("First 5 rows of y: \n", y[:5])
+Generated code for sklearn.datasets.load_sample_image
+
+
+from sklearn.datasets import load_sample_image
+
+# Load the sample image
+china = load_sample_image("china.jpg")
+
+# Print the shape of the image
+print(china.shape)
+
+# Show the image
+import matplotlib.pyplot as plt
+plt.imshow(china)
+plt.show()
+Generated code for sklearn.datasets.load_sample_images
+
+
+from sklearn.datasets import load_sample_images
+
+# Load sample images
+dataset = load_sample_images()
+
+# Get the images
+images = dataset.images
+
+# Get the target
+target = dataset.target
+
+# Print the shape of the images
+print(images.shape)
+
+# Print the shape of the target
+print(target.shape)
+
+# Iterate over the images and target
+for image, target in zip(images, target):
+    # Print the image and target
+    print(image, target)
+Generated code for sklearn.datasets.load_svmlight_file
+
+
+from sklearn.datasets import load_svmlight_file
+
+# Load the data
+X, y = load_svmlight_file('data.txt')
+
+# Print the shape of the data
+print(X.shape, y.shape)
+
+# Print the first 5 rows of the data
+print(X[:5], y[:5])
+Generated code for sklearn.datasets.load_svmlight_files
+
+
+from sklearn.datasets import load_svmlight_files
+
+# Load the data
+X_train, y_train, X_test, y_test = load_svmlight_files(('train.txt', 'test.txt'))
+
+# Print the shapes of the data
+print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
+
+# Fit a model
+from sklearn.linear_model import LogisticRegression
+clf = LogisticRegression()
+clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.datasets.load_wine
+
+
+from sklearn.datasets import load_wine
+
+# Load the wine dataset
+wine_data = load_wine()
+
+# Print the feature names
+print(wine_data.feature_names)
+
+# Print the target names
+print(wine_data.target_names)
+
+# Print the data
+print(wine_data.data)
+
+# Print the target
+print(wine_data.target)
+Generated code for sklearn.datasets.make_biclusters
+
+
+import numpy as np
+from sklearn.datasets import make_biclusters
+
+# Generate a random bicluster data set
+data, rows, columns = make_biclusters(
+    shape=(100, 100), n_clusters=4, noise=5,
+    shuffle=False, random_state=0)
+
+# Print the data set
+print(data)
+
+# Print the row and column labels
+print(rows)
+print(columns)
+Generated code for sklearn.datasets.make_blobs
+
+
+from sklearn.datasets import make_blobs
+
+# Generate isotropic Gaussian blobs for clustering
+X, y = make_blobs(n_samples=100, n_features=2, centers=3, cluster_std=1.0, random_state=0)
+
+# Plot the blobs
+import matplotlib.pyplot as plt
+plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='viridis')
+plt.show()
+Generated code for sklearn.datasets.make_checkerboard
+
+
+import numpy as np
+from sklearn.datasets import make_checkerboard
+
+# Generate a checkerboard dataset
+X, y = make_checkerboard(shape=(8, 8), n_classes=2, noise=1.0)
+
+# Print the dataset
+print(X)
+print(y)
+Generated code for sklearn.datasets.make_circles
+
+
+import numpy as np
+from sklearn.datasets import make_circles
+
+# Generate data
+X, y = make_circles(n_samples=100, noise=0.05, random_state=0)
+
+# Plot the data
+import matplotlib.pyplot as plt
+plt.figure(figsize=(5, 5))
+plt.plot(X[y==0, 0], X[y==0, 1], 'ob', alpha=0.5)
+plt.plot(X[y==1, 0], X[y==1, 1], 'xr', alpha=0.5)
+plt.xlim(-1.5, 1.5)
+plt.ylim(-1.5, 1.5)
+plt.legend(['0', '1'])
+plt.title("Blue circles and Red crosses")
+plt.show()
+Generated code for sklearn.datasets.make_classification
+
+
+from sklearn.datasets import make_classification
+
+X, y = make_classification(n_samples=1000, n_features=20, n_informative=2, n_redundant=2, random_state=0)
+
+print(X.shape)
+print(y.shape)
+Generated code for sklearn.datasets.make_friedman1
+
+
+import numpy as np
+from sklearn.datasets import make_friedman1
+
+X, y = make_friedman1(n_samples=100, n_features=7, random_state=0)
+
+# Print the shapes of X and y
+print(X.shape)
+print(y.shape)
+
+# Print the first 5 rows of X
+print(X[:5, :])
+
+# Print the first 5 values of y
+print(y[:5])
+Generated code for sklearn.datasets.make_friedman2
+
+
+import numpy as np
+from sklearn.datasets import make_friedman2
+
+X, y = make_friedman2(n_samples=100, noise=0.5, random_state=0)
+
+# Print the shapes of X and y
+print(X.shape)
+print(y.shape)
+
+# Print the first 5 rows of X
+print(X[:5, :])
+
+# Print the first 5 elements of y
+print(y[:5])
+Generated code for sklearn.datasets.make_friedman3
+
+
+import numpy as np
+from sklearn.datasets import make_friedman3
+
+X, y = make_friedman3(n_samples=100, random_state=0)
+
+# Print the shapes of X and y
+print(X.shape)
+print(y.shape)
+
+# Print the first 5 rows of X
+print(X[:5, :])
+
+# Print the first 5 elements of y
+print(y[:5])
+Generated code for sklearn.datasets.make_gaussian_quantiles
+
+
+import numpy as np
+from sklearn.datasets import make_gaussian_quantiles
+
+# Generate a dataset with 2 features and 3 classes
+X, y = make_gaussian_quantiles(n_features=2, n_classes=3)
+
+# Print the shape of the dataset
+print(X.shape)
+print(y.shape)
+
+# Print the first 5 samples of the dataset
+print(X[:5])
+print(y[:5])
+Generated code for sklearn.datasets.make_hastie_10_2
+
+
+import numpy as np
+from sklearn.datasets import make_hastie_10_2
+
+X, y = make_hastie_10_2(random_state=0)
+
+# Print the shape of the data
+print("Shape of X:", X.shape)
+print("Shape of y:", y.shape)
+
+# Print the first 5 rows of the data
+print("\nFirst 5 rows of X:\n", X[:5, :])
+print("\nFirst 5 rows of y:\n", y[:5])
+Generated code for sklearn.datasets.make_low_rank_matrix
+
+
+import numpy as np
+from sklearn.datasets import make_low_rank_matrix
+
+# Generate a low-rank matrix
+X, _ = make_low_rank_matrix(n_samples=100, n_features=20, effective_rank=5, tail_strength=0.5, random_state=42)
+
+# Print the shape of the matrix
+print(X.shape)
+
+# Print the first 5 rows of the matrix
+print(X[:5])
+Generated code for sklearn.datasets.make_moons
+
+
+from sklearn.datasets import make_moons
+
+# Generate sample data
+X, y = make_moons(n_samples=100, noise=0.1, random_state=42)
+
+# Plot the data
+import matplotlib.pyplot as plt
+plt.scatter(X[:, 0], X[:, 1], c=y)
+plt.show()
+Generated code for sklearn.datasets.make_multilabel_classification
+
+
+import numpy as np
+from sklearn.datasets import make_multilabel_classification
+
+# Generate a random multilabel dataset
+X, y = make_multilabel_classification(n_samples=1000, n_features=20,
+                                      n_classes=5, n_labels=2,
+                                      length=50, allow_unlabeled=True,
+                                      sparse=False, return_indicator='dense',
+                                      return_distributions=False,
+                                      random_state=None)
+
+# Print the shape of the dataset
+print(X.shape)
+print(y.shape)
+Generated code for sklearn.datasets.make_regression
+
+
+from sklearn.datasets import make_regression
+
+X, y = make_regression(n_samples=100, n_features=2, noise=0.1)
+
+# print the shapes of X and y
+print(X.shape)
+print(y.shape)
+
+# import the necessary packages
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+# create the linear regression model
+model = LinearRegression()
+
+# fit the model to the data
+model.fit(X, y)
+
+# make predictions
+y_pred = model.predict(X)
+
+# calculate the mean squared error
+mse = mean_squared_error(y, y_pred)
+
+# print the mean squared error
+print("Mean Squared Error:", mse)
+Generated code for sklearn.datasets.make_s_curve
+
+
+import numpy as np
+from sklearn.datasets import make_s_curve
+
+# Generate a random s-curve dataset
+data, colors = make_s_curve(n_samples=1000)
+
+# Plot the s-curve
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(data[:,0], data[:,1], data[:,2], c=colors)
+plt.show()
+Generated code for sklearn.datasets.make_sparse_coded_signal
+
+
+import numpy as np
+from sklearn.datasets import make_sparse_coded_signal
+
+# Generate a sparse coded signal
+n_samples, n_features, n_components, n_nonzero_coefs = 1000, 10, 5, 3
+X, _, _ = make_sparse_coded_signal(n_samples, n_features, n_components, n_nonzero_coefs)
+
+# Print the shape of the generated sparse coded signal
+print(X.shape)
+Generated code for sklearn.datasets.make_sparse_spd_matrix
+
+
+import numpy as np
+from scipy.sparse import random
+from sklearn.datasets import make_sparse_spd_matrix
+
+# Generate a sparse symmetric positive definite matrix
+n_dim = 10
+A = random(n_dim, n_dim, density=0.2, random_state=42,
+           data_rvs=np.random.randn).todense()
+A = (A + A.T) / 2
+A = make_sparse_spd_matrix(A)
+Generated code for sklearn.datasets.make_sparse_uncorrelated
+
+
+import numpy as np
+from sklearn.datasets import make_sparse_uncorrelated
+
+# Generate a random sparse uncorrelated dataset
+X, y = make_sparse_uncorrelated(n_samples=100, n_features=10, random_state=42)
+
+# Print the shape of the dataset
+print(X.shape)
+
+# Print the first 5 rows of the dataset
+print(X[:5])
+Generated code for sklearn.datasets.make_spd_matrix
+
+
+import numpy as np
+from sklearn.datasets import make_spd_matrix
+
+# Generate a random symmetric, positive-definite matrix
+A = make_spd_matrix(n_dim=5)
+
+# Check if A is symmetric
+if np.allclose(A, A.T):
+    print("A is symmetric")
+
+# Check if A is positive-definite
+if np.all(np.linalg.eigvals(A) > 0):
+    print("A is positive-definite")
+Generated code for sklearn.datasets.make_swiss_roll
+
+
+import numpy as np
+from sklearn.datasets import make_swiss_roll
+
+X, y = make_swiss_roll(n_samples=1000, noise=0.2, random_state=42)
+
+# Plot the swiss roll
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(X[:, 0], X[:, 1], X[:, 2], c=y, cmap=plt.cm.hot)
+plt.show()
+Generated code for sklearn.decomposition.DictionaryLearning
+
+
+from sklearn.decomposition import DictionaryLearning
+
+# Create a DictionaryLearning object
+dl = DictionaryLearning(n_components=10)
+
+# Fit the model to the data
+dl.fit(X)
+
+# Transform the data
+X_transformed = dl.transform(X)
+
+# Get the components of the model
+components = dl.components_
+
+# Get the dictionary of the model
+dictionary = dl.dictionary_
+Generated code for sklearn.decomposition.FactorAnalysis
+
+
+from sklearn.decomposition import FactorAnalysis
+
+# Create a FactorAnalysis object
+fa = FactorAnalysis(n_components=2)
+
+# Fit the model to the data
+fa.fit(X)
+
+# Transform the data
+X_transformed = fa.transform(X)
+
+# Get the factor loadings
+loadings = fa.components_
+
+# Get the variance explained by each factor
+variance_explained = fa.explained_variance_ratio_
+Generated code for sklearn.decomposition.FastICA
+
+
+import numpy as np
+from sklearn.decomposition import FastICA
+
+# Generate sample data
+np.random.seed(0)
+n_samples = 2000
+time = np.linspace(0, 8, n_samples)
+
+s1 = np.sin(2 * time)  # Signal 1 : sinusoidal signal
+s2 = np.sign(np.sin(3 * time))  # Signal 2 : square signal
+s3 = signal.sawtooth(2 * np.pi * time)  # Signal 3: saw tooth signal
+
+S = np.c_[s1, s2, s3]
+S += 0.2 * np.random.normal(size=S.shape)  # Add noise
+
+S /= S.std(axis=0)  # Standardize data
+# Mix data
+A = np.array([[1, 1, 1], [0.5, 2, 1.0], [1.5, 1.0, 2.0]])  # Mixing matrix
+X = np.dot(S, A.T)  # Generate observations
+
+# Compute ICA
+ica = FastICA(n_components=3)
+S_ = ica.fit_transform(X)  # Reconstruct signals
+A_ = ica.mixing_  # Get estimated mixing matrix
+
+# We can `prove` that the ICA model applies by reverting the unmixing.
+assert np.allclose(X, np.dot(S_, A_.T) + ica.mean_)
+Generated code for sklearn.decomposition.IncrementalPCA
+
+
+from sklearn.decomposition import IncrementalPCA
+
+# Create an instance of IncrementalPCA
+inc_pca = IncrementalPCA()
+
+# Fit the model with the data
+inc_pca.fit(X)
+
+# Transform the data
+X_transformed = inc_pca.transform(X)
+
+# Get the explained variance ratio
+explained_variance_ratio = inc_pca.explained_variance_ratio_
+
+# Get the components
+components = inc_pca.components_
+Generated code for sklearn.decomposition.KernelPCA
+
+
+from sklearn.decomposition import KernelPCA
+
+# Create a KernelPCA object
+kpca = KernelPCA(kernel='rbf', gamma=15)
+
+# Fit the model to the data
+kpca.fit(X)
+
+# Transform the data
+X_kpca = kpca.transform(X)
+Generated code for sklearn.decomposition.LatentDirichletAllocation
+
+
+from sklearn.decomposition import LatentDirichletAllocation
+
+# Create an instance of the LDA model
+lda = LatentDirichletAllocation(n_components=10, random_state=0)
+
+# Fit the model to the data
+lda.fit(X)
+
+# Transform the data
+X_transformed = lda.transform(X)
+
+# Print the topics
+print(lda.components_)
+Generated code for sklearn.decomposition.MiniBatchDictionaryLearning
+
+
+from sklearn.decomposition import MiniBatchDictionaryLearning
+
+# Create an instance of the MiniBatchDictionaryLearning class
+mbdl = MiniBatchDictionaryLearning(n_components=100, alpha=1, n_iter=1000)
+
+# Fit the model to the data
+mbdl.fit(X)
+
+# Transform the data
+X_transformed = mbdl.transform(X)
+
+# Get the components of the model
+components = mbdl.components_
+
+# Get the dictionary of the model
+dictionary = mbdl.dictionary_
+Generated code for sklearn.decomposition.MiniBatchSparsePCA
+
+
+from sklearn.decomposition import MiniBatchSparsePCA
+
+# Create an instance of MiniBatchSparsePCA
+mb_sparse_pca = MiniBatchSparsePCA(n_components=2, batch_size=10, random_state=42)
+
+# Fit the model to the data
+mb_sparse_pca.fit(X)
+
+# Transform the data
+X_transformed = mb_sparse_pca.transform(X)
+Generated code for sklearn.decomposition.NMF
+
+
+from sklearn.decomposition import NMF
+
+# Create an NMF instance
+model = NMF(n_components=2)
+
+# Fit the model to the data
+model.fit(X)
+
+# Transform the data
+X_transformed = model.transform(X)
+
+# Get the components
+components = model.components_
+Generated code for sklearn.decomposition.MiniBatchNMF
+
+
+from sklearn.decomposition import MiniBatchNMF
+
+# Create an instance of the MiniBatchNMF class
+model = MiniBatchNMF(n_components=2, init='random', random_state=0)
+
+# Fit the model to the data
+model.fit(X)
+
+# Transform the data
+X_transformed = model.transform(X)
+
+# Get the components
+components = model.components_
+Generated code for sklearn.decomposition.PCA
+
+
+from sklearn.decomposition import PCA
+
+# Create an instance of PCA
+pca = PCA(n_components=2)
+
+# Fit the data to the model
+pca.fit(X)
+
+# Transform the data
+X_pca = pca.transform(X)
+
+# Print the components
+print(pca.components_)
+
+# Print the explained variance
+print(pca.explained_variance_)
+Generated code for sklearn.decomposition.SparsePCA
+
+
+from sklearn.decomposition import SparsePCA
+
+# Create a SparsePCA object
+sparse_pca = SparsePCA(n_components=2)
+
+# Fit the model to the data
+sparse_pca.fit(X)
+
+# Transform the data
+X_transformed = sparse_pca.transform(X)
+
+# Get the explained variance ratio
+explained_variance_ratio = sparse_pca.explained_variance_ratio_
+
+# Get the components
+components = sparse_pca.components_
+Generated code for sklearn.decomposition.SparseCoder
+
+
+from sklearn.decomposition import SparseCoder
+
+# Create a sparse coder object
+sc = SparseCoder(transform_n_nonzero_coefs=2, transform_alpha=1.0)
+
+# Fit the sparse coder to the data
+sc.fit(X)
+
+# Transform the data using the sparse coder
+X_transformed = sc.transform(X)
+Generated code for sklearn.decomposition.TruncatedSVD
+
+
+from sklearn.decomposition import TruncatedSVD
+
+# Create an instance of TruncatedSVD
+svd = TruncatedSVD(n_components=2)
+
+# Fit the data to the model
+svd.fit(X)
+
+# Transform the data
+X_transformed = svd.transform(X)
+Generated code for sklearn.decomposition.dict_learning
+
+
+from sklearn.decomposition import dict_learning
+
+# Create a matrix of data
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+# Create a dictionary learning model
+model = dict_learning.DictLearning(n_components=2)
+
+# Fit the model to the data
+model.fit(X)
+
+# Get the components of the model
+components = model.components_
+
+# Get the reconstructed data
+X_reconstructed = model.inverse_transform(components)
+Generated code for sklearn.decomposition.dict_learning_online
+
+
+from sklearn.decomposition import dict_learning_online
+
+# Create a data matrix
+X = np.random.rand(100, 10)
+
+# Create a dictionary learning model
+model = dict_learning_online(n_components=5, alpha=1.0, max_iter=100)
+
+# Fit the model to the data
+model.fit(X)
+
+# Get the dictionary components
+components = model.components_
+
+# Get the sparse codes
+codes = model.transform(X)
+Generated code for sklearn.decomposition.fastica
+
+
+import numpy as np
+from sklearn.decomposition import FastICA
+
+# Generate sample data
+np.random.seed(0)
+n_samples = 2000
+time = np.linspace(0, 8, n_samples)
+
+s1 = np.sin(2 * time)  # Signal 1 : sinusoidal signal
+s2 = np.sign(np.sin(3 * time))  # Signal 2 : square signal
+s3 = signal.sawtooth(2 * np.pi * time)  # Signal 3: saw tooth signal
+
+S = np.c_[s1, s2, s3]
+S += 0.2 * np.random.normal(size=S.shape)  # Add noise
+
+S /= S.std(axis=0)  # Standardize data
+
+# Compute ICA
+ica = FastICA(n_components=3)
+S_ = ica.fit_transform(S)  # Reconstruct signals
+A_ = ica.mixing_  # Get estimated mixing matrix
+
+# We can `prove` that the ICA model applies by reverting the unmixing.
+assert np.allclose(S, np.dot(S_, A_.T) + ica.mean_)
+Generated code for sklearn.decomposition.non_negative_factorization
+
+
+from sklearn.decomposition import non_negative_factorization
+
+# Create a matrix of data
+X = [[1, 2, 3],
+     [2, 3, 4],
+     [3, 4, 5],
+     [4, 5, 6]]
+
+# Create the non-negative factorization model
+model = non_negative_factorization(X)
+
+# Fit the model to the data
+model.fit(X)
+
+# Get the factorization results
+W, H = model.components_
+
+# Print the results
+print("W:")
+print(W)
+print("H:")
+print(H)
+Generated code for sklearn.decomposition.sparse_encode
+
+
+import numpy as np
+from sklearn.decomposition import sparse_encode
+
+# Generate random data
+X = np.random.rand(10, 5)
+
+# Set the dictionary
+D = np.random.rand(5, 3)
+
+# Encode the data
+code = sparse_encode(X, D, algorithm='lasso_lars')
+
+# Print the encoded data
+print(code)
+Generated code for sklearn.discriminant_analysis.LinearDiscriminantAnalysis
+
+
+# Importing necessary libraries
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.model_selection import train_test_split
+import numpy as np
+
+# Generating random data
+X = np.random.rand(100, 5)
+y = np.random.randint(2, size=100)
+
+# Splitting the data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initializing the LinearDiscriminantAnalysis model
+lda = LinearDiscriminantAnalysis()
+
+# Fitting the model to the training data
+lda.fit(X_train, y_train)
+
+# Making predictions on the test set
+y_pred = lda.predict(X_test)
+
+# Calculating the accuracy of the model
+accuracy = lda.score(X_test, y_test)
+
+# Printing the accuracy
+print("Accuracy:", accuracy)
+Generated code for sklearn.discriminant_analysis.QuadraticDiscriminantAnalysis
+
+
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+# Create an instance of the QuadraticDiscriminantAnalysis class
+qda = QuadraticDiscriminantAnalysis()
+
+# Fit the model to the data
+qda.fit(X, y)
+
+# Make predictions
+predictions = qda.predict(X_test)
+
+# Calculate the accuracy of the model
+accuracy = qda.score(X_test, y_test)
+Generated code for sklearn.dummy.DummyClassifier
+
+
+from sklearn.dummy import DummyClassifier
+
+# Create dummy classifier
+dummy_clf = DummyClassifier(strategy="most_frequent")
+
+# Fit the dummy classifier to the data
+dummy_clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = dummy_clf.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: {:.2f}".format(accuracy))
+Generated code for sklearn.dummy.DummyRegressor
+
+
+from sklearn.dummy import DummyRegressor
+
+# Create a dummy regressor
+dummy_regressor = DummyRegressor()
+
+# Fit the dummy regressor to the data
+dummy_regressor.fit(X, y)
+
+# Make predictions
+predictions = dummy_regressor.predict(X)
+
+# Evaluate the model
+score = dummy_regressor.score(X, y)
+Generated code for sklearn.ensemble.AdaBoostClassifier
+
+
+from sklearn.ensemble import AdaBoostClassifier
+
+# Create an AdaBoostClassifier
+clf = AdaBoostClassifier(n_estimators=100, random_state=0)
+
+# Train the classifier
+clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+accuracy = clf.score(X_test, y_test)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.ensemble.AdaBoostRegressor
+
+
+from sklearn.ensemble import AdaBoostRegressor
+
+# Create the AdaBoost Regressor
+regressor = AdaBoostRegressor()
+
+# Fit the regressor to the training data
+regressor.fit(X_train, y_train)
+
+# Predict on the test data
+y_pred = regressor.predict(X_test)
+
+# Calculate the accuracy
+accuracy = regressor.score(X_test, y_test)
+Generated code for sklearn.ensemble.BaggingClassifier
+
+
+from sklearn.ensemble import BaggingClassifier
+
+# Create a BaggingClassifier
+bagging_clf = BaggingClassifier(n_estimators=10,
+                               max_samples=100,
+                               bootstrap=True,
+                               n_jobs=-1)
+
+# Fit the classifier to the training data
+bagging_clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+predictions = bagging_clf.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, predictions)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.ensemble.BaggingRegressor
+
+
+from sklearn.ensemble import BaggingRegressor
+
+# Create a BaggingRegressor object
+bagging_regressor = BaggingRegressor()
+
+# Fit the regressor to the data
+bagging_regressor.fit(X_train, y_train)
+
+# Make predictions
+y_pred = bagging_regressor.predict(X_test)
+
+# Evaluate the model
+score = bagging_regressor.score(X_test, y_test)
+Generated code for sklearn.ensemble.ExtraTreesClassifier
+
+
+from sklearn.ensemble import ExtraTreesClassifier
+
+# Create an ExtraTreesClassifier
+clf = ExtraTreesClassifier(n_estimators=100, random_state=0)
+
+# Train the classifier
+clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+accuracy = clf.score(X_test, y_test)
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+Generated code for sklearn.ensemble.ExtraTreesRegressor
+
+
+from sklearn.ensemble import ExtraTreesRegressor
+
+# Create the ExtraTreesRegressor object
+regressor = ExtraTreesRegressor()
+
+# Fit the regressor to the data
+regressor.fit(X, y)
+
+# Make predictions
+y_pred = regressor.predict(X_test)
+
+# Calculate the mean absolute error
+mae = mean_absolute_error(y_test, y_pred)
+
+# Print the mean absolute error
+print('Mean Absolute Error:', mae)
+Generated code for sklearn.ensemble.GradientBoostingClassifier
+
+
+#importing necessary libraries
+import numpy as np
+from sklearn.ensemble import GradientBoostingClassifier
+
+#creating the classifier
+clf = GradientBoostingClassifier()
+
+#fitting the classifier
+clf.fit(X_train, y_train)
+
+#predicting the labels
+y_pred = clf.predict(X_test)
+
+#calculating the accuracy
+accuracy = clf.score(X_test, y_test)
+
+#printing the accuracy
+print("Accuracy:", accuracy)
+Generated code for sklearn.ensemble.GradientBoostingRegressor
+
+
+from sklearn.ensemble import GradientBoostingRegressor
+
+# Create the regressor
+regressor = GradientBoostingRegressor()
+
+# Fit the regressor to the training data
+regressor.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = regressor.predict(X_test)
+
+# Calculate the mean absolute error
+mae = mean_absolute_error(y_test, y_pred)
+
+# Print the mean absolute error
+print('Mean Absolute Error:', mae)
+Generated code for sklearn.ensemble.IsolationForest
+
+
+import numpy as np
+from sklearn.ensemble import IsolationForest
+
+# Create a random dataset
+rng = np.random.RandomState(42)
+X = rng.rand(100, 2)
+
+# Create the IsolationForest object
+clf = IsolationForest(random_state=rng)
+
+# Fit the model to the data
+clf.fit(X)
+
+# Make predictions
+y_pred = clf.predict(X)
+Generated code for sklearn.ensemble.RandomForestClassifier
+
+
+# Import the necessary libraries
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import make_classification
+
+# Create the dataset
+X, y = make_classification(n_samples=1000, n_features=4,
+                           n_informative=2, n_redundant=0,
+                           random_state=0, shuffle=False)
+
+# Create the Random Forest Classifier
+clf = RandomForestClassifier(n_estimators=100, max_depth=2,
+                             random_state=0)
+
+# Fit the model
+clf.fit(X, y)
+
+# Make predictions
+predictions = clf.predict(X)
+Generated code for sklearn.ensemble.RandomForestRegressor
+
+
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+
+# Create the random forest regressor
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# Train the model on training data
+rf.fit(X_train, y_train)
+
+# Make predictions on test data
+predictions = rf.predict(X_test)
+
+# Calculate the mean absolute error
+mae = np.mean(abs(predictions - y_test))
+
+print('Mean Absolute Error:', mae)
+Generated code for sklearn.ensemble.RandomTreesEmbedding
+
+
+from sklearn.ensemble import RandomTreesEmbedding
+
+# Create the RandomTreesEmbedding object
+rt = RandomTreesEmbedding(n_estimators=100, random_state=0)
+
+# Fit the model to the data
+rt.fit(X, y)
+
+# Transform the data
+X_transformed = rt.transform(X)
+Generated code for sklearn.ensemble.StackingClassifier
+
+
+from sklearn.ensemble import StackingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+
+estimators = [('lr', LogisticRegression()),
+              ('knn', KNeighborsClassifier()),
+              ('svc', SVC())]
+
+clf = StackingClassifier(estimators=estimators)
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+Generated code for sklearn.ensemble.StackingRegressor
+
+
+from sklearn.ensemble import StackingRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.svm import SVR
+
+# Create the individual regressors
+lr = LinearRegression()
+svr_lin = SVR(kernel='linear')
+svr_rbf = SVR(kernel='rbf')
+
+# Create the stacking regressor
+regressor = StackingRegressor(
+    regressors=[lr, svr_lin, svr_rbf],
+    meta_regressor=lr
+)
+
+# Fit the regressor
+regressor.fit(X, y)
+
+# Make predictions
+predictions = regressor.predict(X_test)
+Generated code for sklearn.ensemble.VotingClassifier
+
+
+import numpy as np
+from sklearn.ensemble import VotingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+
+# Create the three classifiers
+clf1 = LogisticRegression(random_state=1)
+clf2 = GaussianNB()
+clf3 = SVC(random_state=1)
+
+# Combine the classifiers in a voting classifier
+voting_clf = VotingClassifier(estimators=[('lr', clf1), ('gnb', clf2), ('svc', clf3)], voting='hard')
+
+# Fit the classifier on the training set
+voting_clf.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = voting_clf.predict(X_test)
+Generated code for sklearn.ensemble.VotingRegressor
+
+
+from sklearn.ensemble import VotingRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.svm import SVR
+
+# Create estimators
+estimators = [('lr', LinearRegression()),
+              ('svr', SVR(kernel='linear'))]
+
+# Create a voting regressor
+reg = VotingRegressor(estimators)
+
+# Fit the regressor
+reg.fit(X, y)
+
+# Make predictions
+predictions = reg.predict(X_test)
+Generated code for sklearn.ensemble.HistGradientBoostingRegressor
+
+
+# Importing necessary libraries
+import numpy as np
+from sklearn.ensemble import HistGradientBoostingRegressor
+
+# Creating the data
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+y = np.array([1, 2, 3, 4])
+
+# Initializing the model
+model = HistGradientBoostingRegressor()
+
+# Fitting the model
+model.fit(X, y)
+
+# Making predictions
+predictions = model.predict(X)
+
+# Printing the predictions
+print(predictions)
+Generated code for sklearn.ensemble.HistGradientBoostingClassifier
+
+
+# Importing necessary libraries
+import numpy as np
+from sklearn.ensemble import HistGradientBoostingClassifier
+
+# Creating the model
+model = HistGradientBoostingClassifier()
+
+# Fitting the model
+model.fit(X_train, y_train)
+
+# Making predictions
+y_pred = model.predict(X_test)
+
+# Evaluating the model
+accuracy = model.score(X_test, y_test)
+
+# Printing the accuracy
+print("Accuracy:", accuracy)
+Generated code for sklearn.exceptions.ConvergenceWarning
+
+
+try:
+    # code that may raise a ConvergenceWarning
+except ConvergenceWarning:
+    # code to handle the ConvergenceWarning
+    pass
+Generated code for sklearn.exceptions.DataConversionWarning
+
+
+try:
+    # code that may raise DataConversionWarning
+except sklearn.exceptions.DataConversionWarning as e:
+    # handle DataConversionWarning
+    print(e)
+Generated code for sklearn.exceptions.DataDimensionalityWarning
+
+
+try:
+    # code that may raise DataDimensionalityWarning
+except sklearn.exceptions.DataDimensionalityWarning as e:
+    print("DataDimensionalityWarning:", e)
+Generated code for sklearn.exceptions.EfficiencyWarning
+
+
+try:
+    # code that may raise EfficiencyWarning
+except sklearn.exceptions.EfficiencyWarning:
+    # code to handle EfficiencyWarning
+    print('EfficiencyWarning was raised!')
+Generated code for sklearn.exceptions.FitFailedWarning
+
+
+class FitFailedWarning(Warning):
+    """Warning used when a fitting procedure fails"""
+    pass
+Generated code for sklearn.exceptions.NotFittedError
+
+
+try:
+    # code that uses the model
+except sklearn.exceptions.NotFittedError:
+    print("Error: Model is not fitted yet. Please fit the model first.")
+Generated code for sklearn.exceptions.UndefinedMetricWarning
+
+
+try:
+    # code that may raise an exception
+except sklearn.exceptions.UndefinedMetricWarning:
+    # code to handle the exception
+    print("Warning: UndefinedMetricWarning encountered")
+Generated code for sklearn.experimental.enable_hist_gradient_boosting
+
+
+# Import the necessary libraries
+from sklearn.ensemble import HistGradientBoostingClassifier
+
+# Enable Histogram-based Gradient Boosting
+clf = HistGradientBoostingClassifier(max_iter=100, learning_rate=0.1,
+                                    max_depth=3, random_state=0)
+Generated code for sklearn.experimental.enable_iterative_imputer
+
+
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
+# Create an IterativeImputer object
+imputer = IterativeImputer()
+
+# Fit the imputer using the data
+imputer.fit(X)
+
+# Transform the data, replacing missing values with the learned medians
+X_transformed = imputer.transform(X)
+Generated code for sklearn.experimental.enable_halving_search_cv
+
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.experimental import enable_halving_search_cv
+
+# Create the parameter grid
+param_grid = {
+    'max_depth': [4, 8, 12],
+    'min_samples_leaf': [1, 2, 4],
+    'min_samples_split': [2, 4, 8],
+    'n_estimators': [50, 100, 200]
+}
+
+# Instantiate the halving search CV object
+halving_search_cv = enable_halving_search_cv(estimator=RandomForestRegressor(),
+                                            param_grid=param_grid,
+                                            scoring='neg_mean_squared_error',
+                                            cv=5,
+                                            n_iter=10,
+                                            random_state=42)
+
+# Fit the halving search CV object
+halving_search_cv.fit(X_train, y_train)
+
+# Print the best parameters and best score
+print("Best Parameters:", halving_search_cv.best_params_)
+print("Best Score:", halving_search_cv.best_score_)
+Generated code for sklearn.feature_extraction.DictVectorizer
+
+
+from sklearn.feature_extraction import DictVectorizer
+
+# Create a dictionary of feature names and values
+data_dict = {'height': [6.0, 5.7], 'weight': [180, 190], 'age': [30, 40]}
+
+# Create the DictVectorizer object
+dictvectorizer = DictVectorizer()
+
+# Transform the data into a feature matrix
+features = dictvectorizer.fit_transform(data_dict)
+
+# Print the feature matrix
+print(features.toarray())
+Generated code for sklearn.feature_extraction.FeatureHasher
+
+
+from sklearn.feature_extraction import FeatureHasher
+
+# Create a FeatureHasher object
+hasher = FeatureHasher(n_features=10, input_type='string')
+
+# Create a list of feature names
+feature_names = ['color', 'size', 'shape']
+
+# Create a list of feature values
+feature_values = [['red', 'small', 'circle'],
+                  ['blue', 'medium', 'square'],
+                  ['green', 'large', 'triangle']]
+
+# Fit the FeatureHasher object
+hasher.fit(feature_values)
+
+# Transform the feature values into a sparse matrix
+sparse_matrix = hasher.transform(feature_values)
+
+# Print the sparse matrix
+print(sparse_matrix)
+Generated code for sklearn.feature_extraction.image.extract_patches_2d
+
+
+from sklearn.feature_extraction.image import extract_patches_2d
+
+# define the size of the patches to be extracted
+patch_size = (8, 8)
+
+# extract the patches from the image
+patches = extract_patches_2d(image, patch_size)
+
+# print the shape of the patches
+print(patches.shape)
+Generated code for sklearn.feature_extraction.image.grid_to_graph
+
+
+import numpy as np
+from sklearn.feature_extraction.image import grid_to_graph
+
+def grid_to_graph(n_x, n_y):
+    """
+    Generates a graph from a grid with n_x and n_y nodes.
+    Parameters
+    ----------
+    n_x : int
+        Number of nodes in the x-direction.
+    n_y : int
+        Number of nodes in the y-direction.
+    Returns
+    -------
+    graph : array of shape (n_x * n_y, n_x * n_y)
+        Adjacency matrix of the grid graph.
+    """
+    # Generate the edges of the graph
+    edges = []
+    for x in range(n_x):
+        for y in range(n_y):
+            if x < n_x-1:
+                edges.append([x*n_y+y, (x+1)*n_y+y])
+            if y < n_y-1:
+                edges.append([x*n_y+y, x*n_y+(y+1)])
+
+    # Generate the adjacency matrix
+    graph = np.zeros((n_x*n_y, n_x*n_y))
+    for edge in edges:
+        graph[edge[0], edge[1]] = 1
+        graph[edge[1], edge[0]] = 1
+
+    return graph
+Generated code for sklearn.feature_extraction.image.img_to_graph
+
+
+from sklearn.feature_extraction.image import img_to_graph
+
+def img_to_graph(image, mask=None):
+    """
+    Transforms a 2D image into a graph with the value of the
+    pixel as the weight of the edge.
+
+    Parameters
+    ----------
+    image : array_like
+        The input image.
+    mask : array_like, optional
+        An optional mask to limit the pixels used in the graph.
+
+    Returns
+    -------
+    graph : array_like
+        The graph of the image.
+    """
+
+    # Get the shape of the image
+    rows, cols = image.shape
+
+    # Create the graph
+    graph = np.zeros((rows * cols, rows * cols))
+
+    # Iterate over the image
+    for row in range(rows):
+        for col in range(cols):
+            # Get the pixel value
+            pixel = image[row, col]
+
+            # If the mask is not None, check if the pixel is valid
+            if mask is not None and not mask[row, col]:
+                continue
+
+            # Get the index of the pixel
+            index = row * cols + col
+
+            # Iterate over the neighbors
+            for i in range(row - 1, row + 2):
+                for j in range(col - 1, col + 2):
+                    # Check if the neighbor is valid
+                    if i < 0 or i >= rows or j < 0 or j >= cols:
+                        continue
+
+                    # Get the neighbor index
+                    neighbor_index = i * cols + j
+
+                    # If the mask is not None, check if the neighbor is valid
+                    if mask is not None and not mask[i, j]:
+                        continue
+
+                    # Get the neighbor pixel value
+                    neighbor_pixel = image[i, j]
+
+                    # Set the weight of the edge
+                    graph[index, neighbor_index] = abs(pixel - neighbor_pixel)
+
+    return graph
+Generated code for sklearn.feature_extraction.image.reconstruct_from_patches_2d
+
+
+from sklearn.feature_extraction.image import reconstruct_from_patches_2d
+
+def reconstruct_from_patches_2d(patches, image_size):
+    """Reconstructs an image from all of its patches.
+    
+    Parameters
+    ----------
+    patches : array, shape = (n_patches, patch_height, patch_width)
+        The complete set of patches.
+    image_size : tuple of ints (image_height, image_width)
+        the size of the image that will be reconstructed.
+    
+    Returns
+    -------
+    image : array, shape = image_size
+        The reconstructed image.
+    """
+    image_height, image_width = image_size
+    patch_height, patch_width = patches.shape[1:]
+    n_patches = patches.shape[0]
+    
+    # Initialize reconstructed image
+    image = np.zeros(image_size)
+    
+    # Calculate the number of patches per row and column
+    n_rows = int(np.ceil(image_height / patch_height))
+    n_cols = int(np.ceil(image_width / patch_width))
+    
+    # Iterate over patches
+    for i in range(n_patches):
+        # Calculate the row and column of the patch
+        row = int(i // n_cols)
+        col = int(i % n_cols)
+        
+        # Calculate the start and end indices of the patch
+        start_row = row * patch_height
+        end_row = min(start_row + patch_height, image_height)
+        start_col = col * patch_width
+        end_col = min(start_col + patch_width, image_width)
+        
+        # Add the patch to the reconstructed image
+        image[start_row:end_row, start_col:end_col] += patches[i]
+    
+    return image
+Generated code for sklearn.feature_extraction.image.PatchExtractor
+
+
+from sklearn.feature_extraction.image import PatchExtractor
+
+# Create an instance of the PatchExtractor class
+patch_extractor = PatchExtractor(patch_size=(64, 64))
+
+# Extract patches from an image
+patches = patch_extractor.transform(image)
+
+# Reshape the patches into a 2D array
+patches_2d = patches.reshape(-1, 64*64)
+Generated code for sklearn.feature_extraction.text.CountVectorizer
+
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Create the CountVectorizer object
+vectorizer = CountVectorizer()
+
+# Get text data
+text_data = ["The quick brown fox jumped over the lazy dog."]
+
+# Fit and transform the text data
+count_vector = vectorizer.fit_transform(text_data)
+
+# Print the resulting feature names
+print(vectorizer.get_feature_names())
+Generated code for sklearn.feature_extraction.text.HashingVectorizer
+
+
+from sklearn.feature_extraction.text import HashingVectorizer
+
+# Create an instance of the HashingVectorizer
+vectorizer = HashingVectorizer(n_features=20)
+
+# Fit the vectorizer to the data
+vectorizer.fit(data)
+
+# Transform the data into a sparse matrix
+X = vectorizer.transform(data)
+
+# Print the sparse matrix
+print(X.toarray())
+Generated code for sklearn.feature_extraction.text.TfidfTransformer
+
+
+from sklearn.feature_extraction.text import TfidfTransformer
+
+class TfidfTransformer(BaseEstimator, TransformerMixin):
+    """Transform a count matrix to a normalized tf or tf-idf representation
+    Tf means term-frequency while tf-idf means term-frequency times inverse
+    document-frequency. This is a common term weighting scheme in information
+    retrieval, that has also found good use in document classification.
+
+The goal of using tf-idf instead of the raw frequencies of occurrence of a
+token in a given document is to scale down the impact of tokens that occur
+very frequently in a given corpus and that are hence empirically less
+informative than features that occur in a small fraction of the training
+corpus.
+
+Parameters
+----------
+norm : 'l1', 'l2' or None, optional
+    Norm used to normalize term vectors. None for no normalization.
+
+use_idf : boolean, optional
+    Enable inverse-document-frequency reweighting.
+
+smooth_idf : boolean, optional
+    Smooth idf weights by adding one to document frequencies, as if an
+    extra document was seen containing every term in the collection
+    exactly once. Prevents zero divisions.
+
+sublinear_tf : boolean, optional
+    Apply sublinear tf scaling, i.e. replace tf with 1 + log(tf).
+
+Attributes
+----------
+idf_ : array, shape (n_features)
+    The inverse document frequency (IDF) vector; only defined
+    if use_idf is True.
+
+idf_diag_ : array, shape (n_features, n_features)
+    The IDF diagonal matrix; only defined if use_idf is True.
+
+stop_words_ : array, shape (n_stop_words,)
+    Terms that were ignored because they either:
+      - occurred in too many documents (`max_df`)
+      - occurred in too few documents (`min_df`)
+      - were cut off by feature selection (`max_features`).
+
+vocabulary_ : dict
+    A mapping of terms to feature indices.
+
+Examples
+--------
+>>> from sklearn.feature_extraction.text import
+Generated code for sklearn.feature_extraction.text.TfidfVectorizer
+
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Create the vectorizer
+vectorizer = TfidfVectorizer()
+
+# Fit the vectorizer to the data
+vectorizer.fit(data)
+
+# Transform the data into a vector
+vectorized_data = vectorizer.transform(data)
+Generated code for sklearn.feature_selection.GenericUnivariateSelect
+
+
+from sklearn.feature_selection import GenericUnivariateSelect
+
+# Create an instance of GenericUnivariateSelect
+selector = GenericUnivariateSelect(score_func=f_classif, mode='k_best', param=10)
+
+# Fit the selector to the data
+selector.fit(X, y)
+
+# Get the selected features
+selected_features = selector.get_support()
+
+# Print the selected features
+print(selected_features)
+Generated code for sklearn.feature_selection.SelectPercentile
+
+
+from sklearn.feature_selection import SelectPercentile
+
+# Create an instance of SelectPercentile
+selector = SelectPercentile(percentile=50)
+
+# Fit the selector to the data
+selector.fit(X, y)
+
+# Get the selected features
+selected_features = selector.get_support()
+
+# Print the selected features
+print(selected_features)
+Generated code for sklearn.feature_selection.SelectKBest
+
+
+#import necessary libraries
+import numpy as np
+from sklearn.feature_selection import SelectKBest
+
+#create a sample dataset
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
+y = np.array([1, 0, 1, 0])
+
+#instantiate SelectKBest
+selector = SelectKBest(k=2)
+
+#fit the selector to the data
+selector.fit(X, y)
+
+#get the selected features
+selected_features = selector.get_support()
+
+#print the selected features
+print(selected_features)
+Generated code for sklearn.feature_selection.SelectFpr
+
+
+from sklearn.feature_selection import SelectFpr
+
+# Create an instance of SelectFpr
+selector = SelectFpr(score_func=f_classif)
+
+# Fit the selector to the data
+selector.fit(X, y)
+
+# Get the selected features
+selected_features = selector.get_support()
+
+# Print the selected features
+print(selected_features)
+Generated code for sklearn.feature_selection.SelectFdr
+
+
+# Import necessary libraries
+from sklearn.feature_selection import SelectFdr
+from sklearn.datasets import make_classification
+
+# Generate a sample dataset
+X, y = make_classification(n_samples=1000, n_features=20, random_state=1)
+
+# Create an instance of SelectFdr
+selector = SelectFdr(alpha=0.05)
+
+# Fit the selector to the data
+selector.fit(X, y)
+
+# Get the selected features
+selected_features = selector.get_support()
+
+# Print the selected features
+print(selected_features)
+Generated code for sklearn.feature_selection.SelectFromModel
+
+
+from sklearn.feature_selection import SelectFromModel
+from sklearn.ensemble import RandomForestClassifier
+
+# Create a random forest classifier
+clf = RandomForestClassifier(random_state=0)
+
+# Create the selector object
+selector = SelectFromModel(clf)
+
+# Fit the selector to the data
+selector.fit(X, y)
+
+# Get the selected features
+selected_features = selector.get_support()
+Generated code for sklearn.feature_selection.SelectFwe
+
+
+from sklearn.feature_selection import SelectFwe
+
+# Create an instance of SelectFwe
+selector = SelectFwe(alpha=0.05)
+
+# Fit the selector to the data
+selector.fit(X, y)
+
+# Get the selected features
+selected_features = selector.get_support()
+
+# Print the selected features
+print(selected_features)
+Generated code for sklearn.feature_selection.SequentialFeatureSelector
+
+
+from sklearn.feature_selection import SequentialFeatureSelector
+
+# Create the selector object
+selector = SequentialFeatureSelector(
+    estimator=RandomForestClassifier(n_estimators=100),
+    k_features=10,
+    forward=True,
+    verbose=2,
+    scoring='accuracy',
+    cv=5
+)
+
+# Fit the selector to the data
+selector.fit(X, y)
+
+# Get the selected features
+selected_features = selector.k_feature_idx_
+
+# Print the selected features
+print(selected_features)
+Generated code for sklearn.feature_selection.RFE
+
+
+#importing necessary libraries
+import numpy as np
+from sklearn.feature_selection import RFE
+from sklearn.svm import SVR
+
+#creating a sample dataset
+X = np.array([[1,2,3,4], [2,3,4,5], [3,4,5,6], [4,5,6,7]])
+y = np.array([1,2,3,4])
+
+#creating the RFE model and selecting 3 attributes
+estimator = SVR(kernel="linear")
+selector = RFE(estimator, 3, step=1)
+selector = selector.fit(X, y)
+
+#printing the selected attributes
+print(selector.support_)
+print(selector.ranking_)
+Generated code for sklearn.feature_selection.RFECV
+
+
+from sklearn.feature_selection import RFECV
+from sklearn.ensemble import RandomForestClassifier
+
+# Create the RFE object and compute a cross-validated score.
+# The "accuracy" scoring is proportional to the number of correct classifications
+rfecv = RFECV(estimator=RandomForestClassifier(), step=1, cv=5, scoring='accuracy')
+rfecv.fit(X, y)
+
+# Print the optimal number of features
+print("Optimal number of features : %d" % rfecv.n_features_)
+
+# Plot number of features VS. cross-validation scores
+plt.figure()
+plt.xlabel("Number of features selected")
+plt.ylabel("Cross validation score (nb of correct classifications)")
+plt.plot(range(1, len(rfecv.grid_scores_) + 1), rfecv.grid_scores_)
+plt.show()
+Generated code for sklearn.feature_selection.VarianceThreshold
+
+
+from sklearn.feature_selection import VarianceThreshold
+
+# Create an instance of VarianceThreshold
+sel = VarianceThreshold(threshold=0.5)
+
+# Fit the instance to the data
+sel.fit(X)
+
+# Get the indices of the features with variance above the threshold
+indices = sel.get_support(indices=True)
+
+# Get the feature names
+features = [X.columns[i] for i in indices]
+
+# Print the feature names
+print(features)
+Generated code for sklearn.feature_selection.chi2
+
+
+import numpy as np
+from sklearn.feature_selection import chi2
+
+# Create a sample dataset
+X = np.array([[1, 2, 3, 4],
+              [2, 4, 6, 8],
+              [3, 6, 9, 12],
+              [4, 8, 12, 16]])
+y = np.array([0, 0, 1, 1])
+
+# Calculate chi-squared test
+chi2_score, p_value = chi2(X, y)
+
+# Print the results
+print("Chi-squared score:", chi2_score)
+print("P-value:", p_value)
+Generated code for sklearn.feature_selection.f_classif
+
+
+import numpy as np
+from sklearn.feature_selection import f_classif
+
+# Generate some random data
+X = np.random.rand(100, 10)
+y = np.random.randint(2, size=100)
+
+# Calculate the F-value and p-value for each feature
+F, p = f_classif(X, y)
+
+# Print the F-value and p-value
+for i in range(len(F)):
+    print("F-value for feature {}: {}".format(i, F[i]))
+    print("p-value for feature {}: {}".format(i, p[i]))
+Generated code for sklearn.feature_selection.f_regression
+
+
+from sklearn.feature_selection import f_regression
+
+# Create a feature matrix
+X = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+# Create a target vector
+y = [1, 2, 3]
+
+# Calculate the F-statistic and p-values
+f_values, p_values = f_regression(X, y)
+
+# Print the F-statistic and p-values
+print(f_values)
+print(p_values)
+Generated code for sklearn.feature_selection.r_regression
+
+
+# Import necessary libraries
+import numpy as np
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LinearRegression
+
+# Create a linear regression object
+reg = LinearRegression()
+
+# Create the RFE object and rank each feature
+rfe = RFE(reg, n_features_to_select=1)
+rfe.fit(X, y)
+
+# Print the feature ranking
+print("Feature ranking: %s" % rfe.ranking_)
+Generated code for sklearn.feature_selection.mutual_info_classif
+
+
+import numpy as np
+from sklearn.feature_selection import mutual_info_classif
+
+# Create a random dataset
+X = np.random.rand(1000, 10)
+y = np.random.randint(2, size=1000)
+
+# Calculate mutual information
+mi = mutual_info_classif(X, y)
+
+# Print the results
+print(mi)
+Generated code for sklearn.feature_selection.mutual_info_regression
+
+
+import numpy as np
+from sklearn.feature_selection import mutual_info_regression
+
+# Generate some random data
+X = np.random.rand(1000, 10)
+y = np.random.rand(1000)
+
+# Calculate mutual information
+mi = mutual_info_regression(X, y)
+
+# Print the results
+print(mi)
+Generated code for sklearn.gaussian_process.GaussianProcessClassifier
+
+
+from sklearn.gaussian_process import GaussianProcessClassifier
+
+# Create a Gaussian Process Classifier
+gpc = GaussianProcessClassifier()
+
+# Fit the model to the data
+gpc.fit(X_train, y_train)
+
+# Make predictions
+y_pred = gpc.predict(X_test)
+
+# Evaluate the model
+accuracy = gpc.score(X_test, y_test)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.gaussian_process.GaussianProcessRegressor
+
+
+from sklearn.gaussian_process import GaussianProcessRegressor
+
+# Create the Gaussian Process Regressor
+gp = GaussianProcessRegressor()
+
+# Fit the model to the data
+gp.fit(X, y)
+
+# Make predictions
+y_pred = gp.predict(X_test)
+
+# Compute the mean absolute error
+mae = mean_absolute_error(y_test, y_pred)
+
+# Print the mean absolute error
+print('Mean Absolute Error:', mae)
+Generated code for sklearn.gaussian_process.kernels.CompoundKernel
+
+
+from sklearn.gaussian_process.kernels import CompoundKernel
+
+# Create a CompoundKernel object
+kernel = CompoundKernel()
+
+# Add kernels to the CompoundKernel
+kernel += RBF() + WhiteKernel() + ExpSineSquared()
+
+# Fit the CompoundKernel to the data
+gp = GaussianProcessRegressor(kernel=kernel)
+gp.fit(X, y)
+
+# Make predictions using the CompoundKernel
+y_pred = gp.predict(X_test)
+Generated code for sklearn.gaussian_process.kernels.ConstantKernel
+
+
+from sklearn.gaussian_process.kernels import ConstantKernel
+
+# Create a ConstantKernel instance
+constant_kernel = ConstantKernel(constant_value=1.0, constant_value_bounds=(1e-05, 1e5))
+
+# Fit the kernel to the data
+constant_kernel.fit(X, y)
+
+# Make predictions using the kernel
+y_pred = constant_kernel.predict(X)
+Generated code for sklearn.gaussian_process.kernels.DotProduct
+
+
+import numpy as np
+from sklearn.gaussian_process.kernels import DotProduct
+
+# Create a DotProduct kernel
+dot_product_kernel = DotProduct()
+
+# Generate two random vectors
+x1 = np.random.rand(10)
+x2 = np.random.rand(10)
+
+# Compute the dot product of the two vectors
+dot_product = dot_product_kernel(x1, x2)
+
+# Print the result
+print(dot_product)
+Generated code for sklearn.gaussian_process.kernels.ExpSineSquared
+
+
+import numpy as np
+from sklearn.gaussian_process.kernels import ExpSineSquared
+
+# Define the kernel
+kernel = ExpSineSquared(length_scale=1.0, periodicity=2.0,
+                        length_scale_bounds=(1e-2, 1e3),
+                        periodicity_bounds=(1e-2, 1e3))
+
+# Generate some data
+X = np.random.rand(10, 1)
+
+# Compute the kernel
+K = kernel(X, X)
+
+# Print the result
+print(K)
+Generated code for sklearn.gaussian_process.kernels.Exponentiation
+
+
+class Exponentiation(Kernel):
+    """Exponentiation kernel: k(x, y) = (sigma2)^d
+    where d is the degree of the polynomial and sigma2 is the variance.
+    Parameters
+    ----------
+    degree : int
+        The degree of the polynomial.
+    variance : float
+        The variance of the kernel.
+    """
+
+    def __init__(self, degree=2, variance=1.0):
+        self.degree = degree
+        self.variance = variance
+        self.hyperparameters = Hyperparameter("degree", "int", (1, 10))
+        self.hyperparameters.append(
+            Hyperparameter("variance", "float", (1e-5, 1e5))
+        )
+
+    def __call__(self, X, Y=None, eval_gradient=False):
+        if Y is None:
+            Y = X
+
+        d = self.degree
+        sigma2 = self.variance
+
+        K = sigma2 ** d
+
+        if eval_gradient:
+            if d == 1:
+                dK = np.zeros((X.shape[0], X.shape[0], 1))
+            else:
+                dK = np.zeros((X.shape[0], X.shape[0], 2))
+                dK[:, :, 0] = d * sigma2 ** (d - 1)
+                dK[:, :, 1] = d * np.log(sigma2) * sigma2 ** d
+
+            return K, dK
+        else:
+            return K
+Generated code for sklearn.gaussian_process.kernels.Hyperparameter
+
+
+import numpy as np
+from sklearn.gaussian_process.kernels import Hyperparameter
+
+def hyperparameter(X, Y, theta):
+    """
+    Computes the hyperparameter for a Gaussian process.
+    
+    Parameters
+    ----------
+    X : array-like, shape (n_samples, n_features)
+        The input data.
+    Y : array-like, shape (n_samples, n_targets)
+        The target values.
+    theta : array-like, shape (n_hyperparameters,)
+        The hyperparameters.
+    
+    Returns
+    -------
+    hyperparameter : float
+        The hyperparameter for the Gaussian process.
+    """
+    # Compute the kernel matrix
+    K = np.exp(-theta[0] * np.sum((X[:, None, :] - X[None, :, :]) ** 2, axis=-1))
+    
+    # Compute the hyperparameter
+    hyperparameter = np.sum(K * Y) / np.sum(K)
+    
+    return hyperparameter
+Generated code for sklearn.gaussian_process.kernels.Kernel
+
+
+import numpy as np
+from sklearn.gaussian_process.kernels import Kernel
+
+class MyKernel(Kernel):
+    def __init__(self, length_scale=1.0, length_scale_bounds=(1e-5, 1e5)):
+        self.length_scale = length_scale
+        self.length_scale_bounds = length_scale_bounds
+        self.hyperparameters = [
+            {
+                'name': 'length_scale',
+                'type': 'numeric',
+                'bounds': self.length_scale_bounds
+            }
+        ]
+
+    def __call__(self, X, Y=None):
+        if Y is None:
+            Y = X
+        return np.exp(-0.5 * self.length_scale * np.sum((X[:, None, :] - Y[None, :, :]) ** 2, axis=-1))
+
+    def diag(self, X):
+        return np.ones(X.shape[0])
+
+    def is_stationary(self):
+        return True
+Generated code for sklearn.gaussian_process.kernels.Matern
+
+
+import numpy as np
+from sklearn.gaussian_process.kernels import Matern
+
+# define the Matern kernel
+matern_kernel = Matern(length_scale=1.0, nu=1.5)
+
+# generate a random sample of points
+X = np.random.rand(10, 2)
+
+# compute the kernel matrix
+K = matern_kernel(X, X)
+
+# print the kernel matrix
+print(K)
+Generated code for sklearn.gaussian_process.kernels.PairwiseKernel
+
+
+from sklearn.gaussian_process.kernels import PairwiseKernel
+
+class PairwiseKernel(Kernel):
+    """Pairwise kernel.
+    
+    This kernel is defined as the product of two kernels, each of which is
+    defined on a single feature.
+    
+    Parameters
+    ----------
+    kernel1 : Kernel
+        The first kernel.
+    kernel2 : Kernel
+        The second kernel.
+    """
+    def __init__(self, kernel1, kernel2):
+        self.kernel1 = kernel1
+        self.kernel2 = kernel2
+        self.hyperparameters = self.kernel1.hyperparameters + \
+                               self.kernel2.hyperparameters
+    
+    def __call__(self, X, Y=None):
+        K1 = self.kernel1(X, Y)
+        K2 = self.kernel2(X, Y)
+        return K1 * K2
+Generated code for sklearn.gaussian_process.kernels.Product
+
+
+from sklearn.gaussian_process.kernels import Product
+
+# Create a Product kernel instance
+kernel = Product(k1, k2)
+
+# Compute the kernel value between two points
+value = kernel(x1, x2)
+
+# Compute the gradient of the kernel value between two points
+gradient = kernel.gradient(x1, x2)
+Generated code for sklearn.gaussian_process.kernels.RBF
+
+
+import numpy as np
+from sklearn.gaussian_process.kernels import RBF
+
+# Create a radial basis function (RBF) kernel
+rbf_kernel = RBF(length_scale=1.0, length_scale_bounds=(1e-2, 1e3))
+
+# Generate a random sample of data
+X = np.random.rand(10, 2)
+
+# Compute the kernel matrix
+K = rbf_kernel(X, X)
+
+# Print the kernel matrix
+print(K)
+Generated code for sklearn.gaussian_process.kernels.RationalQuadratic
+
+
+import numpy as np
+from sklearn.gaussian_process.kernels import RationalQuadratic
+
+# define the kernel
+kernel = RationalQuadratic(length_scale=1.0, alpha=1.0)
+
+# generate some data
+X = np.random.rand(10, 2)
+
+# compute the kernel matrix
+K = kernel(X, X)
+
+# print the kernel matrix
+print(K)
+Generated code for sklearn.gaussian_process.kernels.Sum
+
+
+class Sum(Kernel):
+    """Additive kernel, also known as a linear kernel.
+
+    The Sum kernel is a simple kernel defined as:
+
+    .. math::
+        k(x_i, x_j) = \sum_{k=1}^K k_k(x_i, x_j)
+
+    where :math:`k_k` is a kernel function.
+
+    Parameters
+    ----------
+    k1, k2, ..., kn : Kernel or float
+        The kernels to be added. If a float is given, a ConstantKernel is
+        created.
+
+    """
+    def __init__(self, k1, k2, *kernels):
+        self.kernels = []
+        for k in (k1, k2) + kernels:
+            if isinstance(k, Kernel):
+                self.kernels.append(k)
+            elif isinstance(k, float):
+                self.kernels.append(ConstantKernel(k))
+            else:
+                raise ValueError("Expected a kernel or float")
+
+    @property
+    def hyperparameters(self):
+        return Hyperparameter("sum_kernels", "numeric", 0, len(self.kernels))
+
+    def __call__(self, X, Y=None, eval_gradient=False):
+        if Y is None:
+            Y = X
+
+        K = np.zeros((X.shape[0], Y.shape[0]))
+        for kernel in self.kernels:
+            K += kernel(X, Y, eval_gradient=eval_gradient)
+
+        if eval_gradient:
+            K_gradient = np.zeros((len(self.kernels), X.shape[0], Y.shape[0]))
+            for i, kernel in enumerate(self.kernels):
+                K_gradient[i] = kernel(X, Y, eval_gradient=eval_gradient)
+            return K, K_gradient
+        else:
+            return K
+Generated code for sklearn.gaussian_process.kernels.WhiteKernel
+
+
+from sklearn.gaussian_process.kernels import WhiteKernel
+
+class WhiteKernel(WhiteKernel):
+    """The White kernel is a stationary kernel that can be used to
+    model the noise level of observations.
+    
+    Parameters
+    ----------
+    noise_level : float, default=1.0
+        Amplitude (variance) of the white noise.
+    
+    Attributes
+    ----------
+    noise_level : float
+        The noise level (variance) of the kernel.
+    
+    Examples
+    --------
+    >>> from sklearn.gaussian_process.kernels import WhiteKernel
+    >>> rbf = WhiteKernel(noise_level=1.0)
+    >>> X = [[0], [1], [2]]
+    >>> rbf(X, X)
+    array([[1.  , 0.25, 0.06],
+           [0.25, 1.  , 0.25],
+           [0.06, 0.25, 1.  ]])
+    """
+    def __init__(self, noise_level=1.0):
+        self.noise_level = noise_level
+        self.theta = np.array([noise_level])
+
+    def __call__(self, X, Y=None):
+        """Return the kernel k(X, Y)"""
+        if Y is None:
+            Y = X
+        K = np.ones((X.shape[0], Y.shape[0])) * self.noise_level
+        return K
+Generated code for sklearn.impute.SimpleImputer
+
+
+#importing the SimpleImputer class from sklearn.impute
+from sklearn.impute import SimpleImputer
+
+#creating an instance of the SimpleImputer class
+imputer = SimpleImputer(missing_values=np.nan, strategy='mean')
+
+#fitting the imputer instance to the data
+imputer.fit(X)
+
+#transforming the data using the imputer instance
+X = imputer.transform(X)
+Generated code for sklearn.impute.IterativeImputer
+
+
+#importing the necessary libraries
+import numpy as np
+from sklearn.impute import IterativeImputer
+
+#creating a sample dataset
+X = np.array([[1, 2], [3, np.nan], [7, 6], [np.nan, 9], [12, 16]])
+
+#instantiating the IterativeImputer
+imputer = IterativeImputer(max_iter=10, random_state=0)
+
+#fitting the imputer to the dataset
+imputer.fit(X)
+
+#transforming the dataset
+X_transformed = imputer.transform(X)
+
+#printing the transformed dataset
+print(X_transformed)
+Generated code for sklearn.impute.MissingIndicator
+
+
+# Import the necessary libraries
+import numpy as np
+from sklearn.impute import MissingIndicator
+
+# Create a sample dataset
+X = np.array([[1, np.nan, 3], [4, 5, np.nan], [7, 8, 9]])
+
+# Create an instance of the MissingIndicator class
+indicator = MissingIndicator()
+
+# Fit the indicator to the dataset
+indicator.fit(X)
+
+# Transform the dataset
+X_ind = indicator.transform(X)
+
+# Print the transformed dataset
+print(X_ind)
+Generated code for sklearn.impute.KNNImputer
+
+
+from sklearn.impute import KNNImputer
+
+# Create an instance of KNNImputer
+imputer = KNNImputer(n_neighbors=3)
+
+# Fit the imputer on the data
+imputer.fit(X)
+
+# Transform the data, replacing missing values with the learned medians
+X_imputed = imputer.transform(X)
+Generated code for sklearn.inspection.partial_dependence
+
+
+import numpy as np
+from sklearn.inspection import partial_dependence
+
+def partial_dependence(estimator, X, features, response_variable=None):
+    """
+    Compute the partial dependence of a response variable on a set of features.
+    
+    Parameters
+    ----------
+    estimator : estimator object
+        This is assumed to implement the scikit-learn estimator interface.
+    X : array-like, shape (n_samples, n_features)
+        Data on which to calculate partial dependence.
+    features : list of length n_features
+        The features of interest for which to calculate partial dependence.
+    response_variable : string, optional (default=None)
+        The response variable for which to calculate partial dependence.
+        If None, the estimator's ``predict`` method will be used.
+    
+    Returns
+    -------
+    partial_dependence : array-like, shape (n_features, )
+        The partial dependence of the response variable on the given features.
+    """
+    # Check that the estimator implements the scikit-learn estimator interface
+    if not hasattr(estimator, 'fit'):
+        raise TypeError('estimator must implement the scikit-learn estimator interface')
+    
+    # Check that X is a 2-dimensional array
+    if X.ndim != 2:
+        raise ValueError('X must be a 2-dimensional array')
+    
+    # Check that features is a list
+    if not isinstance(features, list):
+        raise TypeError('features must be a list')
+    
+    # Check that the length of features is equal to the number of features in X
+    if len(features) != X.shape[1]:
+        raise ValueError('length of features must be equal to the number of features in X')
+    
+    # Fit the estimator to the data
+    estimator.fit(X, response_variable)
+    
+    # Initialize the partial dependence array
+    partial_dependence = np.zeros(len(features))
+    
+    # Iterate over the features
+    for i, feature in enumerate(features):
+        # Get the feature values for the given feature
+Generated code for sklearn.inspection.permutation_importance
+
+
+import numpy as np
+from sklearn.inspection import permutation_importance
+
+# Create a random dataset
+rng = np.random.RandomState(42)
+X = rng.rand(10, 2)
+y = rng.randint(2, size=(10, 1))
+
+# Fit a model
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X, y)
+
+# Calculate permutation importance
+result = permutation_importance(clf, X, y, n_repeats=10,
+                                random_state=42)
+
+# Print the results
+for i in range(X.shape[1]):
+    print('Feature %d: %f' % (i, result.importances_mean[i]))
+Generated code for sklearn.inspection.DecisionBoundaryDisplay
+
+
+from sklearn.inspection import DecisionBoundaryDisplay
+
+# Create a DecisionBoundaryDisplay object
+dbd = DecisionBoundaryDisplay(clf, feature_names=['x1', 'x2'])
+
+# Plot the decision boundary
+dbd.plot()
+
+# Plot the decision boundary with the data points
+dbd.plot(X, y)
+
+# Plot the decision boundary with the data points and the probabilities
+dbd.plot(X, y, probabilities=True)
+Generated code for sklearn.inspection.PartialDependenceDisplay
+
+
+from sklearn.inspection import PartialDependenceDisplay
+
+# Create a PartialDependenceDisplay object
+pdd = PartialDependenceDisplay(model, features=[0, 1])
+
+# Fit the model
+pdd.fit(X, y)
+
+# Plot the partial dependence
+pdd.plot()
+Generated code for sklearn.isotonic.IsotonicRegression
+
+
+import numpy as np
+from sklearn.isotonic import IsotonicRegression
+
+# Generate some data
+x = np.arange(100)
+y = np.random.randint(0, 100, size=100)
+
+# Fit the model
+ir = IsotonicRegression()
+ir.fit(x, y)
+
+# Make predictions
+predictions = ir.predict(x)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.isotonic.check_increasing
+
+
+def check_increasing(x):
+    """
+    Check if x is an increasing sequence.
+
+    Parameters
+    ----------
+    x : array-like
+        Input array.
+
+    Returns
+    -------
+    is_increasing : bool
+        True if x is an increasing sequence, False otherwise.
+    """
+    if len(x) < 2:
+        return True
+    else:
+        return all(x[i] <= x[i+1] for i in range(len(x)-1))
+Generated code for sklearn.isotonic.isotonic_regression
+
+
+import numpy as np
+from sklearn.isotonic import IsotonicRegression
+
+# Generate data
+x = np.arange(100)
+y = np.random.randint(0, 100, size=100)
+
+# Fit the model
+ir = IsotonicRegression()
+y_ = ir.fit_transform(x, y)
+
+# Print the results
+print("Original y values:", y)
+print("Transformed y values:", y_)
+Generated code for sklearn.kernel_approximation.AdditiveChi2Sampler
+
+
+from sklearn.kernel_approximation import AdditiveChi2Sampler
+
+# Create an instance of the AdditiveChi2Sampler
+sampler = AdditiveChi2Sampler(sample_steps=2)
+
+# Fit the sampler to the data
+sampler.fit(X)
+
+# Transform the data using the sampler
+X_transformed = sampler.transform(X)
+Generated code for sklearn.kernel_approximation.Nystroem
+
+
+from sklearn.kernel_approximation import Nystroem
+
+# Create a Nystroem object
+nystroem = Nystroem(kernel='rbf', gamma=0.1, n_components=100)
+
+# Fit the Nystroem object to the data
+nystroem.fit(X_train, y_train)
+
+# Transform the data using the Nystroem object
+X_train_transformed = nystroem.transform(X_train)
+X_test_transformed = nystroem.transform(X_test)
+
+# Train a model on the transformed data
+clf = SVC(kernel='linear')
+clf.fit(X_train_transformed, y_train)
+
+# Make predictions on the transformed data
+y_pred = clf.predict(X_test_transformed)
+Generated code for sklearn.kernel_approximation.PolynomialCountSketch
+
+
+from sklearn.kernel_approximation import PolynomialCountSketch
+
+# Create a PolynomialCountSketch object
+poly_sketch = PolynomialCountSketch(degree=2, n_components=100)
+
+# Fit the sketch to the data
+poly_sketch.fit(X)
+
+# Transform the data using the sketch
+X_transformed = poly_sketch.transform(X)
+Generated code for sklearn.kernel_approximation.RBFSampler
+
+
+from sklearn.kernel_approximation import RBFSampler
+
+# Create an instance of the RBFSampler
+rbf_sampler = RBFSampler(gamma=1.0, n_components=100, random_state=1)
+
+# Fit the sampler to the data
+rbf_sampler.fit(X)
+
+# Transform the data using the fitted sampler
+X_transformed = rbf_sampler.transform(X)
+Generated code for sklearn.kernel_approximation.SkewedChi2Sampler
+
+
+from sklearn.kernel_approximation import SkewedChi2Sampler
+
+# Create a SkewedChi2Sampler object
+skewed_chi2_sampler = SkewedChi2Sampler(skew=0.5)
+
+# Fit the sampler to the data
+skewed_chi2_sampler.fit(X)
+
+# Transform the data using the fitted sampler
+X_transformed = skewed_chi2_sampler.transform(X)
+Generated code for sklearn.kernel_ridge.KernelRidge
+
+
+from sklearn.kernel_ridge import KernelRidge
+
+# Create a KernelRidge object
+kr = KernelRidge(alpha=1.0, kernel='rbf', gamma=0.1)
+
+# Fit the model to the data
+kr.fit(X, y)
+
+# Make predictions
+y_pred = kr.predict(X_test)
+Generated code for sklearn.linear_model.LogisticRegression
+
+
+# Import the necessary libraries
+from sklearn.linear_model import LogisticRegression
+
+# Create an instance of the LogisticRegression class
+logreg = LogisticRegression()
+
+# Fit the model to the training data
+logreg.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = logreg.predict(X_test)
+
+# Calculate the accuracy of the model
+accuracy = logreg.score(X_test, y_test)
+Generated code for sklearn.linear_model.LogisticRegressionCV
+
+
+import numpy as np
+from sklearn.linear_model import LogisticRegressionCV
+
+# Create a logistic regression classifier
+log_reg = LogisticRegressionCV(cv=5, random_state=0)
+
+# Train the classifier
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+y = np.array([0, 1, 0, 1])
+log_reg.fit(X, y)
+
+# Make predictions
+predictions = log_reg.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.linear_model.PassiveAggressiveClassifier
+
+
+# Importing the necessary libraries
+from sklearn.linear_model import PassiveAggressiveClassifier
+from sklearn.datasets import make_classification
+
+# Generating a sample dataset
+X, y = make_classification(n_samples=1000, n_features=4,
+                           n_informative=2, n_redundant=0,
+                           random_state=0, shuffle=False)
+
+# Instantiating the PassiveAggressiveClassifier
+pac = PassiveAggressiveClassifier(max_iter=1000, tol=1e-3)
+
+# Fitting the model
+pac.fit(X, y)
+
+# Making predictions
+y_pred = pac.predict(X)
+Generated code for sklearn.linear_model.Perceptron
+
+
+from sklearn.linear_model import Perceptron
+
+# Create a Perceptron object
+clf = Perceptron()
+
+# Train the model using the training sets
+clf.fit(X_train, y_train)
+
+# Predict the response for test dataset
+y_pred = clf.predict(X_test)
+Generated code for sklearn.linear_model.RidgeClassifier
+
+
+from sklearn.linear_model import RidgeClassifier
+
+# Create an instance of the RidgeClassifier
+clf = RidgeClassifier()
+
+# Fit the model using the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+accuracy = clf.score(X_test, y_test)
+print('Accuracy: %.2f' % accuracy)
+Generated code for sklearn.linear_model.RidgeClassifierCV
+
+
+from sklearn.linear_model import RidgeClassifierCV
+
+# Create an instance of the RidgeClassifierCV class
+clf = RidgeClassifierCV()
+
+# Fit the model to the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Calculate the accuracy of the model
+accuracy = clf.score(X_test, y_test)
+
+# Print the accuracy
+print(accuracy)
+Generated code for sklearn.linear_model.SGDClassifier
+
+
+# Import the SGDClassifier
+from sklearn.linear_model import SGDClassifier
+
+# Create an instance of the SGDClassifier
+clf = SGDClassifier()
+
+# Fit the model using the training data
+clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Evaluate the model
+accuracy = clf.score(X_test, y_test)
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+Generated code for sklearn.linear_model.SGDOneClassSVM
+
+
+from sklearn.linear_model import SGDClassifier
+
+# Create an instance of the SGDClassifier
+sgd_clf = SGDClassifier(loss="hinge", penalty="l2", max_iter=1000, tol=1e-3)
+
+# Fit the model to the data
+sgd_clf.fit(X_train, y_train)
+
+# Make predictions
+y_pred = sgd_clf.predict(X_test)
+
+# Evaluate the model
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+Generated code for sklearn.linear_model.LinearRegression
+
+
+#importing the necessary libraries
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+#creating the data
+x = np.array([[1, 2], [3, 4], [5, 6]])
+y = np.array([7, 8, 9])
+
+#creating the model
+model = LinearRegression()
+
+#fitting the model
+model.fit(x, y)
+
+#predicting the output
+prediction = model.predict([[7, 8]])
+
+#printing the output
+print(prediction)
+Generated code for sklearn.linear_model.Ridge
+
+
+# Import the necessary libraries
+import numpy as np
+from sklearn.linear_model import Ridge
+
+# Create the data
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+y = np.array([1, 2, 3])
+
+# Create the Ridge model
+model = Ridge()
+
+# Fit the model
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.linear_model.RidgeCV
+
+
+#importing the necessary libraries
+import numpy as np
+from sklearn.linear_model import RidgeCV
+
+#creating the data
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+y = np.array([1, 3, 5, 7])
+
+#creating the RidgeCV model
+model = RidgeCV(alphas=[0.1, 1.0, 10.0])
+
+#fitting the model
+model.fit(X, y)
+
+#predicting the output
+predictions = model.predict(X)
+
+#printing the predictions
+print(predictions)
+Generated code for sklearn.linear_model.SGDRegressor
+
+
+from sklearn.linear_model import SGDRegressor
+
+# Create an instance of the SGDRegressor
+sgd_reg = SGDRegressor()
+
+# Fit the model to the training data
+sgd_reg.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = sgd_reg.predict(X_test)
+
+# Calculate the mean squared error
+mse = mean_squared_error(y_test, y_pred)
+
+# Print the mean squared error
+print(mse)
+Generated code for sklearn.linear_model.ElasticNet
+
+
+#importing the necessary libraries
+import numpy as np
+from sklearn.linear_model import ElasticNet
+
+#creating the data
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+y = np.array([1, 2, 3, 4])
+
+#creating the model
+model = ElasticNet(alpha=0.1, l1_ratio=0.5)
+
+#fitting the model
+model.fit(X, y)
+
+#predicting the output
+predictions = model.predict(X)
+
+#printing the predictions
+print(predictions)
+Generated code for sklearn.linear_model.ElasticNetCV
+
+
+from sklearn.linear_model import ElasticNetCV
+
+# Create an instance of ElasticNetCV
+model = ElasticNetCV(cv=5, random_state=0)
+
+# Fit the model to the data
+model.fit(X, y)
+
+# Print the optimal value of alpha
+print("Optimal alpha value:", model.alpha_)
+
+# Print the optimal value of l1_ratio
+print("Optimal l1_ratio:", model.l1_ratio_)
+
+# Print the coefficients of the model
+print("Coefficients:", model.coef_)
+
+# Print the intercept of the model
+print("Intercept:", model.intercept_)
+
+# Make predictions using the model
+predictions = model.predict(X)
+Generated code for sklearn.linear_model.Lars
+
+
+import numpy as np
+from sklearn.linear_model import Lars
+
+# Create a sample dataset
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+y = np.array([1, 2, 3])
+
+# Create and fit the model
+model = Lars()
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.linear_model.LarsCV
+
+
+import numpy as np
+from sklearn.linear_model import LarsCV
+
+# Create a random dataset
+rng = np.random.RandomState(42)
+X = rng.rand(100, 10)
+y = rng.rand(100)
+
+# Create the LarsCV model
+model = LarsCV(cv=5, max_iter=500).fit(X, y)
+
+# Print the model coefficients
+print(model.coef_)
+Generated code for sklearn.linear_model.Lasso
+
+
+# Import the necessary libraries
+import numpy as np
+from sklearn.linear_model import Lasso
+
+# Create the data
+x = np.array([[1,2,3], [4,5,6], [7,8,9]])
+y = np.array([1,2,3])
+
+# Create the model
+model = Lasso()
+
+# Fit the model
+model.fit(x, y)
+
+# Make predictions
+predictions = model.predict(x)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.linear_model.LassoCV
+
+
+from sklearn.linear_model import LassoCV
+
+# Create an instance of LassoCV
+reg = LassoCV()
+
+# Fit the model to the data
+reg.fit(X, y)
+
+# Print the coefficients
+print(reg.coef_)
+
+# Make predictions
+predictions = reg.predict(X)
+
+# Calculate the mean squared error
+mse = mean_squared_error(y, predictions)
+
+# Print the mean squared error
+print(mse)
+Generated code for sklearn.linear_model.LassoLars
+
+
+import numpy as np
+from sklearn.linear_model import LassoLars
+
+# Create a random dataset
+x = np.random.rand(100, 5)
+y = np.random.rand(100)
+
+# Create and fit the LassoLars model
+model = LassoLars(alpha=0.1)
+model.fit(x, y)
+
+# Make predictions
+predictions = model.predict(x)
+
+# Print the coefficients
+print(model.coef_)
+Generated code for sklearn.linear_model.LassoLarsCV
+
+
+from sklearn.linear_model import LassoLarsCV
+
+# Create an instance of the LassoLarsCV model
+model = LassoLarsCV()
+
+# Fit the model to the data
+model.fit(X, y)
+
+# Make predictions using the model
+predictions = model.predict(X)
+
+# Print the model's coefficients
+print(model.coef_)
+Generated code for sklearn.linear_model.LassoLarsIC
+
+
+from sklearn.linear_model import LassoLarsIC
+
+# Create an instance of the LassoLarsIC model
+model = LassoLarsIC()
+
+# Fit the model to the data
+model.fit(X, y)
+
+# Make predictions using the model
+predictions = model.predict(X)
+
+# Evaluate the model
+score = model.score(X, y)
+Generated code for sklearn.linear_model.OrthogonalMatchingPursuit
+
+
+from sklearn.linear_model import OrthogonalMatchingPursuit
+
+# Create an instance of the OrthogonalMatchingPursuit model
+model = OrthogonalMatchingPursuit()
+
+# Fit the model to the data
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Evaluate the model
+score = model.score(X, y)
+Generated code for sklearn.linear_model.OrthogonalMatchingPursuitCV
+
+
+from sklearn.linear_model import OrthogonalMatchingPursuitCV
+
+# Create an instance of the OrthogonalMatchingPursuitCV class
+omp_cv = OrthogonalMatchingPursuitCV(cv=5, n_nonzero_coefs=10)
+
+# Fit the model to the data
+omp_cv.fit(X, y)
+
+# Get the coefficients of the model
+coefs = omp_cv.coef_
+
+# Get the intercept of the model
+intercept = omp_cv.intercept_
+
+# Get the score of the model
+score = omp_cv.score(X, y)
+Generated code for sklearn.linear_model.ARDRegression
+
+
+# Import the necessary libraries
+import numpy as np
+from sklearn.linear_model import ARDRegression
+
+# Create the data
+X = np.array([[1, 2], [3, 4], [5, 6]])
+y = np.array([7, 8, 9])
+
+# Create the ARD Regression model
+model = ARDRegression()
+
+# Fit the model
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.linear_model.BayesianRidge
+
+
+# Import the necessary libraries
+import numpy as np
+from sklearn.linear_model import BayesianRidge
+
+# Create the data
+X = np.array([[1, 2], [3, 4], [5, 6]])
+y = np.array([7, 8, 9])
+
+# Create the Bayesian Ridge model
+model = BayesianRidge()
+
+# Fit the model
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.linear_model.MultiTaskElasticNet
+
+
+import numpy as np
+from sklearn.linear_model import MultiTaskElasticNet
+
+# Create some sample data
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+y = np.array([[1, 2], [3, 4], [5, 6]])
+
+# Create and fit the model
+model = MultiTaskElasticNet(alpha=1.0, l1_ratio=0.5)
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.linear_model.MultiTaskElasticNetCV
+
+
+from sklearn.linear_model import MultiTaskElasticNetCV
+
+# Create the model
+model = MultiTaskElasticNetCV(cv=5, random_state=0)
+
+# Fit the model
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Get the coefficients
+coefficients = model.coef_
+
+# Get the intercept
+intercept = model.intercept_
+Generated code for sklearn.linear_model.MultiTaskLasso
+
+
+from sklearn.linear_model import MultiTaskLasso
+
+# Create the model
+model = MultiTaskLasso()
+
+# Fit the model
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Evaluate the model
+score = model.score(X, y)
+Generated code for sklearn.linear_model.MultiTaskLassoCV
+
+
+import numpy as np
+from sklearn.linear_model import MultiTaskLassoCV
+
+# Generate some random data
+n_samples, n_features, n_tasks = 100, 30, 2
+rng = np.random.RandomState(0)
+X = rng.randn(n_samples, n_features)
+Y = rng.randn(n_samples, n_tasks)
+
+# Create and fit the model
+model = MultiTaskLassoCV(cv=5, random_state=0).fit(X, Y)
+
+# Print the coefficients
+print(model.coef_)
+Generated code for sklearn.linear_model.HuberRegressor
+
+
+# Import the necessary libraries
+import numpy as np
+from sklearn.linear_model import HuberRegressor
+
+# Create the data
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+y = np.array([1, 2, 3, 4])
+
+# Create the HuberRegressor object
+huber_reg = HuberRegressor()
+
+# Fit the model
+huber_reg.fit(X, y)
+
+# Make predictions
+predictions = huber_reg.predict(X)
+
+# Print the predictions
+print(predictions)
+Generated code for sklearn.linear_model.QuantileRegressor
+
+
+import numpy as np
+from sklearn.linear_model import QuantileRegressor
+
+# Generate some data
+X = np.random.rand(100, 1)
+y = np.sin(X).ravel()
+
+# Fit the model
+quantile_regressor = QuantileRegressor()
+quantile_regressor.fit(X, y)
+
+# Make predictions
+y_pred = quantile_regressor.predict(X)
+Generated code for sklearn.linear_model.RANSACRegressor
+
+
+import numpy as np
+from sklearn.linear_model import RANSACRegressor
+
+# Generate some random data
+x = np.random.rand(100, 1)
+y = 2 * x + np.random.rand(100, 1)
+
+# Create and fit the RANSAC regressor
+ransac = RANSACRegressor()
+ransac.fit(x, y)
+
+# Predict the values
+y_pred = ransac.predict(x)
+
+# Calculate the score
+score = ransac.score(x, y)
+
+# Print the results
+print("RANSAC score:", score)
+Generated code for sklearn.linear_model.TheilSenRegressor
+
+
+#importing the necessary libraries
+import numpy as np
+from sklearn.linear_model import TheilSenRegressor
+
+#creating the data
+x = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
+y = np.array([1, 3, 5, 7, 9])
+
+#creating the model
+model = TheilSenRegressor()
+
+#fitting the model
+model.fit(x, y)
+
+#predicting the output
+prediction = model.predict(x)
+
+#printing the output
+print(prediction)
+Generated code for sklearn.linear_model.PoissonRegressor
+
+
+from sklearn.linear_model import PoissonRegressor
+
+# Create the PoissonRegressor object
+regressor = PoissonRegressor()
+
+# Fit the model to the data
+regressor.fit(X, y)
+
+# Make predictions
+predictions = regressor.predict(X_test)
+
+# Evaluate the model
+score = regressor.score(X_test, y_test)
+Generated code for sklearn.linear_model.TweedieRegressor
+
+
+from sklearn.linear_model import TweedieRegressor
+
+# Create a TweedieRegressor object
+regressor = TweedieRegressor(power=1.5, alpha=0.1, max_iter=1000)
+
+# Fit the model to the data
+regressor.fit(X, y)
+
+# Make predictions
+y_pred = regressor.predict(X)
+
+# Calculate the mean squared error
+mse = mean_squared_error(y, y_pred)
+
+# Print the mean squared error
+print(mse)
+Generated code for sklearn.linear_model.GammaRegressor
+
+
+import numpy as np
+from sklearn.linear_model import GammaRegressor
+
+# Generate some sample data
+X = np.random.rand(100, 1)
+y = np.random.rand(100, 1)
+
+# Create the GammaRegressor model
+model = GammaRegressor()
+
+# Fit the model to the data
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+Generated code for sklearn.linear_model.PassiveAggressiveRegressor
+
+
+# Importing the necessary libraries
+import numpy as np
+from sklearn.linear_model import PassiveAggressiveRegressor
+
+# Creating the dataset
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
+y = np.array([1, 3, 5, 7, 9])
+
+# Creating the model
+model = PassiveAggressiveRegressor()
+
+# Fitting the model
+model.fit(X, y)
+
+# Making predictions
+predictions = model.predict(X)
+
+# Printing the predictions
+print(predictions)
+Generated code for sklearn.linear_model.enet_path
+
+
+# Import necessary modules
+from sklearn.linear_model import enet_path
+from sklearn.datasets import make_regression
+
+# Generate simulated data
+X, y = make_regression(n_samples=100, n_features=2, random_state=0)
+
+# Compute paths
+_, coefs_path, _ = enet_path(X, y, l1_ratio=0.8, fit_intercept=False)
+
+# Print the coefficients along the path
+print(coefs_path.shape)
+
+# Plot the paths
+import matplotlib.pyplot as plt
+plt.plot(coefs_path.T)
+plt.xlabel('Lambda')
+plt.ylabel('Coefficients')
+plt.show()
+Generated code for sklearn.linear_model.lars_path
+
+
+# Importing the necessary libraries
+import numpy as np
+from sklearn.linear_model import Lars
+from sklearn.metrics import mean_squared_error
+
+# Generating the data
+np.random.seed(42)
+X = np.random.rand(100, 1)
+y = 4 + 3 * X + np.random.randn(100, 1)
+
+# Fitting the model
+lars_reg = Lars(n_nonzero_coefs=1)
+lars_reg.fit(X, y)
+
+# Making predictions
+y_pred = lars_reg.predict(X)
+
+# Calculating the mean squared error
+mse = mean_squared_error(y, y_pred)
+print(f'Mean Squared Error: {mse}')
+Generated code for sklearn.linear_model.lars_path_gram
+
+
+import numpy as np
+from sklearn.linear_model import Lars
+
+# Create a Lars object
+lars_model = Lars()
+
+# Fit the model to the data
+lars_model.fit(X, y)
+
+# Compute the lars_path_gram
+lars_path_gram = lars_model.lars_path_gram(X, y)
+
+# Print the lars_path_gram
+print(lars_path_gram)
+Generated code for sklearn.linear_model.lasso_path
+
+
+# Import necessary libraries
+import numpy as np
+from sklearn.linear_model import Lasso
+from sklearn.linear_model.coordinate_descent import lasso_path
+
+# Create a random dataset
+n_samples, n_features = 10, 5
+np.random.seed(0)
+y = np.random.randn(n_samples)
+X = np.random.randn(n_samples, n_features)
+
+# Compute paths
+eps = 5e-3  # the smaller it is the longer is the path
+
+print("Computing regularization path using the lasso...")
+alphas_lasso, coefs_lasso, _ = lasso_path(X, y, eps, fit_intercept=False)
+
+# Display results
+print("Alphas:")
+print(alphas_lasso)
+print("Coefficients:")
+print(coefs_lasso)
+Generated code for sklearn.linear_model.orthogonal_mp
+
+
+import numpy as np
+from sklearn.linear_model import OrthogonalMatchingPursuit
+
+# Create a random matrix
+X = np.random.rand(100, 10)
+
+# Create a random vector
+y = np.random.rand(100)
+
+# Create an instance of OrthogonalMatchingPursuit
+omp = OrthogonalMatchingPursuit(n_nonzero_coefs=5)
+
+# Fit the model
+omp.fit(X, y)
+
+# Get the coefficients
+coef = omp.coef_
+
+# Get the intercept
+intercept = omp.intercept_
+Generated code for sklearn.linear_model.orthogonal_mp_gram
+
+
+import numpy as np
+from sklearn.linear_model import OrthogonalMatchingPursuitGram
+
+# Generate some random data
+n_samples, n_features = 10, 5
+X = np.random.randn(n_samples, n_features)
+y = np.random.randn(n_samples)
+
+# Create the Orthogonal Matching Pursuit model
+omp_gram = OrthogonalMatchingPursuitGram(n_nonzero_coefs=3)
+
+# Fit the model
+omp_gram.fit(X, y)
+
+# Print the coefficients
+print(omp_gram.coef_)
+Generated code for sklearn.linear_model.ridge_regression
+
+
+# Importing necessary libraries 
+import numpy as np 
+from sklearn.linear_model import Ridge 
+
+# Creating data 
+x = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]) 
+y = np.array([1, 3, 2, 5, 7, 8, 8, 9, 10, 12]) 
+
+# Creating the model 
+model = Ridge() 
+
+# Fitting the model 
+model.fit(x.reshape(-1, 1), y.reshape(-1, 1)) 
+
+# Printing the coefficients 
+print(model.coef_) 
+print(model.intercept_) 
+
+# Predicting the output 
+predicted_output = model.predict(x.reshape(-1, 1)) 
+
+# Printing the predicted output 
+print(predicted_output)
+Generated code for sklearn.manifold.Isomap
+
+
+import numpy as np
+from sklearn.manifold import Isomap
+
+# Create a 2D array of points
+points = np.array([[1,2], [3,4], [5,6], [7,8], [9,10]])
+
+# Create an Isomap object
+isomap = Isomap(n_components=2)
+
+# Fit the Isomap object to the points
+isomap.fit(points)
+
+# Transform the points using the Isomap object
+transformed_points = isomap.transform(points)
+
+# Print the transformed points
+print(transformed_points)
+Generated code for sklearn.manifold.LocallyLinearEmbedding
+
+
+from sklearn.manifold import LocallyLinearEmbedding
+
+# Create the LocallyLinearEmbedding object
+lle = LocallyLinearEmbedding(n_components=2, n_neighbors=10, random_state=42)
+
+# Fit the model to the data
+lle.fit(X)
+
+# Transform the data
+X_transformed = lle.transform(X)
+Generated code for sklearn.manifold.MDS
+
+
+from sklearn.manifold import MDS
+
+# Create an MDS object
+mds = MDS(n_components=2, random_state=0)
+
+# Fit the data to the MDS object
+mds_fit = mds.fit_transform(data)
+
+# Print the results
+print(mds_fit)
+Generated code for sklearn.manifold.SpectralEmbedding
+
+
+import numpy as np
+from sklearn.manifold import SpectralEmbedding
+
+# Create a random matrix of size (n_samples, n_features)
+X = np.random.rand(n_samples, n_features)
+
+# Create a SpectralEmbedding object
+se = SpectralEmbedding(n_components=2, random_state=0)
+
+# Fit the data to the model
+X_transformed = se.fit_transform(X)
+Generated code for sklearn.manifold.TSNE
+
+
+import numpy as np
+from sklearn.manifold import TSNE
+
+# Create a random array of 3-dimensional points
+X = np.random.rand(100, 3)
+
+# Initialize and fit the model
+model = TSNE(n_components=2, random_state=0)
+transformed = model.fit_transform(X)
+
+# Print the transformed data
+print(transformed)
+Generated code for sklearn.manifold.locally_linear_embedding
+
+
+from sklearn.manifold import LocallyLinearEmbedding
+
+# Create the LocallyLinearEmbedding object
+lle = LocallyLinearEmbedding(n_neighbors=10, n_components=2, random_state=42)
+
+# Fit the model to the data
+lle.fit(X)
+
+# Transform the data
+X_lle = lle.transform(X)
+Generated code for sklearn.manifold.smacof
+
+
+import numpy as np
+from sklearn.manifold import smacof
+
+# Generate random data
+X = np.random.rand(100, 3)
+
+# Compute SMACOF
+Y = smacof(X, metric=True, n_components=2)
+
+# Print the result
+print(Y)
+Generated code for sklearn.manifold.spectral_embedding
+
+
+import numpy as np
+from sklearn.manifold import spectral_embedding
+
+# Generate a random graph
+A = np.random.rand(10, 10)
+
+# Compute the spectral embedding of the graph
+embedding = spectral_embedding(A, n_components=2)
+
+# Print the embedding
+print(embedding)
+Generated code for sklearn.manifold.trustworthiness
+
+
+import numpy as np
+from sklearn.manifold import trustworthiness
+
+# Generate some random data
+X = np.random.rand(100, 10)
+
+# Compute trustworthiness
+trustworthiness_score = trustworthiness(X)
+
+print("Trustworthiness score:", trustworthiness_score)
+Generated code for sklearn.metrics.check_scoring
+
+
+import numpy as np
+from sklearn.metrics import check_scoring
+
+# Generate some random data
+X = np.random.rand(100, 10)
+y = np.random.randint(2, size=100)
+
+# Define a scoring function
+def my_custom_loss_func(ground_truth, predictions):
+    return np.mean(np.abs(ground_truth - predictions))
+
+# Check if the scoring function is valid
+scorers = check_scoring(my_custom_loss_func, X, y)
+
+# Print the results
+print(scorers)
+Generated code for sklearn.metrics.get_scorer
+
+
+from sklearn.metrics import get_scorer
+
+def get_scorer(scoring, **kwargs):
+    """
+    Get a scorer from a string or a callable.
+    
+    Parameters
+    ----------
+    scoring : string, callable or None, optional (default=None)
+        A string (see model evaluation documentation) or
+        a scorer callable object / function with signature
+        ``scorer(estimator, X, y)``.
+        If None, the estimator's default scorer (if available) is used.
+    
+    **kwargs : additional arguments
+        Additional keyword arguments to be passed to the scorer
+        callable.
+    
+    Returns
+    -------
+    scoring : callable
+        A scorer callable object / function with signature
+        ``scorer(estimator, X, y)``.
+    """
+    if callable(scoring):
+        return scoring
+    elif isinstance(scoring, str):
+        return SCORERS[scoring](**kwargs)
+    else:
+        raise ValueError('scoring must be a string or a callable.')
+Generated code for sklearn.metrics.get_scorer_names
+
+
+import sklearn.metrics
+
+def get_scorer_names():
+    return sklearn.metrics.SCORERS.keys()
+
+scorer_names = get_scorer_names()
+print(scorer_names)
+Generated code for sklearn.metrics.make_scorer
+
+
+from sklearn.metrics import make_scorer
+
+def custom_scorer(y_true, y_pred):
+    # Calculate the score
+    score = 0
+    # Loop through each prediction
+    for i in range(len(y_true)):
+        # If the prediction is correct
+        if y_true[i] == y_pred[i]:
+            # Increment the score
+            score += 1
+    # Return the score
+    return score
+
+# Create the scorer
+scorer = make_scorer(custom_scorer)
+Generated code for sklearn.metrics.accuracy_score
+
+
+def accuracy_score(y_true, y_pred):
+    """
+    Calculates the accuracy score between two arrays of labels.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) labels.
+    
+    y_pred : array-like of shape (n_samples,)
+        Predicted labels, as returned by a classifier.
+    
+    Returns
+    -------
+    score : float
+        The accuracy score between y_true and y_pred.
+    """
+    # Check that y_true and y_pred have the same shape
+    if y_true.shape != y_pred.shape:
+        raise ValueError("y_true and y_pred must have the same shape")
+    
+    # Calculate the accuracy score
+    score = np.sum(y_true == y_pred) / len(y_true)
+    
+    return score
+Generated code for sklearn.metrics.auc
+
+
+import numpy as np
+from sklearn.metrics import auc
+
+# Generate some random data
+y_true = np.array([0, 0, 1, 1])
+y_scores = np.array([0.1, 0.4, 0.35, 0.8])
+
+# Calculate the AUC
+auc_score = auc(y_true, y_scores)
+
+print('AUC: %.3f' % auc_score)
+Generated code for sklearn.metrics.average_precision_score
+
+
+from sklearn.metrics import average_precision_score
+
+def average_precision_score(y_true, y_score):
+    """
+    Compute average precision (AP) from prediction scores
+    Parameters
+    ----------
+    y_true : array-like, shape = [n_samples]
+        True binary labels.
+    y_score : array-like, shape = [n_samples]
+        Target scores, can either be probability estimates of the positive
+        class, confidence values, or non-thresholded measure of decisions
+        (as returned by "decision_function" on some classifiers).
+    Returns
+    -------
+    average_precision : float
+    """
+    # Check that y_true and y_score have the same shape
+    if y_true.shape != y_score.shape:
+        raise ValueError("y_true and y_score have different shapes")
+
+    # Sort y_score and corresponding y_true by the descending order of y_score
+    sorted_indices = np.argsort(y_score)[::-1]
+    y_true = y_true[sorted_indices]
+    y_score = y_score[sorted_indices]
+
+    # Compute the precision at each threshold
+    precision = []
+    for i in range(len(y_true)):
+        # Count the number of true positives
+        true_positives = np.sum(y_true[:i+1])
+        # Count the number of false positives
+        false_positives = i + 1 - true_positives
+        # Compute precision
+        precision.append(true_positives / (true_positives + false_positives))
+
+    # Compute the average precision
+    average_precision = np.mean(precision)
+
+    return average_precision
+Generated code for sklearn.metrics.balanced_accuracy_score
+
+
+def balanced_accuracy_score(y_true, y_pred, sample_weight=None):
+    """Compute the balanced accuracy
+    The balanced accuracy in binary and multiclass classification problems to
+    deal with imbalanced datasets. It is defined as the average of recall
+    obtained on each class.
+
+The best value is 1 and the worst value is 0 when ``normalize == True``.
+
+Read more in the :ref:`User Guide <balanced_accuracy_score>`.
+
+Parameters
+----------
+y_true : 1d array-like, or label indicator array / sparse matrix
+Ground truth (correct) target values.
+
+y_pred : 1d array-like, or label indicator array / sparse matrix
+Estimated targets as returned by a classifier.
+
+sample_weight : array-like of shape (n_samples,), default=None
+Sample weights.
+
+Returns
+-------
+balanced_accuracy : float
+
+Examples
+--------
+>>> from sklearn.metrics import balanced_accuracy_score
+>>> y_true = [0, 1, 0, 0, 1, 0]
+>>> y_pred = [0, 1, 0, 0, 0, 1]
+>>> balanced_accuracy_score(y_true, y_pred)
+0.6666666666666666
+
+"""
+    y_type, y_true, y_pred = _check_targets(y_true, y_pred)
+    check_consistent_length(y_true, y_pred, sample_weight)
+    if sample_weight is not None:
+        sample_weight = column_or_1d(sample_weight)
+    n_classes = len(np.unique(y_true))
+    if n_classes <= 1:
+        raise ValueError("y_true has less than 2 classes and the "
+                         "balanced_accuracy_score is not defined.")
+
+    # Calculate the accuracy for each class
+    accuracy_per_class = np.zeros(n_classes, dtype=np.float64)
+    for class_idx in range(n_classes):
+        class_accuracy = accuracy_score(y_true, y_pred,
+                                        normalize=True,
+Generated code for sklearn.metrics.brier_score_loss
+
+
+import numpy as np
+from sklearn.metrics import brier_score_loss
+
+# Generate some random data
+y_true = np.random.randint(2, size=10)
+y_prob = np.random.random(10)
+
+# Calculate the Brier score loss
+brier_score_loss(y_true, y_prob)
+Generated code for sklearn.metrics.class_likelihood_ratios
+
+
+import numpy as np
+from sklearn.metrics import confusion_matrix
+
+def class_likelihood_ratios(y_true, y_pred):
+    """
+    Computes the class likelihood ratios for a given set of true and predicted labels.
+    
+    Parameters
+    ----------
+    y_true : array-like, shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like, shape (n_samples,)
+        Estimated targets as returned by a classifier.
+    
+    Returns
+    -------
+    class_likelihood_ratios : array-like, shape (n_classes,)
+        The class likelihood ratios for each class.
+    """
+    cm = confusion_matrix(y_true, y_pred)
+    n_classes = cm.shape[0]
+    class_likelihood_ratios = np.zeros(n_classes)
+    for i in range(n_classes):
+        tp = cm[i,i]
+        fp = np.sum(cm[:,i]) - tp
+        fn = np.sum(cm[i,:]) - tp
+        tn = np.sum(cm) - tp - fp - fn
+        class_likelihood_ratios[i] = (tp*tn)/(fp*fn)
+    return class_likelihood_ratios
+Generated code for sklearn.metrics.classification_report
+
+
+from sklearn.metrics import classification_report
+
+y_true = [0, 1, 2, 2, 2]
+y_pred = [0, 0, 2, 2, 1]
+target_names = ['class 0', 'class 1', 'class 2']
+
+print(classification_report(y_true, y_pred, target_names=target_names))
+
+# Output
+#              precision    recall  f1-score   support
+# 
+#     class 0       0.50      1.00      0.67         1
+#     class 1       0.00      0.00      0.00         1
+#     class 2       1.00      0.67      0.80         3
+# 
+#    accuracy                           0.60         5
+#   macro avg       0.50      0.56      0.49         5
+#weighted avg       0.70      0.60      0.61         5
+Generated code for sklearn.metrics.cohen_kappa_score
+
+
+import numpy as np
+from sklearn.metrics import cohen_kappa_score
+
+y_true = np.array([0, 1, 2, 0, 1, 2])
+y_pred = np.array([0, 2, 1, 0, 0, 1])
+
+cohen_kappa_score(y_true, y_pred)
+
+# Output: 0.3333333333333333
+Generated code for sklearn.metrics.confusion_matrix
+
+
+import numpy as np
+from sklearn.metrics import confusion_matrix
+
+# Create a confusion matrix
+y_true = [2, 0, 2, 2, 0, 1]
+y_pred = [0, 0, 2, 2, 0, 2]
+confusion_matrix = confusion_matrix(y_true, y_pred)
+
+# Print the confusion matrix
+print(confusion_matrix)
+
+# Output
+# [[2 0 0]
+#  [0 0 1]
+#  [1 0 2]]
+Generated code for sklearn.metrics.dcg_score
+
+
+def dcg_score(y_true, y_score, k=None, gains="exponential"):
+    """Discounted cumulative gain (DCG)
+    Parameters
+    ----------
+    y_true : array, shape = [n_samples]
+        Ground truth (true relevance labels).
+    y_score : array, shape = [n_samples]
+        Predicted scores.
+    k : int
+        Number of results to consider. If None, all results are considered.
+    gains : str
+        Whether gains should be "exponential" (default) or "linear".
+    Returns
+    -------
+    DCG : float
+    """
+    order = np.argsort(y_score)[::-1]
+    y_true = np.take(y_true, order[:k])
+
+    if gains == "exponential":
+        gains = 2 ** y_true - 1
+    elif gains == "linear":
+        gains = y_true
+    else:
+        raise ValueError("Invalid gains option.")
+
+    # highest rank is 1 so +2 instead of +1
+    discounts = np.log2(np.arange(len(y_true)) + 2)
+    return np.sum(gains / discounts)
+Generated code for sklearn.metrics.det_curve
+
+
+import numpy as np
+from sklearn.metrics import precision_recall_curve
+
+# Generate some data
+y_true = np.array([0, 0, 1, 1])
+y_scores = np.array([0.1, 0.4, 0.35, 0.8])
+
+# Calculate precision-recall curve
+precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
+
+# Plot precision-recall curve
+import matplotlib.pyplot as plt
+plt.plot(recall, precision)
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.show()
+Generated code for sklearn.metrics.f1_score
+
+
+from sklearn.metrics import f1_score
+
+# example data
+y_true = [0, 1, 1, 0, 1, 0, 1, 0, 0, 1]
+y_pred = [0, 0, 1, 0, 0, 0, 1, 1, 1, 1]
+
+# calculate F1 score
+f1 = f1_score(y_true, y_pred)
+
+print('F1 score: %f' % f1)
+Generated code for sklearn.metrics.fbeta_score
+
+
+def fbeta_score(y_true, y_pred, beta):
+    """
+    Computes the F-beta score, which is a weighted harmonic mean of precision and recall.
+    The F-beta score is the weighted harmonic mean of precision and recall, reaching its
+    optimal value at 1 and its worst value at 0.
+    The beta parameter determines the weight of precision in the combined score.
+    If beta < 1, precision is favored. If beta > 1, recall is favored.
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated targets as returned by a classifier.
+    beta : float
+        Weight of precision in harmonic mean.
+    Returns
+    -------
+    score : float
+        The F-beta score.
+    """
+    # Calculate precision and recall
+    precision = precision_score(y_true, y_pred)
+    recall = recall_score(y_true, y_pred)
+
+    # Calculate F-beta score
+    score = (1 + beta**2) * (precision * recall) / (beta**2 * precision + recall)
+
+    return score
+Generated code for sklearn.metrics.hamming_loss
+
+
+from sklearn.metrics import hamming_loss
+
+def hamming_loss(y_true, y_pred):
+    """
+    Computes the Hamming loss.
+    The Hamming loss is the fraction of labels that are incorrectly predicted.
+    Parameters
+    ----------
+    y_true : array-like of shape = [n_samples] or [n_samples, n_classes]
+        Ground truth (correct) labels.
+    y_pred : array-like of shape = [n_samples] or [n_samples, n_classes]
+        Predicted labels, as returned by a classifier.
+    Returns
+    -------
+    loss : float
+        The Hamming loss.
+    """
+    y_true, y_pred = check_arrays(y_true, y_pred)
+    if y_true.shape != y_pred.shape:
+        raise ValueError("y_true and y_pred must have the same shape")
+    if y_true.ndim == 1:
+        y_true = np.reshape(y_true, (-1, 1))
+    if y_pred.ndim == 1:
+        y_pred = np.reshape(y_pred, (-1, 1))
+    if y_true.shape[1] == 1:
+        y_true = np.append(1 - y_true, y_true, axis=1)
+    if y_pred.shape[1] == 1:
+        y_pred = np.append(1 - y_pred, y_pred, axis=1)
+    n_samples, n_classes = y_true.shape
+    incorrect_labels = np.sum(y_true != y_pred)
+    loss = incorrect_labels / (n_samples * n_classes)
+    return loss
+Generated code for sklearn.metrics.hinge_loss
+
+
+def hinge_loss(y_true, y_pred):
+    loss = np.maximum(1 - y_true * y_pred, 0)
+    return np.mean(loss)
+Generated code for sklearn.metrics.jaccard_score
+
+
+import numpy as np
+from sklearn.metrics import jaccard_score
+
+y_true = np.array([0, 0, 1, 1])
+y_pred = np.array([0, 1, 0, 1])
+
+jaccard_score(y_true, y_pred)
+
+# Output: 0.5
+Generated code for sklearn.metrics.log_loss
+
+
+def log_loss(y_true, y_pred, eps=1e-15):
+    """
+    Computes the logarithmic loss between y_true and y_pred.
+    Parameters
+    ----------
+    y_true : array, shape = [n_samples]
+        Ground truth (correct) labels.
+    y_pred : array, shape = [n_samples]
+        Predicted labels, as returned by a classifier.
+    eps : float
+        Log loss is undefined for p=0 or p=1, so probabilities are
+        clipped to max(eps, min(1 - eps, p)).
+    Returns
+    -------
+    loss : float
+        The logarithmic loss between y_true and y_pred.
+    """
+    y_pred = np.clip(y_pred, eps, 1 - eps)
+    loss = -(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+    return np.mean(loss)
+Generated code for sklearn.metrics.matthews_corrcoef
+
+
+def matthews_corrcoef(y_true, y_pred):
+    """Calculate Matthews correlation coefficient (MCC)
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated targets as returned by a classifier.
+    Returns
+    -------
+    mcc : float
+        The Matthews correlation coefficient (+1 represents a perfect
+        prediction, 0 an average random prediction and -1 an inverse
+        prediction).
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    # Compute confusion matrix
+    tp, fp, fn, tn = confusion_matrix(y_true, y_pred).ravel()
+
+    # Calculate MCC
+    mcc = ((tp * tn) - (fp * fn)) / np.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+
+    return mcc
+Generated code for sklearn.metrics.multilabel_confusion_matrix
+
+
+import numpy as np
+from sklearn.metrics import multilabel_confusion_matrix
+
+# Generate some random data
+y_true = np.array([[0, 1, 0], [1, 0, 1]])
+y_pred = np.array([[1, 0, 0], [1, 0, 1]])
+
+# Calculate the multilabel confusion matrix
+conf_matrix = multilabel_confusion_matrix(y_true, y_pred)
+
+# Print the confusion matrix
+print(conf_matrix)
+Generated code for sklearn.metrics.ndcg_score
+
+
+import numpy as np
+from sklearn.metrics import ndcg_score
+
+# Generate some dummy data
+y_true = np.array([1, 0, 0, 1, 0])
+y_pred = np.array([0.75, 0.5, 0.25, 0.75, 0.25])
+
+# Calculate the NDCG score
+ndcg_score(y_true, y_pred)
+
+# Output: 0.8333333333333334
+Generated code for sklearn.metrics.precision_recall_curve
+
+
+from sklearn.metrics import precision_recall_curve
+
+def precision_recall_curve(y_true, y_score):
+    """
+    Compute precision-recall curve
+    Parameters
+    ----------
+    y_true : array, shape = [n_samples]
+        True binary labels.
+    y_score : array, shape = [n_samples]
+        Target scores, can either be probability estimates of the positive
+        class, confidence values, or non-thresholded measure of decisions
+        (as returned by "decision_function" on some classifiers).
+    Returns
+    -------
+    precision : array, shape = [n_thresholds + 1]
+        Precision values such that element i is the precision of
+        predictions with score >= thresholds[i] and the last element is 1.
+    recall : array, shape = [n_thresholds + 1]
+        Decreasing recall values such that element i is the recall of
+        predictions with score >= thresholds[i] and the last element is 0.
+    thresholds : array, shape = [n_thresholds <= len(np.unique(y_score))]
+        Increasing thresholds on the decision function used to compute
+        precision and recall.
+    """
+    # Sort scores and corresponding truth values
+    desc_score_indices = np.argsort(y_score)[::-1]
+    y_score = y_score[desc_score_indices]
+    y_true = y_true[desc_score_indices]
+
+    # y_score typically has many tied values. Here we extract
+    # the indices associated with the distinct values. We also
+    # concatenate a value for the end of the curve.
+    distinct_value_indices = np.where(np.diff(y_score))[0]
+    threshold_idxs = np.r_[distinct_value_indices, y_true.size - 1]
+
+    # accumulate the true positives with decreasing threshold
+    tps = stable_cumsum(y_true)[threshold_idxs]
+    fps = 1 + threshold_idxs - tps
+    prec = tps / (tps + fps
+Generated code for sklearn.metrics.precision_recall_fscore_support
+
+
+from sklearn.metrics import precision_recall_fscore_support
+
+y_true = [0, 1, 2, 0, 1, 2]
+y_pred = [0, 2, 1, 0, 0, 1]
+
+precision, recall, fscore, support = precision_recall_fscore_support(y_true, y_pred, average='macro')
+
+print('precision: {}'.format(precision))
+print('recall: {}'.format(recall))
+print('fscore: {}'.format(fscore))
+print('support: {}'.format(support))
+Generated code for sklearn.metrics.precision_score
+
+
+from sklearn.metrics import precision_score
+
+# example data
+y_true = [0, 0, 1, 1]
+y_pred = [0, 1, 0, 1]
+
+# calculate precision score
+precision_score = precision_score(y_true, y_pred)
+
+print('Precision score: %.3f' % precision_score)
+Generated code for sklearn.metrics.recall_score
+
+
+from sklearn.metrics import recall_score
+
+# example data
+y_true = [0, 1, 2, 0, 1, 2]
+y_pred = [0, 2, 1, 0, 0, 1]
+
+# calculate recall score
+recall_score(y_true, y_pred)
+
+# output: 0.3333333333333333
+Generated code for sklearn.metrics.roc_auc_score
+
+
+import numpy as np
+from sklearn.metrics import roc_auc_score
+
+# Generate some dummy data
+y_true = np.array([0, 0, 1, 1])
+y_scores = np.array([0.1, 0.4, 0.35, 0.8])
+
+# Calculate the ROC AUC score
+roc_auc_score(y_true, y_scores)
+
+# Output: 0.75
+Generated code for sklearn.metrics.roc_curve
+
+
+import numpy as np
+from sklearn.metrics import roc_curve
+
+# Generate some dummy data
+y_true = np.array([0, 0, 1, 1])
+y_scores = np.array([0.1, 0.4, 0.35, 0.8])
+
+# Calculate the ROC curve
+fpr, tpr, thresholds = roc_curve(y_true, y_scores)
+
+# Print the results
+print('False Positive Rate:', fpr)
+print('True Positive Rate:', tpr)
+print('Thresholds:', thresholds)
+Generated code for sklearn.metrics.top_k_accuracy_score
+
+
+def top_k_accuracy_score(y_true, y_pred, k=5):
+    """
+    Computes the top-k accuracy score for a given set of true labels and predicted labels.
+    
+    Parameters
+    ----------
+    y_true : array-like, shape = [n_samples]
+        Ground truth (correct) labels.
+    
+    y_pred : array-like, shape = [n_samples]
+        Predicted labels, as returned by a classifier.
+    
+    k : int, optional (default=5)
+        The number of top-k predictions to consider.
+    
+    Returns
+    -------
+    score : float
+        The top-k accuracy score.
+    """
+    # Check that the inputs are valid
+    if not isinstance(y_true, np.ndarray):
+        raise TypeError('y_true must be a numpy array')
+    if not isinstance(y_pred, np.ndarray):
+        raise TypeError('y_pred must be a numpy array')
+    if not isinstance(k, int):
+        raise TypeError('k must be an integer')
+    if k < 1:
+        raise ValueError('k must be greater than 0')
+    
+    # Compute the top-k accuracy score
+    num_correct = 0
+    for i in range(len(y_true)):
+        # Get the top-k predictions for this sample
+        top_k_preds = np.argsort(y_pred[i])[-k:]
+        
+        # Check if the true label is in the top-k predictions
+        if y_true[i] in top_k_preds:
+            num_correct += 1
+    
+    # Compute and return the score
+    score = num_correct / len(y_true)
+    return score
+Generated code for sklearn.metrics.zero_one_loss
+
+
+def zero_one_loss(y_true, y_pred, normalize=True):
+    """
+    Compute the zero-one classification loss.
+    The zero-one loss is the fraction of misclassifications (float),
+    i.e. the number of incorrect predictions divided by the total number of
+    predictions.
+    Read more in the :ref:`User Guide <zero_one_loss>`.
+    Parameters
+    ----------
+    y_true : array-like or label indicator matrix
+        Ground truth (correct) labels.
+    y_pred : array-like or label indicator matrix
+        Predicted labels, as returned by a classifier.
+    normalize : bool, optional (default=True)
+        If ``False``, return the number of misclassifications.
+        Otherwise, return the fraction of misclassifications.
+    Returns
+    -------
+    loss : float or int,
+        If ``normalize == True``, return the fraction of misclassifications
+        (float), else it returns the number of misclassifications (int).
+    Examples
+    --------
+    >>> from sklearn.metrics import zero_one_loss
+    >>> y_pred = [1, 2, 3, 4]
+    >>> y_true = [2, 2, 3, 4]
+    >>> zero_one_loss(y_true, y_pred)
+    0.25
+    >>> zero_one_loss(y_true, y_pred, normalize=False)
+    1
+    """
+    score = accuracy_score(y_true, y_pred, normalize=normalize)
+    return 1 - score
+Generated code for sklearn.metrics.explained_variance_score
+
+
+def explained_variance_score(y_true, y_pred):
+    """
+    Computes the explained variance score.
+    
+    The explained variance score is the fraction of the variance in the 
+    observed data that is explained by the model.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape = (n_samples)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape = (n_samples)
+        Estimated target values.
+    
+    Returns
+    -------
+    score : float
+        The explained variance score.
+    """
+    y_true = np.array(y_true)
+    y_pred = np.array(y_pred)
+    numerator = np.sum(np.square(y_true - y_pred))
+    denominator = np.sum(np.square(y_true - np.mean(y_true)))
+    score = 1 - (numerator / denominator)
+    return score
+Generated code for sklearn.metrics.max_error
+
+
+import numpy as np
+from sklearn.metrics import max_error
+
+# Generate some random data
+y_true = np.random.randint(0, 10, size=100)
+y_pred = np.random.randint(0, 10, size=100)
+
+# Calculate the max error
+max_err = max_error(y_true, y_pred)
+
+print("Max Error:", max_err)
+Generated code for sklearn.metrics.mean_absolute_error
+
+
+from sklearn.metrics import mean_absolute_error
+
+def mean_absolute_error(y_true, y_pred):
+    """
+    Computes the mean absolute error between two arrays.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated target values.
+    
+    Returns
+    -------
+    mae : float
+        The mean absolute error between y_true and y_pred.
+    """
+    mae = np.mean(np.abs(y_true - y_pred))
+    return mae
+Generated code for sklearn.metrics.mean_squared_error
+
+
+from sklearn.metrics import mean_squared_error
+
+def mean_squared_error(y_true, y_pred):
+    """
+    Computes the mean squared error between two arrays.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated target values.
+    
+    Returns
+    -------
+    mse : float
+        The mean squared error, a measure of the difference between
+        `y_true` and `y_pred`.
+    """
+    mse = ((y_true - y_pred) ** 2).mean()
+    return mse
+Generated code for sklearn.metrics.mean_squared_log_error
+
+
+import numpy as np
+from sklearn.metrics import mean_squared_log_error
+
+y_true = np.array([1, 2, 3, 4, 5])
+y_pred = np.array([1.2, 2.3, 3.4, 4.5, 5.6])
+
+mean_squared_log_error(y_true, y_pred)
+
+# Output: 0.0108
+Generated code for sklearn.metrics.median_absolute_error
+
+
+from sklearn.metrics import median_absolute_error
+
+def median_absolute_error(y_true, y_pred):
+    """
+    Computes the median absolute error between two arrays.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated target values.
+    
+    Returns
+    -------
+    median_absolute_error : float
+        The median absolute error between y_true and y_pred.
+    """
+    errors = abs(y_true - y_pred)
+    return np.median(errors)
+Generated code for sklearn.metrics.mean_absolute_percentage_error
+
+
+def mean_absolute_percentage_error(y_true, y_pred): 
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+Generated code for sklearn.metrics.r2_score
+
+
+def r2_score(y_true, y_pred):
+    numerator = ((y_true - y_pred)**2).sum()
+    denominator = ((y_true - y_true.mean())**2).sum()
+    return 1 - (numerator/denominator)
+Generated code for sklearn.metrics.mean_poisson_deviance
+
+
+import numpy as np
+from sklearn.metrics import mean_poisson_deviance
+
+# Generate random data
+y_true = np.random.randint(low=0, high=10, size=100)
+y_pred = np.random.randint(low=0, high=10, size=100)
+
+# Calculate mean poisson deviance
+mean_poisson_deviance_score = mean_poisson_deviance(y_true, y_pred)
+
+print("Mean Poisson Deviance:", mean_poisson_deviance_score)
+Generated code for sklearn.metrics.mean_gamma_deviance
+
+
+import numpy as np
+from sklearn.metrics import mean_gamma_deviance
+
+# Generate random data
+y_true = np.random.randint(2, size=100)
+y_pred = np.random.rand(100)
+
+# Calculate mean gamma deviance
+mean_gamma_deviance(y_true, y_pred)
+Generated code for sklearn.metrics.mean_tweedie_deviance
+
+
+import numpy as np
+from sklearn.metrics import mean_tweedie_deviance
+
+# Generate random data
+y_true = np.random.randint(0, 10, size=100)
+y_pred = np.random.randint(0, 10, size=100)
+
+# Calculate mean Tweedie deviance
+mean_tweedie_dev = mean_tweedie_deviance(y_true, y_pred)
+
+print("Mean Tweedie Deviance:", mean_tweedie_dev)
+Generated code for sklearn.metrics.d2_tweedie_score
+
+
+def d2_tweedie_score(y_true, y_pred, power=1.5):
+    """
+    Computes the D2 Tweedie score for a given prediction.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated target values.
+    power : float, optional (default=1.5)
+        The power parameter of the Tweedie distribution.
+    
+    Returns
+    -------
+    score : float
+        The D2 Tweedie score.
+    """
+    # Compute the residuals
+    residuals = y_true - y_pred
+    
+    # Compute the D2 Tweedie score
+    score = np.sum(np.power(residuals, 2 - power)) / np.sum(np.power(y_true, 2 - power))
+    
+    return score
+Generated code for sklearn.metrics.mean_pinball_loss
+
+
+def mean_pinball_loss(y_true, y_pred, tau):
+    """
+    Computes the mean pinball loss between y_true and y_pred.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated target values.
+    tau : float
+        The pinball parameter.
+        
+    Returns
+    -------
+    loss : float
+        The mean pinball loss.
+    """
+    loss = 0.0
+    for i in range(len(y_true)):
+        loss += max(tau * (y_true[i] - y_pred[i]), (y_true[i] - y_pred[i]) * (1 - tau))
+    return loss / len(y_true)
+Generated code for sklearn.metrics.d2_pinball_score
+
+
+def d2_pinball_score(y_true, y_pred, quantiles):
+    """
+    Computes the D2 pinball score for a given set of predictions and true values.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated target values.
+    quantiles : array-like of shape (n_quantiles,)
+        Quantiles to use for computing the pinball score.
+        
+    Returns
+    -------
+    score : float
+        The D2 pinball score.
+    """
+    # Check inputs
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    quantiles = np.asarray(quantiles)
+    
+    # Compute the pinball score
+    score = 0.0
+    for q in quantiles:
+        score += np.mean(np.maximum(y_true - y_pred, q * (y_pred - y_true)))
+    return score
+Generated code for sklearn.metrics.d2_absolute_error_score
+
+
+from sklearn.metrics import d2_absolute_error_score
+
+def d2_absolute_error_score(y_true, y_pred):
+    """
+    Computes the D2 absolute error score between two arrays.
+    
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,)
+        Estimated target values.
+    
+    Returns
+    -------
+    score : float
+        The D2 absolute error score.
+    """
+    return np.mean(np.abs(y_true - y_pred))
+Generated code for sklearn.metrics.coverage_error
+
+
+from sklearn.metrics import coverage_error
+
+def coverage_error_score(y_true, y_pred):
+    """
+    Computes the coverage error score for a given set of true labels and predicted labels.
+    
+    Parameters
+    ----------
+    y_true : array-like, shape = [n_samples]
+        True labels.
+    
+    y_pred : array-like, shape = [n_samples]
+        Predicted labels.
+    
+    Returns
+    -------
+    coverage_error : float
+        The coverage error score.
+    """
+    return coverage_error(y_true, y_pred)
+Generated code for sklearn.metrics.label_ranking_average_precision_score
+
+
+from sklearn.metrics import label_ranking_average_precision_score
+
+def label_ranking_average_precision_score(y_true, y_score):
+    """
+    Compute the average precision score for a set of labels
+    Parameters
+    ----------
+    y_true : array-like, shape = [n_samples]
+        Ground truth (true relevance labels).
+    y_score : array-like, shape = [n_samples, n_labels]
+        Predicted scores.
+    Returns
+    -------
+    score : float
+        Average precision score
+    """
+    # Check that y_true and y_score have the same shape
+    if y_true.shape != y_score.shape:
+        raise ValueError("y_true and y_score have different shapes")
+
+    # Compute the average precision score
+    score = 0.0
+    for i in range(y_true.shape[0]):
+        # Compute the precision at each label
+        true_labels = y_true[i]
+        scores = y_score[i]
+        precision = 0.0
+        for j in range(true_labels.shape[0]):
+            if true_labels[j] == 1:
+                precision += scores[j]
+        # Compute the average precision
+        score += precision / true_labels.sum()
+
+    # Return the average precision score
+    return score / y_true.shape[0]
+Generated code for sklearn.metrics.label_ranking_loss
+
+
+from sklearn.metrics import label_ranking_loss
+
+def label_ranking_loss(y_true, y_score):
+    """
+    Computes the label ranking loss.
+    
+    Parameters
+    ----------
+    y_true : array-like, shape = [n_samples]
+        Ground truth (true relevance labels).
+    
+    y_score : array-like, shape = [n_samples, n_labels]
+        Predicted scores.
+    
+    Returns
+    -------
+    loss : float
+    """
+    n_samples, n_labels = y_score.shape
+    y_true = y_true.reshape(n_samples, 1)
+    y_true_onehot = np.eye(n_labels)[y_true.astype(int)]
+    loss = np.sum(np.maximum(0, -(y_true_onehot - y_score))) / n_samples
+    return loss
+Generated code for sklearn.metrics.adjusted_mutual_info_score
+
+
+def adjusted_mutual_info_score(labels_true, labels_pred, average_method='arithmetic'):
+    """Compute the Adjusted Mutual Information between two clusterings
+    Adjusted Mutual Information (AMI) is an adjustment of the Mutual
+    Information (MI) score to account for chance. It accounts for the fact
+    that the MI is generally higher for two clusterings with a larger
+    number of clusters, regardless of whether there is actually more
+    agreement between the clusterings.
+    Read more in the :ref:`User Guide <adjusted_mutual_info_score>`.
+    Parameters
+    ----------
+    labels_true : int array, shape = [n_samples]
+        A clustering of the data into disjoint subsets.
+    labels_pred : array, shape = [n_samples]
+        A clustering of the data into disjoint subsets.
+    average_method : string, optional
+        The average method used to calculate the AMI.
+        Supported methods are 'arithmetic' (default) and 'geometric'.
+    Returns
+    -------
+    ami : float
+        Adjusted Mutual Information between the two clusterings
+    See also
+    --------
+    adjusted_rand_score: Adjusted Rand index
+    mutual_info_score: Mutual Information
+    Examples
+    --------
+    >>> from sklearn.metrics.cluster import adjusted_mutual_info_score
+    >>> adjusted_mutual_info_score([0, 0, 1, 1], [1, 1, 0, 0])
+    1.0
+    """
+    labels_true, labels_pred = check_clusterings(labels_true, labels_pred)
+    classes = np.unique(labels_true)
+    clusters = np.unique(labels_pred)
+    # Special limit cases: no clustering since the data is not split.
+    # This is a perfect match hence return 1.0.
+    if (classes.shape[0] == clusters.shape[0] == 1
+            or classes.shape[0] == clusters.shape[0] == 0):
+        return 1.0
+    contingency = contingency_matrix(labels_true, labels_pred)
+   
+Generated code for sklearn.metrics.adjusted_rand_score
+
+
+def adjusted_rand_score(labels_true, labels_pred):
+    """
+    Compute the Adjusted Rand Index (ARI) of two clusterings.
+    
+    Parameters
+    ----------
+    labels_true : int array, shape = [n_samples]
+        Ground truth class labels to be used as a reference
+    labels_pred : int array, shape = [n_samples]
+        Cluster labels to evaluate
+    
+    Returns
+    -------
+    ari : float
+        The resulting ARI score
+    """
+    from sklearn.metrics.cluster import contingency_matrix
+    from sklearn.metrics.cluster.supervised import _comb2
+    from sklearn.utils.extmath import _adjusted_rand_score
+    
+    # Compute the contingency matrix
+    cont_mat = contingency_matrix(labels_true, labels_pred)
+    
+    # Compute the combinatorial terms
+    n_comb_c, n_comb_k = _comb2(cont_mat)
+    
+    # Compute the Adjusted Rand Index
+    ari = _adjusted_rand_score(cont_mat, n_comb_c, n_comb_k)
+    
+    return ari
+Generated code for sklearn.metrics.calinski_harabasz_score
+
+
+def calinski_harabasz_score(X, labels):
+    """Calculate the Calinski and Harabasz score.
+    
+    The Calinski and Harabasz score is defined as the ratio of the between-clusters dispersion mean 
+    and the within-cluster dispersion.
+    
+    This score is valid only for clusters with more than one sample.
+    
+    Parameters
+    ----------
+    X : array-like or sparse matrix, shape (n_samples, n_features)
+        List of n_features-dimensional data points. Each row corresponds
+        to a single data point.
+    
+    labels : array-like, shape (n_samples,)
+        Predicted labels for each sample.
+    
+    Returns
+    -------
+    score : float
+        The resulting Calinski and Harabasz score.
+    """
+    n_samples, _ = X.shape
+    n_labels = len(np.unique(labels))
+    
+    # Calculate the between-cluster dispersion mean
+    mean_dispersion_b = 0.0
+    for label in np.unique(labels):
+        X_label = X[labels == label]
+        mean_dispersion_b += np.sum((X_label - X_label.mean(axis=0))**2)
+    mean_dispersion_b /= (n_labels - 1)
+    
+    # Calculate the within-cluster dispersion
+    mean_dispersion_w = 0.0
+    for label in np.unique(labels):
+        X_label = X[labels == label]
+        mean_dispersion_w += np.sum((X_label - X_label.mean(axis=0))**2)
+    mean_dispersion_w /= (n_samples - n_labels)
+    
+    # Calculate the Calinski and Harabasz score
+    score = mean_dispersion_b / mean_dispersion_w
+    
+    return score
+Generated code for sklearn.metrics.davies_bouldin_score
+
+
+import numpy as np
+from sklearn.metrics import davies_bouldin_score
+
+# Generate random data
+X = np.random.rand(100, 2)
+
+# Calculate Davies-Bouldin score
+score = davies_bouldin_score(X, np.zeros(100))
+
+print(score)
+Generated code for sklearn.metrics.completeness_score
+
+
+def completeness_score(y_true, y_pred, labels=None):
+    """Compute completeness score
+    The completeness score is defined as the ratio between the number of
+    pairs of elements of the same class in the same set and the total number
+    of pairs in the same set.
+    Read more in the :ref:`User Guide <completeness_score>`.
+    Parameters
+    ----------
+    y_true : array, shape = [n_samples]
+        Ground truth (correct) labels.
+    y_pred : array, shape = [n_samples]
+        Predicted labels, as returned by a classifier.
+    labels : array, shape = [n_classes], optional
+        List of labels to include when calculating the completeness score.
+        If ``None``, all labels are used.
+    Returns
+    -------
+    completeness : float
+        The completeness score.
+    Examples
+    --------
+    >>> from sklearn.metrics import completeness_score
+    >>> y_true = [0, 1, 2, 0, 1, 2]
+    >>> y_pred = [0, 2, 1, 0, 0, 1]
+    >>> completeness_score(y_true, y_pred)
+    0.5
+    >>> completeness_score(y_true, y_pred, labels=[0, 1])
+    1.0
+    """
+    y_true, y_pred = check_arrays(y_true, y_pred)
+    if labels is None:
+        labels = np.unique(np.concatenate((y_true, y_pred)))
+    else:
+        labels = np.asarray(labels)
+
+    n_labels = labels.size
+    label_to_ind = dict((y, x) for x, y in enumerate(labels))
+
+    # convert yt, yp into index
+    y_pred = np.array([label_to_ind.get(x, n_labels + 1) for x in y_pred])
+    y_true = np.array([label_to_ind.get(x, n_labels + 1) for x in y
+Generated code for sklearn.metrics.cluster.contingency_matrix
+
+
+def contingency_matrix(y_true, y_pred, eps=None):
+    classes, class_idx = np.unique(y_true, return_inverse=True)
+    clusters, cluster_idx = np.unique(y_pred, return_inverse=True)
+    n_classes = classes.shape[0]
+    n_clusters = clusters.shape[0]
+    # Using coo_matrix to accelerate simple histogram calculation,
+    # i.e. bins are consecutive integers
+    # Currently, coo_matrix is faster than histogram2d for simple cases
+    contingency = coo_matrix((np.ones(class_idx.shape[0]),
+                             (class_idx, cluster_idx)),
+                            shape=(n_classes, n_clusters),
+                            dtype=np.int).toarray()
+    if eps is not None:
+        # don't use += as contingency is integer
+        contingency = contingency + eps
+    return contingency
+Generated code for sklearn.metrics.cluster.pair_confusion_matrix
+
+
+def pair_confusion_matrix(y_true, y_pred, labels=None):
+    """Compute the pairwise confusion matrix for clustering results.
+    
+    Parameters
+    ----------
+    y_true : array-like, shape (n_samples,)
+        Ground truth (true) labels.
+    y_pred : array-like, shape (n_samples,)
+        Predicted labels, as returned by a clustering algorithm.
+    labels : array-like, shape (n_classes,), optional
+        List of labels to index the matrix. This may be used to reorder
+        or select a subset of labels.
+        If none is given, those that appear at least once
+        in ``y_true`` or ``y_pred`` are used in sorted order.
+    
+    Returns
+    -------
+    C : array, shape (n_classes, n_classes)
+        The pairwise confusion matrix.
+    
+    Examples
+    --------
+    >>> from sklearn.metrics.cluster import pair_confusion_matrix
+    >>> y_true = [0, 0, 1, 1, 2]
+    >>> y_pred = [0, 1, 1, 2, 2]
+    >>> pair_confusion_matrix(y_true, y_pred)
+    array([[2, 0, 0],
+           [0, 1, 1],
+           [0, 1, 2]])
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    if y_true.shape != y_pred.shape:
+        raise ValueError("y_true and y_pred must have the same shape")
+    if labels is None:
+        labels = np.unique(np.concatenate((y_true, y_pred)))
+    else:
+        labels = np.asarray(labels)
+    n_labels = labels.size
+    C = np.empty((n_labels, n_labels), dtype=np.int)
+    for i, label_i in enumerate(labels):
+        for j, label_j in enumerate(lab
+Generated code for sklearn.metrics.fowlkes_mallows_score
+
+
+def fowlkes_mallows_score(labels_true, labels_pred):
+    """Compute the Fowlkes-Mallows score.
+    
+    The Fowlkes-Mallows score is a measure of the similarity between two
+    clusterings. A perfect score is 1.0, whereas a score of 0.0 indicates
+    completely random labelings.
+    
+    Parameters
+    ----------
+    labels_true : array, shape = [n_samples]
+        Ground truth class labels to be used as a reference.
+    labels_pred : array, shape = [n_samples]
+        Cluster labels to evaluate.
+    
+    Returns
+    -------
+    fowlkes_mallows_score : float
+        The Fowlkes-Mallows score.
+    """
+    # Get the unique labels
+    labels_true_unique = np.unique(labels_true)
+    labels_pred_unique = np.unique(labels_pred)
+    
+    # Compute the contingency matrix
+    cont_matrix = confusion_matrix(labels_true, labels_pred)
+    
+    # Compute the Fowlkes-Mallows score
+    num = np.sum(np.sqrt(np.sum(cont_matrix, axis=0) * np.sum(cont_matrix, axis=1)))
+    den = np.sum(cont_matrix)
+    
+    return num / den
+Generated code for sklearn.metrics.homogeneity_completeness_v_measure
+
+
+from sklearn.metrics import homogeneity_completeness_v_measure
+
+def homogeneity_completeness_v_measure(labels_true, labels_pred):
+    """Compute the homogeneity, completeness and V-measure
+    of a clustering given a ground truth.
+    
+    Parameters
+    ----------
+    labels_true : int array, shape = [n_samples]
+        Ground truth class labels to be used as a reference
+    labels_pred : array, shape = [n_samples]
+        Cluster labels to evaluate
+    
+    Returns
+    -------
+    homogeneity : float
+    completeness: float
+    v_measure: float
+        The homogeneity, completeness and V-measure of the
+        clustering
+    """
+    from sklearn.metrics.cluster import contingency_matrix
+    from sklearn.metrics.cluster.supervised import _combined_index
+    from sklearn.utils.validation import check_consistent_length
+    
+    check_consistent_length(labels_true, labels_pred)
+    cont_mat = contingency_matrix(labels_true, labels_pred)
+    homogeneity, completeness, v_measure = _combined_index(cont_mat)
+    return homogeneity, completeness, v_measure
