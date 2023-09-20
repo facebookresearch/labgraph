@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright 2004-present Facebook. All Rights Reserved.
 
+from wsgiref.simple_server import demo_app
 import labgraph as lg
 from typing import Dict, Tuple
 
@@ -101,9 +102,9 @@ class Demo(lg.Graph):
             AttenuatorConfig(
                 attenuation=ATTENUATION,
             )
-        )
-    
-    def connections(self) -> lg.Connections:
+        )            
+        
+    def returnConnect(self):
         return (
             (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.ROLLING_AVERAGER.ROLLING_AVERAGER_INPUT),
             (self.NOISE_GENERATOR.NOISE_GENERATOR_OUTPUT, self.AMPLIFIER.AMPLIFIER_INPUT),
@@ -114,6 +115,10 @@ class Demo(lg.Graph):
             (self.ATTENUATOR.ATTENUATOR_OUTPUT, self.SERIALIZER.SERIALIZER_INPUT_4),
             (self.SERIALIZER.SERIALIZER_OUTPUT, self.WS_SERVER_NODE.topic),
         )
+
+    def connections(self) -> lg.Connections:
+        
+        return self.returnConnect()
 
     def process_modules(self) -> Tuple[lg.Module, ...]:
         return (
@@ -131,3 +136,6 @@ if __name__ == "__main__":
 
     runner = lg.ParallelRunner(graph=graph)
     runner.run()
+    
+    
+    
