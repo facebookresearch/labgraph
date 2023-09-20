@@ -43,3 +43,4 @@ venv.bak/
 # Sphinx
 sphinx/_build/
 *~
+node_modules

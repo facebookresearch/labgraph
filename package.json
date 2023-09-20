@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@mui/icons-material": "^5.8.4",
+    "react-redux": "^8.0.2",
+    "resize-observer-polyfill": "^1.5.1"
+  }
+}
