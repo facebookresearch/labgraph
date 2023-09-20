@@ -12,7 +12,7 @@ LabGraph is a streaming framework built by the Facebook Reality Labs Research te
 - Based on [PyPa](https://github.com/pypa/manylinux), the following Linux systems are also supported: Fedora 32+, Mageia 8+, openSUSE 15.3+, Photon OS 4.0+ (3.0+ with updates), Ubuntu 20.04+
 
 ```
-pip install labgraph
+pip install labgraph==2.0.0
 ```
 For more documentation on installation and trouble shooting, please use this [link](https://github.com/facebookresearch/labgraph/tree/main/docs/installation).
 
