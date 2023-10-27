@@ -13,17 +13,18 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.10'
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
         cd extensions/labgraph_audiogen 
         python -m pip install --upgrade pip
-        pip install torch torchvision torchaudio
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+        pip install --pre xformers
         pip install -e .
         pip install pytest
 
     - name: Run tests
       run: |
         cd extensions/labgraph_audiogen
-        pytest
+        pytest --verbose
