@@ -19,6 +19,7 @@ jobs:
       run: |
         cd extensions/labgraph_audiogen 
         python -m pip install --upgrade pip
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
         pip install -e .
         pip install pytest
 
