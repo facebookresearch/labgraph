@@ -27,4 +27,4 @@ jobs:
     - name: Run tests
       run: |
         cd extensions/labgraph_audiogen
-        pytest --verbose
+        pytest -vvv
