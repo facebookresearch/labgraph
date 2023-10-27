@@ -19,8 +19,7 @@ jobs:
       run: |
         cd extensions/labgraph_audiogen 
         python -m pip install --upgrade pip
-        pip install https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp310-cp310-linux_x86_64.whl\#sha256\=a7a49d459bf4862f64f7bc1a68beccf8881c2fa9f3e0569608e16ba6f85ebf7b
-        pip install https://download.pytorch.org/whl/cu118/torchaudio-2.0.2%2Bcu118-cp310-cp310-linux_x86_64.whl\#sha256\=26692645ea061a005c57ec581a2d0425210ac6ba9f923edf11cc9b0ef3a111e9
+        pip install torch torchvision torchaudio
         pip install -e .
         pip install pytest
 
