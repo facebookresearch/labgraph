@@ -9,6 +9,9 @@ setup(
     packages=["labgraph_audiogen"],
     install_requires=[
         "Click",
+        "torch>=2.0.0",
+        "torchaudio>=2.0.0",
+        "audiocraft"
     ],
     entry_points="""
         [console_scripts]
