@@ -11,14 +11,14 @@ DEFAULT_AUDIO_DURATION = 5
 @click.option('--duration', '-d', default=DEFAULT_AUDIO_DURATION, help='Duration of the generated audio.')
 @click.option('--model', '-m', default=DEFAULT_AUDIOGEN_MODEL, help='Name of the Audiocraft AudioGen model to use.')
 @click.option('--output', '-o', help='Name of the output file.')
-@click.option('--batch', type=click.Path(), help='File name for batch audio description.')
+@click.option('--batch', '-b', type=click.Path(), help='File name for batch audio description.')
 def parse_arguments(description, duration, model, output, batch):
     """
     Generates audio from description using Audiocraft's AudioGen.
     """
     if batch:
         try:
-            with open(batch, 'r') as f:
+            with open(batch, mode='r', encoding='utf-8') as f:
                 descriptions = [line.strip() for line in f.readlines()]
         except FileNotFoundError:
             print(f"File {batch} not found. Please check the file path and try again.")
@@ -26,7 +26,6 @@ def parse_arguments(description, duration, model, output, batch):
         if not description:
             raise click.BadParameter("Description argument is required when not using --batch.")
         descriptions = [' '.join(description)]
-    
     run_audio_generation(descriptions, duration, model, output)
 
 def run_audio_generation(descriptions, duration, model_name, output):
@@ -52,4 +51,5 @@ def run_audio_generation(descriptions, duration, model_name, output):
         # Will save under {output}{idx}.wav, with loudness normalization at -14 db LUFS.
         if not output:
             batch_output = descriptions[idx].replace(' ', '_')
-        audio_write(f'{batch_output}{idx}', one_wav.cpu(), model.sample_rate, strategy="loudness", loudness_compressor=True)
+        audio_write(f'{batch_output}{idx}', one_wav.cpu(),
+                    model.sample_rate, strategy="loudness", loudness_compressor=True)
