@@ -12,6 +12,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        labgraph_audiogen=labgraph_audiogen.main:main
+        labgraph_audiogen=labgraph_audiogen.main:parse_arguments
     ''',
 )
