@@ -3,27 +3,27 @@ name: AudioCraft Tests
 on: [push]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-          - name: Setup Python
-            uses: actions/setup-python@v2
-            with: 
-                python-version: '3.8'
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with: 
+          python-version: '3.8'
 
-          - name: Install dependencies
-            run: |
-                cd extensions/labgraph_audiogen
-                python -m pip install --upgrade pip
-                pip install -e .
-                pip install pytest
-                sudo apt-get install ffmpeg
+      - name: Install dependencies
+        run: |
+          cd extensions/labgraph_audiogen
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest
+          sudo apt-get install ffmpeg
 
-          - name: Run Tests
-            run: |
-                cd extensions/labgraph_audiogen
-                pytest -vvv
+      - name: Run Tests
+        run: |
+          cd extensions/labgraph_audiogen
+          pytest -vvv
