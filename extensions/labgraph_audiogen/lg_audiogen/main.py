@@ -1,13 +1,16 @@
 import click
 
 
+# All models supported by the lg_audiogen command
 SUPPORTED_MODELS = [
-    "audiogen-medium", 
+    "audiogen-medium",
     "musicgen-small",
     "musicgen-medium",
     "musicgen-melody",
     "musicgen-large"
 ]
+
+# Musicgen models supported by the lg_audiogen command
 MUSICGEN_MODELS = [
     "musicgen-small",
     "musicgen-medium",
@@ -19,34 +22,31 @@ MUSICGEN_MODELS = [
 def generate_text_music(descriptions, duration, output, musicgen_model):
     """
     Generate music from the given descritptions and save it on the outputs folder
-    
+
     @param descriptions: list of descriptions to generate music from
     @param duration: duration of the audio to generate
     @param output: name of the output file
     @param musicgen_model: name of the musicgen model to use
     """
     click.secho("\nStarting the music generation from the given descriptions", fg="bright_blue")
+
     # Import MusicGen, audio_write in this function to avoid time consuming imports
     from audiocraft.models import MusicGen
     from audiocraft.data.audio import audio_write
+
+    # Load the corresponding MusicGen model and set the generation parameters
     model = MusicGen.get_pretrained(f"facebook/{musicgen_model}")
     model.set_generation_params(duration=duration)
+
     filenames = []
+    # Validate the descriptions and filenames
     for i, description in enumerate(descriptions):
         if not output:
             filenames.append(f"{description.replace(' ', '_')}")
         else:
             filenames.append(output.replace(' ', '_') + str(i))
 
-        if len(description) > 100:
-            raise click.BadParameter(
-                click.style(
-                    f"Description too long for {description}, "
-                    "please use a description of lees than 100 characters",
-                    fg="bright_red"
-                )
-            )
-        if len(description)  == 0:
+        if len(description) == 0:
             raise click.BadParameter(
                 click.style(
                     f"Description too short for {description}, "
@@ -54,19 +54,25 @@ def generate_text_music(descriptions, duration, output, musicgen_model):
                     fg="bright_red"
                 )
             )
+
         click.secho(
-            f"Generating music from '{description}' written on the '{filenames[i]}.wav' file", 
+            f"Generating music from '{description}' written on the '{filenames[i]}.wav' file",
             fg="bright_green"
-            )
+        )
+
     try:
+        # Generate the music from the descriptions
         music = model.generate(descriptions, progress=True)
+        # Save the music on the outputs folder with the corresponding filename
         for i, generation in enumerate(music):
             audio_write(f"outputs/{filenames[i]}", generation.cpu(), model.sample_rate,
                         strategy="loudness", loudness_compressor=True)
+
             click.secho(
                 f"Audio generated and saved on the outputs/{filenames[i]}.wav file",
                 bg="green", fg="black"
             )
+
     except Exception as music_error:
         click.secho(f"Error generating music: {music_error}", bg="red", fg="white")
 
@@ -82,6 +88,7 @@ def parse_arguments(description, duration, model, output, batch):
     """
     A command-line command to facilitate the usage of the models of Audiocraft
     """
+    # Validate batch and description
     if batch:
         try:
             with open(batch, mode='r', encoding='utf-8') as f:
@@ -97,6 +104,8 @@ def parse_arguments(description, duration, model, output, batch):
                 )
             )
         descriptions = [' '.join(description)]
+
+    # Validate model and duration
     if not model:
         raise click.BadParameter(
             click.style(

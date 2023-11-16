@@ -11,7 +11,6 @@ setup(
     """,
     packages=["lg_audiogen"],
     install_requires=[
-        # Add versions
         "Click>=8.1.7",
         "torch>=2.1.0",
         "torchaudio>=2.1.0",
