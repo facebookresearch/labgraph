@@ -43,6 +43,22 @@ lg_audiogen 'dog barking'
 lg_audiogen -b 'batch.txt'
 ```
 
+### Batch File Format
+
+The batch file should contain one description per line. The descriptions should be in the same format as the descriptions used in the command-line interface.
+
+Example:
+
+*batch.txt*
+```txt
+Natural sounds of a rainforest
+Bird Chirping in the background 
+```
+
+### Samples
+
+[Google Drive Folder](https://drive.google.com/drive/folders/1kdWB1CBog4NGVJ7jWddKLtBAuPm3gwDq?usp=drive_link)
+
 ## O.S Support
 
 ```Tested on Ubuntu 22.04 (Jammy) LTS```
