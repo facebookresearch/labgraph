@@ -43,6 +43,10 @@ lg_audiogen 'dog barking'
 lg_audiogen -b 'batch.txt'
 ```
 
+## O.S Support
+
+```Tested on Ubuntu 22.04 (Jammy) LTS```
+
 ## Error Handling
 
 If the batch file is not found, a notable error message will be presented. Moreover, if a description is not provided when not using a batch file, a misusage error will be raised.
