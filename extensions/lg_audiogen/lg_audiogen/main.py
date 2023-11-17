@@ -32,12 +32,12 @@ def run_audio_generation(descriptions, duration, model_name, output):
     """
     Load Audiocraft's AudioGen model and generate audio from the description.
 
-    :param descriptions: The parsed arguments.
-    :param duration: Duration of the generated audio.
-    :param model_name: Name of the Audiocraft AudioGen model to use.
-    :param output: Name of the output file.
+    @param descriptions: The parsed arguments.
+    @param duration: Duration of the generated audio.
+    @param model_name: Name of the Audiocraft AudioGen model to use.
+    @param output: Name of the output file.
     """
-    print(f"Running labgraph_audiogen with descriptions: {descriptions}")
+    print(f"Running lg_audiogen with descriptions: {descriptions}")
 
     # Load Audiocraft's AudioGen model and set generation params.
     model = AudioGen.get_pretrained(model_name)

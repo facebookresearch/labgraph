@@ -21,7 +21,7 @@ pip install -e .
 
 ### Command-line interface
 
-The CLI usage for Audiogen is `labgraph_audiogen [OPTIONS] [DESCRIPTION]...`.
+The CLI usage for Audiogen is `lg_audiogen [OPTIONS] [DESCRIPTION]...`.
 
 ### Options
 
@@ -36,11 +36,11 @@ The CLI usage for Audiogen is `labgraph_audiogen [OPTIONS] [DESCRIPTION]...`.
 To generate an audio file you would use the following command:
 
 ```shell
-labgraph_audiogen -d 5 -m 'facebook/audiogen-medium' -o 'my_output' 'dog barking'
+lg_audiogen -d 5 -m 'facebook/audiogen-medium' -o 'my_output' 'dog barking'
 
-labgraph_audiogen 'dog barking'
+lg_audiogen 'dog barking'
 
-labgraph_audiogen -b 'batch.txt'
+lg_audiogen -b 'batch.txt'
 ```
 
 ## Error Handling

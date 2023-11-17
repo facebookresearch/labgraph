@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='labgraph_audiogen',
+    name='lg_audiogen',
     version='0.1',
     description="Audio generation on labgraph",
     packages=find_packages(),
@@ -12,6 +12,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        labgraph_audiogen=labgraph_audiogen.main:parse_arguments
+        lg_audiogen=lg_audiogen.main:parse_arguments
     ''',
 )
