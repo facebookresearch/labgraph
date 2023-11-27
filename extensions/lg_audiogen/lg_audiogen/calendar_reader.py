@@ -24,16 +24,18 @@ for component in gcal.walk():
         end_dt = component.get('dtend').dt
         duration = int((end_dt - start_dt).total_seconds() / 60)  # duration in minutes
 
-        # Calculate the recurrence rule, if any
+        # Builds up the missing events that are defined by the recurring rules
+        # Ex: Meetings that happen every M, W, F
         if 'rrule' in component:
+            # rr is a generator
             rr = rrulestr(component.get('rrule').to_ical().decode('utf-8'), dtstart=start_dt)
-            for dt in rr:
-                if not is_within_limit(dt):
-                    continue
-                dt_str = dt.strftime('%Y-%m-%d')
-                if dt_str not in calendar_events:
-                    calendar_events[dt_str] = []
-                calendar_events[dt_str].append({'name': summary, 'duration': duration})
+        for dt in rr:
+            if not is_within_limit(dt): # Year Out of bounds
+                break
+            dt_str = dt.strftime('%Y-%m-%d')
+            if dt_str not in calendar_events:
+                calendar_events[dt_str] = []
+            calendar_events[dt_str].append({'name': summary, 'duration': duration})
         else:
             dt_str = start_dt.strftime('%Y-%m-%d')
             if not is_within_limit(start_dt):
