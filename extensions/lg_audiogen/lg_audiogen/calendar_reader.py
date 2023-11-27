@@ -51,6 +51,24 @@ def calendar_to_dictionary(filepath):
                 populate_events(component, start_dt, calendar_events, summary, duration)
 
     return calendar_events
+
+def get_events_for_specific_date(calendar_events, specific_date_str):
+    # Assumes specific_date_str is in YYYY-MM-DD format
+    return calendar_events.get(specific_date_str, [])
+
+def get_events_between_dates(calendar_events, start_date_str, end_date_str):
+    # Assumes start_date_str and end_date_str are in YYYY-MM-DD format and start_date <= end_date
+    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+
+    events_between_dates = {}
+    current_date = start_date
+    while current_date <= end_date:
+        date_str = current_date.strftime('%Y-%m-%d')
+        if date_str in calendar_events:
+            events_between_dates[date_str] = calendar_events[date_str]
+        current_date += timedelta(days=1)
+    return events_between_dates
     
 calendar_events = calendar_to_dictionary('calendar.ics')
 for date, events in sorted(calendar_events.items()):
