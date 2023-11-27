@@ -36,6 +36,8 @@ for component in gcal.walk():
                 calendar_events[dt_str].append({'name': summary, 'duration': duration})
         else:
             dt_str = start_dt.strftime('%Y-%m-%d')
+            if not is_within_limit(start_dt):
+                continue
             if dt_str not in calendar_events:
                 calendar_events[dt_str] = []
             calendar_events[dt_str].append({'name': summary, 'duration': duration})
