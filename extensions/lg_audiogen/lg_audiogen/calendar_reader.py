@@ -1,5 +1,5 @@
 from icalendar import Calendar
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from dateutil.rrule import rrulestr
 
 # Inclusive [2021, 2021]
@@ -10,13 +10,36 @@ MAX_YEAR = MIN_YEAR
 def is_within_limit(dt):
     return MIN_YEAR <= dt.year <= MAX_YEAR
 
+def convert_to_utc(dt):
+    if isinstance(dt, datetime) and dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None:
+        # Convert offset-aware datetime to UTC
+        return dt.astimezone(timezone.utc)
+    return dt
+
+def datetime_to_timestamp(dt):
+    if isinstance(dt, datetime):
+        return dt.timestamp()
+    elif isinstance(dt, date):
+        return datetime.combine(dt, datetime.min.time(), tzinfo=timezone.utc).timestamp()
+    raise TypeError("Expected datetime.datetime or datetime.date")
+
 def populate_events(component, start_dt, calendar_events, summary, duration):
     if not is_within_limit(start_dt):
-        return 0 
-    dt_str = start_dt.strftime('%Y-%m-%d')
+        return 0
+
+    # Ensure dt is converted to UTC if it's a datetime with timezone info.
+    utc_start_dt = convert_to_utc(start_dt)
+    # Create timestamp from datetime or date (for sorting later)
+    timestamp = datetime_to_timestamp(utc_start_dt)
+
+    dt_str = start_dt.strftime('%Y-%m-%d') if isinstance(start_dt, date) \
+        else utc_start_dt.strftime('%Y-%m-%d')
+
     if dt_str not in calendar_events:
         calendar_events[dt_str] = []
-    calendar_events[dt_str].append({'name': summary, 'duration': duration})
+
+    event = {'name': summary, 'duration': duration, 'ts': timestamp}
+    calendar_events[dt_str].append(event)
     return 1
 
 def populate_recurring_events(component, start_dt, calendar_events, summary, duration):
@@ -54,7 +77,9 @@ def calendar_to_dictionary(filepath):
 
 def get_events_for_specific_date(calendar_events, specific_date_str):
     # Assumes specific_date_str is in YYYY-MM-DD format
-    return calendar_events.get(specific_date_str, [])
+    day_events = calendar_events.get(specific_date_str, [])
+    # Sort events by timestamp key 'ts' in ascending order
+    return sorted(day_events, key=lambda event: event['ts'])
 
 def get_events_between_dates(calendar_events, start_date_str, end_date_str):
     # Assumes start_date_str and end_date_str are in YYYY-MM-DD format and start_date <= end_date
@@ -66,7 +91,8 @@ def get_events_between_dates(calendar_events, start_date_str, end_date_str):
     while current_date <= end_date:
         date_str = current_date.strftime('%Y-%m-%d')
         if date_str in calendar_events:
-            events_between_dates[date_str] = calendar_events[date_str]
+            # Sort events for the current date by timestamp key 'ts' in ascending order
+            events_between_dates[date_str] = sorted(calendar_events[date_str], key=lambda event: event['ts'])
         current_date += timedelta(days=1)
     return events_between_dates
     
