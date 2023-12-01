@@ -1,22 +1,532 @@
 {
+    "meeting": [
+        "Low hum of projector",
+        "Shuffling of papers and notebooks",
+        "Soft taps of laptop keyboards",
+        "Muffled voices through conference room walls",
+        "Clear voice of a presenter",
+        "Opening and closing of a meeting room door",
+        "Quiet whispers as side conversations",
+        "Scribbling of pens on flipcharts"
+    ],
+    "classes": [
+        "Lecture voice echoing in a hall",
+        "Turning of textbook pages",
+        "Scratching of pens on paper during exams",
+        "Bubbling of a chemistry lab experiment",
+        "Clicks of a calculator",
+        "Debate and discussion amongst students",
+        "Laughter and chatter during break",
+        "Sound of a school bell indicating end of class"
+    ],
+    "swimming": [
+        "Splashes of water as swimmers dive in",
+        "Distant whistle of the lifeguard",
+        "Rhythmic movements in the water",
+        "Gurgling of water in the pool",
+        "Echoes of playful shouts in the swimming area",
+        "Snapping of swim caps",
+        "Flapping of flip-flops on wet tiles",
+        "Water cascading from a swimmer's body"
+    ],
+    "lunch": [
+        "Rustling of snack wrappers",
+        "Pop of a soda can opening",
+        "Biting into a crunchy apple",
+        "Laughter and chatter in the cafeteria",
+        "Ding of a microwave",
+        "Silverware clinking in a salad bowl",
+        "Soup slurping",
+        "Vending machine dispensing a snack"
+    ],
+    "yoga": [
+        "Soft instrumental music",
+        "Deep inhaling and exhaling",
+        "Stretching and rolling out a yoga mat",
+        "Quiet voice of instructor guiding the practice",
+        "Gentle taps of feet on the floor",
+        "Rustling of comfortable clothing",
+        "Sound of wind chimes from an open window",
+        "Peaceful silence held in meditation"
+    ],
+    "grocery": [
+        "Beep of the scanner at checkout",
+        "Crinkle of plastic grocery bags",
+        "Background music of the store",
+        "Wheels of a shopping cart rolling down aisles",
+        "Conversations about price checks",
+        "Thud of produce being weighed",
+        "Intercom announcements for sales",
+        "Refrigeration units humming in the frozen section"
+    ],
+    "gardening": [
+        "Snipping of pruning shears",
+        "Swoosh of watering from a hose",
+        "Rustle of plants and leaves",
+        "Thud of a shovel digging into earth",
+        "Chirping of birds nearby",
+        "Creaking of a wheelbarrow",
+        "Buzzing of bees at work",
+        "Patting of soil around a newly planted flower"
+    ],
+    "birthday": [
+        "Laughter and singing of Happy Birthday",
+        "Pop of balloons being inflated",
+        "Rustle of gift wrap",
+        "Crackling of candles being lit",
+        "Cheers and clapping after blowing out candles",
+        "Tinkle of ice cubes in party drinks",
+        "Crunch of chips and snacks",
+        "Thumping bass of celebratory music"
+    ],
+    "concert": [
+        "Roar of the crowd cheering",
+        "Amplified strumming of guitars",
+        "Powerful voice of the lead singer",
+        "Thudding bass vibrating the floor",
+        "Drum solos that resonate through the arena",
+        "Synthesizers adding electronic harmonies",
+        "Clapping along to the rhythm of the song",
+        "Encore chants filling the venue"
+    ],
+    "study": [
+        "Turning pages of a heavy textbook",
+        "Click-clack of a keyboard in a quiet room",
+        "Sighs of concentration and occasional frustration",
+        "Sipping of coffee or tea while pondering",
+        "Timer beeping at the end of a study session",
+        "Whispered readings of notes",
+        "Highlighters scribbling on key points",
+        "Silent ambiance of a library"
+    ],
+    "hiking": [
+        "Leaves crunching underfoot on the trail",
+        "Bird calls echoing through the trees",
+        "Streams trickling over rocks",
+        "Branches snapping as they are moved aside",
+        "Heavy breathing from the ascent",
+        "Wind whistling past mountain peaks",
+        "Zippers of backpacks being opened and closed",
+        "Distant thunder suggesting an approaching storm"
+    ],
+    "travel": [
+        "Airport announcements over the PA system",
+        "Luggage wheels rolling across the floor",
+        "Language chatter from international travelers",
+        "Airplane engine starting up",
+        "Train horn blaring as it arrives",
+        "Distant sounds of a city new to the traveler",
+        "Maps being unfolded and studied",
+        "Camera shutter clicking capturing memories"
+    ],
+    "cooking": [
+        "Chopping vegetables on a cutting board",
+        "Grease popping from a hot pan",
+        "Timer dinging when the oven is preheated",
+        "Blender whirring while making sauces",
+        "Cork squeaking out of a wine bottle",
+        "Faucet running to wash produce",
+        "Tin foil tearing for covering dishes",
+        "Spices being shaken into a pot"
+    ],
+    "festival": [
+        "Carnival music playing in the distance",
+        "Rides whirring and creaking",
+        "Children laughing and shouting with joy",
+        "Food vendors calling out specials",
+        "Balloons rubbing together and squeaking",
+        "Fireworks crackling and booming overhead",
+        "Drum beats from a live band",
+        "Crowds milling and conversing"
+    ],
+    "meditation": [
+        "Chime ringing to start the session",
+        "Gentle bubbling of a water feature",
+        "Soft rustle of meditation cushions",
+        "Steady breathing focused and deep",
+        "Whispers of mantras being repeated",
+        "Wind rustling leaves outside",
+        "Silence enveloping the room",
+        "Faint ting of a singing bowl"
+    ],
+    "party": [
+        "Upbeat music flooding the room",
+        "Laughter and lively conversations",
+        "Clinking of glasses in toasts",
+        "Heels clicking on the dance floor",
+        "Bottles opening and pouring drinks",
+        "Chips dipping into salsa",
+        "Balloons popping unexpectedly",
+        "Games and competitions stirring up excitement"
+    ],
+    "virtual": [
+        "Keyboard tapping during an online chat",
+        "Mouse clicking navigating a digital interface",
+        "Notification pings from incoming messages",
+        "Microphone catching intermittent sounds of breathing",
+        "Silent pauses during a video call",
+        "Earphones rubbing against fabric",
+        "Computer fan whirring quietly",
+        "Echo of a voice due to a bad connection"
+    ],
+    "clubbing": [
+        "Bass reverberating through the floor",
+        "Shouts and cheers to a DJ's beat drop",
+        "Glasses clinking at the bar",
+        "Heels stomping rhythmically on the dance floor",
+        "Securing of wristbands at the entrance",
+        "Stamps being pressed on hands",
+        "Doors opening and closing in VIP sections",
+        "Whistles and yells from the crowd"
+    ],
+    "stay": [
+        "Keys jingling as they unlock a hotel room",
+        "Luggage being rolled across a lobby",
+        "Pages of a book flipping in a quiet space",
+        "Intermittent sips of a hot beverage",
+        "Air conditioning starting up in the background",
+        "Curtains sliding on their rods",
+        "Remote control clicking as the television turns on",
+        "Faucet running water into a bath"
+    ],
+    "wedding": [
+        "Applause as the couple makes their entrance",
+        "Rice being thrown during the exit",
+        "Pop of a champagne cork during toasts",
+        "Tears being dabbed with tissues",
+        "Chairs scraping as guests move to dance",
+        "Camera shutters during the photo session",
+        "Zippers of dresses and the adjusting of suits",
+        "Laughter from shared memories and jokes"
+    ],
+    "brunch": [
+        "Froth hissing from an espresso machine",
+        "Sizzling from breakfast items on a grill",
+        "Juice being poured into glasses",
+        "Silverware tinking against mugs for attention",
+        "Eggshells cracking into a hot pan",
+        "Baskets of pastries being unwrapped",
+        "Spoon clinking inside a mixing bowl",
+        "Toast popping up from toasters"
+    ],
+    "expo": [
+        "Crowds murmuring at convention center",
+        "Scanner beeping over tickets and badges",
+        "Stalls being assembled and disassembled",
+        "Enthusiasts discussing over exhibited items",
+        "Presenters speaking through microphones",
+        "Demo products being tested and tapped",
+        "Rolling of promotional banners and signs",
+        "Carts carrying supplies bumping on the floor"
+    ],
+    "flight": [
+        "Cabin crew walking in aisles",
+        "Seatbelt clicking shut",
+        "Overhead compartments being opened and closed",
+        "Pilot announcements over the intercom",
+        "Beverage carts rattling down the aisle",
+        "Aircraft accelerating on the runway",
+        "Air vents being adjusted",
+        "Soft snores of a sleeping passenger"
+    ],
+    "interview": [
+        "Leather seats creaking in an office",
+        "Handshakes exchanging between participants",
+        "Writing on a notepad",
+        "Clothes rustling as candidates adjust in their seats",
+        "Doors opening and closing as people enter and leave",
+        "Coughs and clears of the throat nervously",
+        "Resume papers being shuffled and examined",
+        "Clock ticking, marking time passing"
+    ],
+    "seminar": [
+        "Audience applause after a speaker's point",
+        "Attendees murmuring in agreement or curiosity",
+        "Microphone feedback before adjustments",
+        "Presenters shuffling cue cards",
+        "Laser pointer clicking and pointing at slides",
+        "Markers squeaking on a whiteboard",
+        "Chairs sliding as participants lean forward",
+        "Water bottles being opened during breaks"
+    ],
+    "picnic": [
+        "Laughter and chatter in open fields",
+        "Cooler lids closing over ice and refreshments",
+        "Plastic utensils tapping on paper plates",
+        "Crunch of biting into fresh fruit",
+        "Kites whooshing in the wind",
+        "Dogs barking and playing",
+        "Blankets flapping before settling on the ground",
+        "Ice melting and clinking in sun-warmed glasses"
+    ],
+    "massage": [
+        "Ointment tubes unscrewing and squeezing",
+        "Gentle tapping of a masseuse's hands",
+        "Quiet whir of a massage chair",
+        "Towels being unfolded and draped",
+        "Oils being warmed and swirled in burners",
+        "Low sighs of relaxation from clients",
+        "Pillows being plumped",
+        "Water trickling from a zen fountain"
+    ],
+    "laundry": [
+        "Washing machine's rhythmic tumbling",
+        "Dryer sheets being pulled apart",
+        "Zippers clanking against the drum",
+        "Liquid detergent glugging into a cup",
+        "Clothes being folded on a hard surface",
+        "Iron hissing steam on fabric",
+        "Buttons rattling in the spin cycle",
+        "Hangers clicking as they're hung on a rod"
+    ],
+    "presentation": [
+        "Slide changes with a soft beep",
+        "Pointer tapping on a table for emphasis",
+        "Audience taking notes in hushed tones",
+        "Cables being connected for multimedia",
+        "Footsteps as the presenter paces",
+        "Questions being asked after the talk",
+        "Hands clapping at the presentation's conclusion",
+        "Breath being drawn in to calm nerves"
+    ],
+    "camping": [
+        "Tent fabric flapping in the breeze",
+        "Zipper of a sleeping bag joining",
+        "Wood being chopped for a fire",
+        "Marshmallows crackling in the flame",
+        "Tree branches snapping underfoot",
+        "Animal calls at night",
+        "Streams flowing gently in the background",
+        "Sleepy yawns in the crisp morning air"
+    ],
+    "errands": [
+        "Shopping list paper unfolding",
+        "Car keys jangling and igniting the engine",
+        "Self-checkout register giving instructions",
+        "Shopping carts being retrieved and returned",
+        "Automatic doors whooshing at entrances",
+        "Pen scribbling to check off items",
+        "Coins clinking as they're handed to cashiers",
+        "Plastic bags rustling with purchased goods"
+    ],
+    "tailgate": [
+        "Grill igniting with a woosh",
+        "Cans being opened with a fizz",
+        "Fans cheering for their team",
+        "Spatula scraping on a griddle",
+        "Football being caught and thrown",
+        "Coolers sliding open on truck beds",
+        "Team chants being bellowed out",
+        "Foldable chairs snapping into place"
+    ],
+    "demo": [
+        "Exclamations from onlookers at a surprising feature",
+        "Machinery whirring during a product test",
+        "Products being handled and tapped",
+        "Questions being asked by potential customers",
+        "Plastic protective film peeling away",
+        "Samples being distributed",
+        "Applause at the end of a successful demonstration",
+        "Pens scribbling notes or feedback"
+    ],
+    "class": [
+        "Students brainstorming in small groups",
+        "Pencils filling in multiple-choice bubbles",
+        "Footsteps of an instructor walking around",
+        "Backpacks zipping as classes end",
+        "Chairs screeching slightly against the floor",
+        "Projector fan blowing softly during a lecture",
+        "Desks being arranged for a group activity",
+        "Excited chatter as a classmate answers correctly"
+    ],
+    "break": [
+        "Steam hissing from a relaxing tea kettle",
+        "Keyboard keys being left idle",
+        "Contented sighs of stretching",
+        "Snack packages crinkling as they are opened",
+        "Laughter and banter in the break room",
+        "Clock ticking, counting down the break time",
+        "Sneakers scuffing on the floor during a quick walk",
+        "Soda fizzing as it's poured into a cup"
+    ],
+    "cleanup": [
+        "Brooms sweeping over a floor",
+        "Trash bags rustling as they're tied up",
+        "Spray bottles misting cleaners",
+        "Bins opening and closing for recycling",
+        "Rags swooshing over surfaces",
+        "Vacuums humming as they pick up debris",
+        "Windows squeaking from being wiped down",
+        "Objects being reorganized on a shelf"
+    ],
+    "repair": [
+        "Tools clanking in a toolbox",
+        "Drill whirring into wood or metal",
+        "Hammer pounding nails into place",
+        "Screws rattling in a jar",
+        "Parts being jostled as they're replaced",
+        "Tape being ripped and applied",
+        "Objects being tested after fixing",
+        "Sigh of satisfaction after a job well done"
+    ],
+    "nap": [
+        "Cloth rustling as one settles in",
+        "Fan whirling softly in the background",
+        "Curtains drawing to dim the room",
+        "Gentle snoring or breathing",
+        "Clock softly ticking away the minutes",
+        "Bed springs creaking slightly with movement",
+        "Soft murmur of daytime ambience",
+        "Alarm beeping to awaken from the rest"
+    ],
+    "read": [
+        "Pages turning slowly and deliberately",
+        "Occasional chuckles or gasps at a plot twist",
+        "Fingers tapping a rhythm on a book spine",
+        "Bookmarks sliding into place",
+        "Glasses being adjusted on the nose",
+        "Armchair creaking with each shift",
+        "Throat clearing before continuing to read aloud",
+        "Sudden silence as concentration deepens"
+    ],
+    "game": [
+        "Die clattering on a board",
+        "Cards being shuffled and dealt",
+        "Pieces being moved across the game board",
+        "Timer ticking down during a speed round",
+        "Cheering after a winning play",
+        "Groans of defeat or frustration",
+        "Strategic whispering among teammates",
+        "Chips being stacked or collected"
+    ],
+    "cook": [
+        "Knife dicing ingredients quickly",
+        "Dough being kneaded on a countertop",
+        "Pot lid rattling from steam",
+        "Vegetables being stirred in a sizzling pan",
+        "Oven door creaking open for inspection",
+        "Timer ringing to signal readiness",
+        "Herbs being chopped on a wooden board",
+        "Utensils being laid out for service"
+    ],
+    "drive": [
+        "Engine revving as the vehicle accelerates",
+        "Wind whooshing past open car windows",
+        "Seatbelts clicking into their holders",
+        "Turn signal ticking before a corner",
+        "Wiper blades swishing in the rain",
+        "Horn honking in a traffic jam",
+        "Tires crunching over a gravel road",
+        "GPS voice announcing upcoming directions"
+    ],
     "commute": [
-        "Sounds of cars honking",
-        "Buzz of a busy metro",
-        "Rhythmic chime of train tracks"
+        "Bus doors hissing open and closed",
+        "Bike bell dinging on a crowded path",
+        "Seats shuffling as people find their spots",
+        "Newspaper pages rustling during the read",
+        "Subway screeching to a halt at a station",
+        "Footsteps hurrying to catch public transport",
+        "Beverage containers being opened and sipped from",
+        "Cyclists pedaling and gears shifting"
     ],
-    "beach": [
-        "Sounds of waves hitting rocks",
-        "Seagulls in the background",
-        "Children playing in the sand"
+    "subway": [
+        "Train conductor announcing stations",
+        "Rails clanking beneath fast-moving cars",
+        "Turnstile clicking as it turns",
+        "Passengers chatting or dozing off",
+        "Card reader beeping as tickets are scanned",
+        "Sudden silence when a car goes underground",
+        "Energetic performers in the station",
+        "Doors sliding shut and warning chimes"
     ],
-    "workout": [
-        "Beats of high-energy music",
-        "Grunts and clanks of gym equipment",
-        "Breathless intensity of a sprint"
+    "cycle": [
+        "Pedals turning with a rhythmic cadence",
+        "Chain clinking as it moves the gears",
+        "Tires humming on smooth pavement",
+        "Breath puffing from exertion",
+        "Helmet strap clicking secure",
+        "Bike frame rattling on uneven surfaces",
+        "Air pump whooshing to inflate tires",
+        "Kickstand clanking as it's put down"
     ],
-    "dinner": [
-        "Clatter of cutlery on plates",
-        "Murmur of dinner conversation",
-        "Sizzle of food cooking"
+    "sail": [
+        "Sails flapping when catching the wind",
+        "Ropes creaking as they're pulled tight",
+        "Waves lapping against the hull",
+        "Wooden deck groaning with the swell",
+        "Seagulls calling out overhead",
+        "Flag whipping at the mast",
+        "Anchor dropping and chain rattling",
+        "Captain calling out directions"
+    ],
+    "walk": [
+        "Footsteps tapping on a sidewalk",
+        "Leaves crunching in a park",
+        "Birds chirping along a nature trail",
+        "Children laughing in nearby playgrounds",
+        "Gravel scattering on a path",
+        "Crosswalk signal beeping for pedestrians",
+        "Jingling of dog collars on a leash",
+        "Traffic passing on adjacent streets"
+    ],
+    "ferry": [
+        "Vessel's horn booming over the water",
+        "Ramp clanging as it lowers for vehicles",
+        "Waves splashing against the sides",
+        "Engines rumbling from below deck",
+        "Passengers' voices mingling on the open deck",
+        "Seating benches shifting slightly on the deck",
+        "Life jackets being adjusted with straps and buckles",
+        "Disembarkment bell signaling arrival"
+    ],
+    "taxi": [
+        "Radio dispatch voices crackling",
+        "Meter beeping as it's activated",
+        "Traffic honking heard through closed windows",
+        "Upholstery creaking with passenger movement",
+        "Driver and passenger exchanging pleasantries",
+        "Car slowing with the sound of brakes",
+        "Trunk popping open for luggage",
+        "Receipts printing for the fare"
+    ],
+    "trip": [
+        "Suitcases zipping and locks clicking",
+        "Maps folding and unfolding for navigation",
+        "Camera shutters snapping photos of sights",
+        "Vehicle doors thudding shut loaded with gear",
+        "Footsteps echoing in historic corridors",
+        "Local wildlife calls in natural reserves",
+        "Chatter of fellow travelers sharing experiences",
+        "Guidebook pages flipping in search of information"
+    ],
+    "vacation": [
+        "Resort pools splashing with joyful swimmers",
+        "Umbrellas flapping in a seaside breeze",
+        "Luggage wheels rolling across hotel lobbies",
+        "Distant laughter from late-night revelers",
+        "Island music floating from a beach bar",
+        "Boardwalk planks creaking under foot traffic",
+        "Ice clinking in a glass of a chilled beverage",
+        "Exchange of greetings in different languages"
+    ],
+    "run": [
+        "Sneakers thudding against pavement",
+        "Breathing quick and steady in rhythm",
+        "Heartbeat pulsing in ears",
+        "Clothing whispering with each stride",
+        "Water bottles sloshing mid-jog",
+        "Birds calling as dawn breaks",
+        "Timer beeping to signal lap completion",
+        "Encouragement shouted from a running buddy"
+    ],
+    "fitness": [
+        "Weights clinking on a rack after a set",
+        "Treadmills humming in a steady pace",
+        "Jump ropes slapping the ground quickly",
+        "Gym mats thumping from dynamic movements",
+        "Instructor's voice motivating the class",
+        "Balls bouncing during a sports practice",
+        "Swim caps gliding through pool water",
+        "Heavy bag absorbing punches and kicks"
     ]
 }
