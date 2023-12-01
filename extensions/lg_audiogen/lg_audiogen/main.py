@@ -4,6 +4,8 @@ import datetime
 from audiocraft.models import AudioGen
 from audiocraft.data.audio import audio_write
 from lg_audiogen.calendar_reader import calendar_to_dictionary, get_events_between_dates
+from lg_audiogen.gpt_utility import query_gpt
+from lg_audiogen.keyword_generator import get_prompts
 
 DEFAULT_AUDIOGEN_MODEL = 'facebook/audiogen-medium'
 DEFAULT_AUDIO_DURATION = 5
@@ -24,7 +26,7 @@ def parse_arguments(description, duration, model, output, batch, activities, gpt
     Generates audio from description using Audiocraft's AudioGen.
     """
     if activities:
-       handle_activities(activities, gpt, deterministic, dates)
+       descriptions, output = handle_activities(activities, gpt, deterministic, dates)
     elif batch:
         try:
             with open(batch, mode='r', encoding='utf-8') as f:
@@ -35,7 +37,7 @@ def parse_arguments(description, duration, model, output, batch, activities, gpt
         if not description:
             raise click.BadParameter("Description argument is required when not using --batch.")
         descriptions = [' '.join(description)]
-    #run_audio_generation(descriptions, duration, model, output)
+    run_audio_generation(descriptions, duration, model, output)
 
 def check_dates_format(dates):
     dates = dates.split(',')
@@ -54,10 +56,19 @@ def handle_activities(activities, gpt, deterministic, dates):
         calendar_events = calendar_to_dictionary(activities)
         # -1 trick to get the last element of the list (end date or single date)
         sorted_events = get_events_between_dates(calendar_events, dates[0], dates[-1])
-        print(sorted_events)
+        # build a list of event name strings if event has a name
+        activities = []
+        for each_date in sorted_events:
+            for each_event in sorted_events[each_date]:
+                if each_event['name']:
+                    activities.append(each_event['name'])
     else:
         activities = activities.split(',')
-        print(activities)
+    if gpt:
+        response = query_gpt(activities, deterministic)
+    else:
+        response = get_prompts(activities, deterministic)
+    return response, activities
 
 def run_audio_generation(descriptions, duration, model_name, output):
     """
@@ -76,11 +87,13 @@ def run_audio_generation(descriptions, duration, model_name, output):
 
     # Generate audio from the descriptions
     wav = model.generate(descriptions)
-    batch_output = output
+    batch_output = output if type(output) == str else ''
     # Save the generated audios.
     for idx, one_wav in enumerate(wav):
         # Will save under {output}{idx}.wav, with loudness normalization at -14 db LUFS.
         if not output:
             batch_output = descriptions[idx].replace(' ', '_')
+        if type(output) == list and len(output) == len(descriptions):
+            batch_output = output[idx]
         audio_write(f'{batch_output}{idx}', one_wav.cpu(),
                     model.sample_rate, strategy="loudness", loudness_compressor=True)
