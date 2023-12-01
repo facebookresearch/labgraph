@@ -1,5 +1,6 @@
 import os
 import json
+import random
 
 # This is the default keyword dictionary. It is a JSON file that maps keywords to prompts
 # The CLI will allow the user to input his own dictionary of keywords
@@ -14,12 +15,16 @@ except FileNotFoundError:
 except:
     raise Exception("Could not load keyword dictionary. Please check that the file exists.")
 
-def match_keyword(event_name):
-    keywords = PROMPT_KEYWORDS.keys()
-    for keyword in keywords:
-        if keyword.lower() in event_name.lower():
-            return keyword
-    return None
+# for each word in the event name, check if it matches a keyword
+# if it does, add one of the random prompt to the list to return
+def get_prompts(event_name):
+    event_name = event_name.lower()
+    prompt = []
+    for word in event_name.split():
+        if word in PROMPT_KEYWORDS:
+            prompt.append(random.choice(PROMPT_KEYWORDS[word]))
+    return prompt
+
 
 events = [
     {"name": "Commute to work", "duration": 30},
@@ -27,8 +32,10 @@ events = [
 ]
 
 for event in events:
-    keyword = match_keyword(event["name"])
-    if keyword:
-        print(f"Event {event['name']} matches keyword {keyword}.")
+    prompts = get_prompts(event["name"])
+    if prompts:
+        print(f"Event {event['name']} matches:")
+        for p in prompts:
+            print(f"{p}\n")
     else:
         print(f"Event {event['name']} does not match any keywords.")
