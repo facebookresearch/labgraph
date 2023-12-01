@@ -1,6 +1,6 @@
 # Audiogen
 
-Audiogen is a Python command-line tool that uses models from Audiocraft's AudioGen to generate audio from specified descriptions. This tool can generate a single piece of audio based on a specific description or multiple pieces of audio based on a batch file containing multiple descriptions.
+Audiogen is a Python command-line tool that uses models from Audiocraft's AudioGen to generate audio from specified descriptions. This tool can generate a single piece of audio based on a specific description, multiple pieces of audio based on a batch file containing multiple descriptions, or based on activities from a string or an `.ics` calendar file.
 
 ## Features
 
@@ -8,6 +8,10 @@ Audiogen is a Python command-line tool that uses models from Audiocraft's AudioG
 * Ability to generate audio based on a batch file.
 * Ability to specify the model to be used for the audio generation.
 * Ability to set the output file name.
+* Ability to generate audio based on daily acitivites from a comma-separated string or a `.ics` calendar file.
+* Ability to integrate with GPT models to enhance activity descriptions.
+* Ability to enable pseudo-deterministic activity prompts
+* Ability to specify a date or a range of dates to get events from the `.ics` calendar file. 
 
 ## Setup
 
@@ -30,6 +34,10 @@ The CLI usage for Audiogen is `lg_audiogen [OPTIONS] [DESCRIPTION]...`.
 * `model, -m`: name of the Audiocraft AudioGen model to use, default is 'facebook/audiogen-medium'.
 * `output, -o`: name of the output file.
 * `batch`: file name for batch audio description.
+* `activities, -a`: comma-separated string or `.ics` calendar file containing events.
+* `gpt`: New: flag to enable GPT model for activities description enhancement.
+* `deterministic`: New: flag to enable deterministic generation.
+* `dates, -dt`: New: date in the format 'YYYY-MM-DD' or as a range 'YYYY-MM-DD,YYYY-MM-DD'.
 
 ### Example
 
@@ -41,7 +49,13 @@ lg_audiogen -d 5 -m 'facebook/audiogen-medium' -o 'my_output' 'dog barking'
 lg_audiogen 'dog barking'
 
 lg_audiogen -b 'batch.txt'
+
+lg_audiogen -a 'meeting with nathan, lunch with friends' -gpt -deterministic
+
+lg_audiogen -a "calendar.ics" -gpt -dt '2023-11-29,2023-12-01'
 ```
+
+**Note:** for GPT usage, create a `.env` file with the same format as the `sample.env` file provided.
 
 ### Batch File Format
 
