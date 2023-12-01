@@ -1,0 +1,31 @@
+name: AudioGen Tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        cd extensions/lg_audiogen 
+        python -m pip install --upgrade pip
+        sudo apt-get install ffmpeg
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+        pip install --pre xformers
+        pip install -e .
+        pip install pytest
+
+    - name: Run tests
+      run: |
+        cd extensions/lg_audiogen
+        pytest -vvv
