@@ -15,7 +15,8 @@ setup(
         "torchaudio>=2.1.0",
         "audiocraft==1.1.0",
         "icalendar==5.0.11",
-        "openai==1.3.6"
+        "openai==1.3.6",
+        "python-dotenv==1.0.0"
     ],
     entry_points='''
         [console_scripts]
