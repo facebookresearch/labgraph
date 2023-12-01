@@ -22,6 +22,14 @@ except:
 # if it does, add one of the random prompt to the list to return
 # deterministic=True will make the random choice deterministic
 def get_prompts(event_names, deterministic=False):
+    """
+    Creates a prompt for each event name by matching keywords
+    in the event name to prompts in the keyword dictionary.
+    
+    @param event_names: A list of event names
+    @param deterministic: A boolean to make the random choice deterministic
+    @return: A list of prompts for each event name
+    """
     if PROMPT_KEYWORDS and len(PROMPT_KEYWORDS) == 0:
         raise Exception("Keyword dictionary is empty. Please check that the file is not empty.")
     full_prompt = []

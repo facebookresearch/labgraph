@@ -40,6 +40,13 @@ def parse_arguments(description, duration, model, output, batch, activities, gpt
     run_audio_generation(descriptions, duration, model, output)
 
 def check_dates_format(dates):
+    """
+    Checks if the dates are in the correct format.
+    
+    @param dates: The dates to be checked. If a string is provided, it will be split by commas.
+    
+    @return: A list of dates.
+    """
     dates = dates.split(',')
     if len(dates) > 2:
         raise click.BadParameter("Dates must be in the format \'YYYY-MM-DD\' or as a range: \'YYYY-MM-DD,YYYY-MM-DD\'.")
@@ -51,6 +58,16 @@ def check_dates_format(dates):
     return dates
 
 def handle_activities(activities, gpt, deterministic, dates):
+    """
+    Handles the activities based on the given parameters.
+
+    @param activities: The activities to be handled. If a string is provided, it will be split by commas.
+    @param gpt: Flag indicating whether to use GPT for generating response.
+    @param deterministic: Flag indicating whether to use deterministic mode for GPT response generation.
+    @param dates: The dates to filter the activities. If a string is provided, it should be in the format 'YYYY-MM-DD'.
+
+    @return: A tuple containing the response generated and the list of activities.
+    """
     if activities.endswith('.ics'):
         dates = check_dates_format(dates)
         calendar_events = calendar_to_dictionary(activities)
