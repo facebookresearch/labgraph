@@ -85,6 +85,7 @@ def handle_activities(activities, gpt, deterministic, dates):
         response = query_gpt(activities, deterministic)
     else:
         response = get_prompts(activities, deterministic)
+    activities = [activity.replace(' ', '_') for activity in activities]
     return response, activities
 
 def run_audio_generation(descriptions, duration, model_name, output):
