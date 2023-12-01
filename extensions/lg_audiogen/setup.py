@@ -14,6 +14,7 @@ setup(
         "torch>=2.1.0",
         "torchaudio>=2.1.0",
         "audiocraft==1.1.0",
+        "openai==1.3.6"
     ],
     entry_points='''
         [console_scripts]
