@@ -7,6 +7,9 @@ import random
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 KEYWORD_DICT =  "/static_inputs/prompt_keywords.json"
 
+# SEED for Deterministic Randomness
+DEFAULT_SEED = 42
+
 # First Try to load KEYWORD_DICT, if it doesn't work, try with THIS_DIR + KEYWORD_DICT
 try:
     PROMPT_KEYWORDS = json.load(open(KEYWORD_DICT))
@@ -17,9 +20,11 @@ except:
 
 # for each word in the event name, check if it matches a keyword
 # if it does, add one of the random prompt to the list to return
-def get_prompts(event_name):
+# deterministic=True will make the random choice deterministic
+def get_prompts(event_name, deterministic=False):
     event_name = event_name.lower()
     prompt = []
+    random.seed(DEFAULT_SEED if deterministic else None)
     for word in event_name.split():
         if word in PROMPT_KEYWORDS:
             prompt.append(random.choice(PROMPT_KEYWORDS[word]))
