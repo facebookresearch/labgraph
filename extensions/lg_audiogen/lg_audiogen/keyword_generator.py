@@ -21,26 +21,22 @@ except:
 # for each word in the event name, check if it matches a keyword
 # if it does, add one of the random prompt to the list to return
 # deterministic=True will make the random choice deterministic
-def get_prompts(event_name, deterministic=False):
-    event_name = event_name.lower()
-    prompt = []
-    random.seed(DEFAULT_SEED if deterministic else None)
-    for word in event_name.split():
-        if word in PROMPT_KEYWORDS:
-            prompt.append(random.choice(PROMPT_KEYWORDS[word]))
-    return prompt
-
-
-events = [
-    {"name": "Commute to work", "duration": 30},
-    {"name": "Going to the beach", "duration": 120},
-]
-
-for event in events:
-    prompts = get_prompts(event["name"])
-    if prompts:
-        print(f"Event {event['name']} matches:")
-        for p in prompts:
-            print(f"{p}\n")
-    else:
-        print(f"Event {event['name']} does not match any keywords.")
+def get_prompts(event_names, deterministic=False):
+    if PROMPT_KEYWORDS and len(PROMPT_KEYWORDS) == 0:
+        raise Exception("Keyword dictionary is empty. Please check that the file is not empty.")
+    full_prompt = []
+    for event in event_names:
+        event_name = event.lower()
+        prompt = []
+        random.seed(DEFAULT_SEED if deterministic else None)
+        for word in event.split():
+            if word in PROMPT_KEYWORDS:
+                prompt.append(random.choice(PROMPT_KEYWORDS[word]))
+        if len(prompt) > 1:
+            prompt = ' combined with '.join(prompt)
+            full_prompt.append(prompt)
+        elif len(prompt) == 1:
+            full_prompt.append(prompt[0])
+        else:
+            full_prompt.append(event_name) # if no prompt is found, just use the event name
+    return full_prompt
