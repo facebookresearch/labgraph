@@ -8,7 +8,7 @@ Audiogen is a Python command-line tool that uses models from Audiocraft's AudioG
 * Ability to generate audio based on a batch file.
 * Ability to specify the model to be used for the audio generation.
 * Ability to set the output file name.
-* Ability to generate audio based on daily acitivites from a comma-separated string or a `.ics` calendar file.
+* Ability to generate audio based on daily activities from a comma-separated string or a `.ics` calendar file.
 * Ability to integrate with GPT models to enhance activity descriptions.
 * Ability to enable pseudo-deterministic activity prompts
 * Ability to specify a date or a range of dates to get events from the `.ics` calendar file. 
