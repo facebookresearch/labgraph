@@ -12,7 +12,7 @@ def query_gpt(event_list, deterministic=False):
         messages=[
             {
                 "role": "system",
-                "content": "Creative and deterministic assistant in generating sound prompts from a given list of events. Ignore proper names and focus on defined sounds."
+                "content": "Creative and deterministic assistant in generating sound prompts from a given list of events. Ignore proper names and focus on defined sounds. Give a list output of the same length as the input."
             },
             {
                 "role": "user",
@@ -30,6 +30,14 @@ def query_gpt(event_list, deterministic=False):
                 "role": "assistant",
                 "content": "[\"Keyboard typing and mouse clicks\", \"Laughter and the clinking of glasses, crunching of chips\"]"
             },
+            {
+                "role": "user",
+                "content": "[\"Meeting with Joe\"]"
+            },
+            {
+                "role": "assistant",
+                "content": "[\"Keyboard typing and mouse clicks with chatter in the background\"]"
+            },
         ],
         temperature=0 if deterministic else 1,
         max_tokens=1101,
@@ -39,7 +47,3 @@ def query_gpt(event_list, deterministic=False):
     )
     response = json.loads(response.choices[0].message.content)
     return response
-
-event_list = ["Commute to work", "Walk by the beach"]
-response = query_gpt(event_list)
-print(response)

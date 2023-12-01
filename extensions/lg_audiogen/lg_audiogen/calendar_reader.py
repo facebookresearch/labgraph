@@ -95,11 +95,3 @@ def get_events_between_dates(calendar_events, start_date_str, end_date_str):
             events_between_dates[date_str] = sorted(calendar_events[date_str], key=lambda event: event['ts'])
         current_date += timedelta(days=1)
     return events_between_dates
-    
-calendar_events = calendar_to_dictionary('calendar.ics')
-for date, events in sorted(calendar_events.items()):
-    print(f"Date: {date}")
-    for event in events:
-        print(f"  Event: {event['name']}")
-        print(f"  Duration: {event['duration']} minutes")
-    print()
