@@ -1,10 +1,18 @@
+import os
+import json
 
-PROMPT_KEYWORDS = {
-    "commute": ["Sounds of cars honking", "Buzz of a busy metro", "Rhythmic chime of train tracks"],
-    "beach": ["Sounds of waves hitting rocks", "Seagulls in the background", "Children playing in the sand"],
-    "workout": ["Beats of high-energy music", "Grunts and clanks of gym equipment", "Breathless intensity of a sprint"],
-    "dinner": ["Clatter of cutlery on plates", "Murmur of dinner conversation", "Sizzle of food cooking"],
-}
+# This is the default keyword dictionary. It is a JSON file that maps keywords to prompts
+# The CLI will allow the user to input his own dictionary of keywords
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+KEYWORD_DICT =  "/static_inputs/prompt_keywords.json"
+
+# First Try to load KEYWORD_DICT, if it doesn't work, try with THIS_DIR + KEYWORD_DICT
+try:
+    PROMPT_KEYWORDS = json.load(open(KEYWORD_DICT))
+except FileNotFoundError:
+    PROMPT_KEYWORDS = json.load(open(THIS_DIR + KEYWORD_DICT))
+except:
+    raise Exception("Could not load keyword dictionary. Please check that the file exists.")
 
 def match_keyword(event_name):
     keywords = PROMPT_KEYWORDS.keys()
@@ -12,7 +20,6 @@ def match_keyword(event_name):
         if keyword.lower() in event_name.lower():
             return keyword
     return None
-
 
 events = [
     {"name": "Commute to work", "duration": 30},
